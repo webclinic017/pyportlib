@@ -9,7 +9,6 @@ class TransactionManager(object):
     ACCOUNTS_DIRECTORY = "client_data/accounts/"
 
     def __init__(self, account):
-
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
         self.filename = f"{self.account}_transactions.csv"
@@ -19,7 +18,6 @@ class TransactionManager(object):
         return self.name
 
     def fetch(self) -> pd.DataFrame:
-
         if check_file(self.directory, self.filename):
             trx = pd.read_csv(f"{self.directory}/{self.filename}")
             try:
@@ -29,7 +27,7 @@ class TransactionManager(object):
             finally:
                 if check_csv(trx, Transaction.TRANSACTIONS_INFO):
                     trx.set_index('Date', inplace=True)
-                    trx.index.name = 'Date'
+                    trx.index.NAME = 'Date'
                     return trx
                 else:
                     raise KeyError("transactions csv file has wrong format")
@@ -43,13 +41,11 @@ class TransactionManager(object):
             return empty_transactions
 
     def write(self) -> None:
-
         self.transactions.index.name = 'Date'
         self.transactions.to_csv(f"{self.directory}/{self.filename}")
         print('transactions file updated')
 
     def add(self, transaction: Transaction) -> None:
-
         new = transaction.get()
         self.transactions = pd.concat([self.transactions, new])
 
@@ -62,16 +58,13 @@ class TransactionManager(object):
         print(f'{transaction} added to account: {self.account}')
 
     def all_tickers(self) -> list:
-
         tickers = list(set(self.transactions.Ticker))
         return tickers
 
     def live_tickers(self) -> list:
-
         live_tickers = self.transactions.groupby('Ticker').sum()
         live_tickers = live_tickers.loc[live_tickers.Quantity > 0]
         return list(live_tickers.index)
 
     def total_fees(self) -> float:
-
         return self.transactions.Fees.sum()

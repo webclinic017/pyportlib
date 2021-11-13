@@ -10,14 +10,14 @@ class AlphaVantageConnection(object):
     STATEMENT_DIRECTORY = 'client_data/data/statements'
     PRICES_DIRECTORY = 'client_data/data/prices'
     FILE_PREFIX = 'AV'
-    name = 'AlphaVantage'
+    NAME = 'AlphaVantage'
     URL = 'https://www.alphavantage.co/query?'
 
     def __init__(self):
-        self.api_key = fetch_key(self.name)
+        self.api_key = fetch_key(self.NAME)
 
     def __repr__(self):
-        return f"{self.name} API Connection"
+        return f"{self.NAME} API Connection"
 
     def get_prices(self, ticker: str,
                    start: datetime,
