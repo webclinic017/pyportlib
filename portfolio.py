@@ -23,7 +23,7 @@ class Portfolio(object):
         tickers = self.transaction_manager.live_tickers()
         for ticker in tickers:
             self.positions[ticker] = Position(ticker)
-            print(f'{ticker} loaded')
 
-        print(f'portfolio {self.account} loaded')
+
+        print(f'positions for {self.account} loaded')
 

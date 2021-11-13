@@ -2,6 +2,7 @@ from datetime import datetime
 import pandas as pd
 import requests
 
+from data_sources.av_request_manager import request_limit
 from utils.config_utils import fetch_key
 from utils.files_utils import check_file
 
@@ -12,9 +13,12 @@ class AlphaVantageConnection(object):
     FILE_PREFIX = 'AV'
     NAME = 'AlphaVantage'
     URL = 'https://www.alphavantage.co/query?'
+    MAX_RPM = 5
 
     def __init__(self):
         self.api_key = fetch_key(self.NAME)
+        self.rpm = 0
+        self.requests = {}
 
     def __repr__(self):
         return f"{self.NAME} API Connection"
@@ -39,13 +43,14 @@ class AlphaVantageConnection(object):
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={ticker}&outputsize=full&apikey={self.api_key}"
 
         request = requests.get(request_url)
+        request_limit()
         data = request.json()
         metadata = data.get('Meta Data')
         data = data.get('Time Series (Daily)')
         # data = pd.DataFrame.from_dict(data, orient='index')
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
-        if not len(data) or request.status_code != 200:
+        if data is None or request.status_code != 200:
             return pd.DataFrame()
 
         df = pd.DataFrame.from_dict(data, orient='index')

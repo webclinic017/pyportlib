@@ -27,7 +27,7 @@ class TransactionManager(object):
             finally:
                 if check_csv(trx, Transaction.TRANSACTIONS_INFO):
                     trx.set_index('Date', inplace=True)
-                    trx.index.NAME = 'Date'
+                    trx.index.name = 'Date'
                     return trx
                 else:
                     raise KeyError("transactions csv file has wrong format")
@@ -58,12 +58,18 @@ class TransactionManager(object):
         print(f'{transaction} added to account: {self.account}')
 
     def all_tickers(self) -> list:
-        tickers = list(set(self.transactions.Ticker))
+        try:
+            tickers = list(set(self.transactions.Ticker))
+        except AttributeError:
+            tickers = []
         return tickers
 
     def live_tickers(self) -> list:
         live_tickers = self.transactions.groupby('Ticker').sum()
-        live_tickers = live_tickers.loc[live_tickers.Quantity > 0]
+        try:
+            live_tickers = live_tickers.loc[live_tickers.Quantity > 0]
+        except AttributeError:
+            return []
         return list(live_tickers.index)
 
     def total_fees(self) -> float:
