@@ -6,7 +6,7 @@ from utils.config_utils import fetch_key
 from utils.files_utils import check_file
 
 
-class APIConnection(object):
+class SimFinConnection(object):
     STATEMENT_DIRECTORY = 'client_data/data/statements'
     PRICES_DIRECTORY = 'client_data/data/prices'
 

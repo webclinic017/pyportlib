@@ -9,7 +9,7 @@ class TransactionManager(object):
     ACCOUNTS_DIRECTORY = "client_data/accounts/"
 
     def __init__(self, account):
-        
+
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
         self.filename = f"{self.account}_transactions.csv"

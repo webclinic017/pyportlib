@@ -8,14 +8,15 @@ class Transaction(object):
     name = 'Transaction'
 
     def __init__(self,
-                 date: datetime,
+                 date: str,
                  ticker: str,
                  type: str,
                  quantity: int,
                  price: float,
                  fees: float,
                  currency: str):
-        self.date = date.strftime("%Y-%m-%d")
+
+        self.date = date
         self.ticker = ticker.upper()
         self.type = type.title()
         self.quantity = quantity
@@ -43,7 +44,11 @@ class Transaction(object):
         currencies = ['USD', 'CAD', 'EUR', 'GBP']
         condition2 = self.currency in currencies
 
+        condition3 = len(self.date) == 10
+
         if not condition1:
             raise ValueError(f'transaction type {self.type} is invalid, must be in {types}')
         if not condition2:
             raise ValueError(f'transaction currency {self.type} is invalid, must be in {currencies}')
+        if not condition3:
+            raise ValueError(f'transaction date {self.date} is invalid, must be in YYYY-mm-dd format')

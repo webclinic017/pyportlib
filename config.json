@@ -1,4 +1,9 @@
 {
-  "api": {"api_key" : "iPRrXC0W6Ar2TFb8dpWehXy79E9wtldG"
+  "api": {
+    "api_key": {
+      "api_key": {
+        "SimFin": "iPRrXC0W6Ar2TFb8dpWehXy79E9wtldG"
+      }
+    }
   }
-}
+  }
