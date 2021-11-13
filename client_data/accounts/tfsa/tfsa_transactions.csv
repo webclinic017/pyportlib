@@ -1,4 +1,2 @@
 Date,Ticker,Type,Quantity,Price,Fees,Currency
 2021-11-12,AAPL,Buy,1.0,200.0,5.0,USD
-2021-10-10,AAPL,Buy,2.0,350.0,5.0,USD
-2021-10-10,AAPL,Buy,2,350.0,5,USD
