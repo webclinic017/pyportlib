@@ -8,8 +8,8 @@ class TransactionManager(object):
     name = "Transactions Manager"
     ACCOUNTS_DIRECTORY = "client_data/accounts/"
 
-    def __init__(self,
-                 account):
+    def __init__(self, account):
+        
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
         self.filename = f"{self.account}_transactions.csv"
@@ -19,7 +19,7 @@ class TransactionManager(object):
         return self.name
 
     def fetch(self) -> pd.DataFrame:
-        
+
         if check_file(self.directory, self.filename):
             trx = pd.read_csv(f"{self.directory}/{self.filename}")
             try:
