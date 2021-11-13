@@ -46,9 +46,13 @@ class Transaction(object):
 
         condition3 = len(self.date) == 10
 
+        condition4 = (self.quantity > 0 and self.type == 'Buy') or (self.quantity == 0 and self.type == 'Dividend') or (self.quantity < 0 and self.type == 'Sell')
+
         if not condition1:
             raise ValueError(f'transaction type {self.type} is invalid, must be in {types}')
         if not condition2:
             raise ValueError(f'transaction currency {self.type} is invalid, must be in {currencies}')
         if not condition3:
             raise ValueError(f'transaction date {self.date} is invalid, must be in YYYY-mm-dd format')
+        if not condition4:
+            raise ValueError(f'transaction type {self.type} and quantity {self.quantity} are invalid')
