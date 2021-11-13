@@ -41,7 +41,7 @@ class Transaction(object):
         types = ['Buy', 'Sell', 'Dividend']
         condition1 = self.type in types
 
-        currencies = ['USD', 'CAD', 'EUR', 'GBP']
+        currencies = ['USD', 'CAD']
         condition2 = self.currency in currencies
 
         condition3 = len(self.date) == 10

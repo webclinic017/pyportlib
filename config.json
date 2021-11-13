@@ -1,9 +1,12 @@
 {
   "api": {
-    "api_key": {
-      "api_key": {
-        "SimFin": "iPRrXC0W6Ar2TFb8dpWehXy79E9wtldG"
+    "api_keys": {
+        "SimFin": "iPRrXC0W6Ar2TFb8dpWehXy79E9wtldG",
+        "AlphaVantage": "QZNH103OFC75BZJQ"
       }
-    }
+    },
+  "datasource": {
+    "statements": "AlphaVantage",
+    "prices": "AlphaVantage"
   }
   }

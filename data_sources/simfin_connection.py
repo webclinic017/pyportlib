@@ -9,13 +9,15 @@ from utils.files_utils import check_file
 class SimFinConnection(object):
     STATEMENT_DIRECTORY = 'client_data/data/statements'
     PRICES_DIRECTORY = 'client_data/data/prices'
+    name = 'SimFin'
+    FILE_PREFIX = 'SF'
+    URL = "https://simfin.com/api/v2/companies/"
 
     def __init__(self):
-        self.api_key = fetch_key()
-        self.url = "https://simfin.com/api/v2/companies/"
+        self.api_key = fetch_key(self.name)
 
     def __repr__(self):
-        return "SimFin API Connection"
+        return f"{self.name} API Connection"
 
     def get_statements(self, ticker: str,
                        statement_type: str,
@@ -31,7 +33,7 @@ class SimFinConnection(object):
         :param read: attempt to read file from disk
         :return: DataFrame containing the periods specified for the year or empty DataFrame if no data found
         """
-        filename = f"{ticker}_{statement_type}_{''.join(periods)}_{''.join([str(y) for y in fiscal_years])}.csv"
+        filename = f"{self.FILE_PREFIX}_{ticker}_{statement_type}_{''.join(periods)}_{''.join([str(y) for y in fiscal_years])}.csv"
         directory = self.STATEMENT_DIRECTORY
         if read:
             if check_file(directory=directory, file=filename):
@@ -39,7 +41,7 @@ class SimFinConnection(object):
 
         columns = []
         output = []
-        request_url = f"{self.url}statements"
+        request_url = f"{self.URL}statements"
         for year in fiscal_years:
             for period in periods:
                 params = {"statement": statement_type,
@@ -69,7 +71,7 @@ class SimFinConnection(object):
 
         start = start.strftime("%Y-%m-%d")
         end = end.strftime("%Y-%m-%d")
-        filename = f"{ticker}_prices.csv"
+        filename = f"{self.FILE_PREFIX}_{ticker}_prices.csv"
         directory = self.PRICES_DIRECTORY
         if read:
             if check_file(directory=directory, file=filename):
@@ -79,7 +81,7 @@ class SimFinConnection(object):
 
         columns = []
         output = []
-        request_url = f"{self.url}prices"
+        request_url = f"{self.URL}prices"
 
         params = {"ticker": ticker,
                   "api-key": self.api_key}
@@ -93,9 +95,12 @@ class SimFinConnection(object):
             output += data['data']
 
         df = pd.DataFrame(output, columns=columns)
-        df.to_csv(f"{directory}/{filename}")
         df['Currency'] = currency
-        return df.loc[(df.Date >= start) & (df.Date <= end)]
+        df.drop(columns=['Dividend', 'Common Shares Outstanding', 'Adj. Close', 'SimFinId'], inplace=True)
+        df.set_index('Date', inplace=True)
+        df.index.name = 'Date'
+        df.to_csv(f"{directory}/{filename}")
+        return df.loc[(df.index >= start) & (df.index <= end)]
 
 
 if __name__ == '__main__':

@@ -1,14 +1,15 @@
+from datetime import datetime
+
+from data_sources.alphavantage_connection import AlphaVantageConnection
 from portfolio import Portfolio
-from transaction import Transaction
+from data_sources.simfin_connection import SimFinConnection
 
 ptf = Portfolio(account='tfsa')
 
-trx = Transaction(date='2021-10-10',
-                  ticker='AAPL',
-                  type='Buy',
-                  quantity=-2,
-                  price=350.0,
-                  fees=5,
-                  currency='USD')
+conn1 = AlphaVantageConnection()
+conn2 = SimFinConnection()
 
-ptf.transaction_manager.add(trx)
+start = datetime(2021, 10, 1)
+end = datetime.today()
+conn1.get_prices('AAPL', start=start, end=end)
+conn2.get_prices('AAPL', start=start, end=end)
