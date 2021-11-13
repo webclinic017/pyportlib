@@ -61,7 +61,7 @@ class TransactionManager(object):
         try:
             tickers = list(set(self.transactions.Ticker))
         except AttributeError:
-            tickers = []
+            return []
         return tickers
 
     def live_tickers(self) -> list:
@@ -74,3 +74,7 @@ class TransactionManager(object):
 
     def total_fees(self) -> float:
         return self.transactions.Fees.sum()
+
+    def summary(self):
+        tickers = self.all_tickers()
+        df = pd.DataFrame(index=tickers, columns=[])

@@ -37,12 +37,19 @@ class DataSourceManager(object):
         self._statements_data_source = statements
         return prices, statements
 
-    def prices(self,
-               ticker: str,
-               start: datetime,
-               end: datetime,
-               read: bool = True):
+    def prices_local(self,
+                     ticker: str,
+                     start: datetime,
+                     end: datetime,
+                     read: bool = True):
         return self._prices_data_source.get_prices(ticker=ticker, start=start, end=end, read=read)
+
+    def fx(self,
+           currency: str,
+           start: datetime,
+           end: datetime,
+           read: bool = True):
+        return self._prices_data_source.get_fx(currency=currency, start=start, end=end, read=read)
 
     def statements(self):
         raise NotImplemented

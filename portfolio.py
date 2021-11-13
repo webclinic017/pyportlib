@@ -22,14 +22,16 @@ class Portfolio(object):
         return self.positions.get(ticker)
 
     def load_positions(self):
-        tickers = self.transaction_manager.live_tickers()
+        tickers = self.transaction_manager.all_tickers()
         for ticker in tickers:
-            self.positions[ticker] = Position(ticker)
+            currency = 'CAD' if ticker[-4:] == '.TRT' else 'USD'
+            self.positions[ticker] = Position(ticker, currency=currency)
         print(f'positions for {self.account} loaded')
 
-    def fetch_prices(self, read: bool):
+    def load_prices(self, read: bool):
         start = datetime(1900, 1, 1)
         end = datetime.today()
         for pos in self.positions.keys():
-            self.get_position(pos).fetch_prices(start, end, read=read)
+            self.get_position(pos).load_prices_local(start, end, read=read)
+            self.get_position(pos).load_prices_cad(start, end, read=read)
 
