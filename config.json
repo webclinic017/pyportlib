@@ -1,5 +1,9 @@
 {
   "api": {
+    "max_rpm": {
+        "SimFin": 100,
+        "AlphaVantage": 5
+      },
     "api_keys": {
         "SimFin": "iPRrXC0W6Ar2TFb8dpWehXy79E9wtldG",
         "AlphaVantage": "QZNH103OFC75BZJQ"
@@ -9,4 +13,4 @@
     "statements": "AlphaVantage",
     "prices": "AlphaVantage"
   }
-  }
+}
