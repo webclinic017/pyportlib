@@ -1,0 +1,10 @@
+2021-11-14 14:32:12,521: INFO:positions for tfsa loaded:load_positions
+2021-11-14 14:32:14,486: INFO:AV request made for (datetime.datetime(2021, 11, 14, 14, 32, 14, 486611), 'fx'):request_limit
+2021-11-14 14:32:15,067: INFO:AV request made for (datetime.datetime(2021, 11, 14, 14, 32, 15, 67665), 'TCPC'):request_limit
+2021-11-14 14:32:15,087: INFO:TCPC loaded:load_prices
+2021-11-14 14:32:15,662: INFO:AV request made for (datetime.datetime(2021, 11, 14, 14, 32, 15, 662457), 'HTGC'):request_limit
+2021-11-14 14:32:15,682: INFO:HTGC loaded:load_prices
+2021-11-14 14:32:16,501: INFO:AV request made for (datetime.datetime(2021, 11, 14, 14, 32, 16, 501496), 'PPL.TRT'):request_limit
+2021-11-14 14:32:16,509: INFO:PPL.TRT loaded:load_prices
+2021-11-14 14:32:17,322: INFO:AV request made for (datetime.datetime(2021, 11, 14, 14, 32, 17, 322709), 'VO'):request_limit
+2021-11-14 14:32:17,322: INFO:waiting for api... 58 seconds before next request:request_limit

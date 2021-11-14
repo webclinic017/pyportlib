@@ -1,8 +1,7 @@
-from datetime import datetime
 import pandas as pd
 import requests
-
 from data_sources.av_request_manager import request_limit
+from utils import logger
 from utils.config_utils import fetch_key
 from utils.files_utils import check_file
 
@@ -26,18 +25,16 @@ class AlphaVantageConnection(object):
 
     def get_prices(self,
                    ticker: str,
-                   start: datetime,
-                   end: datetime,
                    read: bool = True) -> pd.DataFrame:
-        start = start.strftime("%Y-%m-%d")
-        end = end.strftime("%Y-%m-%d")
+
         filename = f"{self.FILE_PREFIX}_{ticker.replace('.TRT', '')}_prices.csv"
         directory = self.PRICES_DIRECTORY
+
         if read:
             if check_file(directory=directory, file=filename):
                 df = pd.read_csv(f"{directory}/{filename}")
-                # print(f"{ticker}: last date retrieved: {df.Date.max()}")
-                return df.loc[(df.Date >= start) & (df.Date <= end)].set_index('Date')
+                df = df.set_index('Date')
+                return df
 
         currency = 'CAD' if ticker[-4:] == '.TRT' else 'USD'
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={ticker}&outputsize=full&apikey={self.api_key}"
@@ -45,12 +42,11 @@ class AlphaVantageConnection(object):
         request = requests.get(request_url)
 
         data = request.json()
-        # metadata = data.get('Meta Data')
         data = data.get('Time Series (Daily)')
-        # data = pd.DataFrame.from_dict(data, orient='index')
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
+            logger.logging.error(f'api error, {currency} data not found')
             raise Exception(f'api error, {currency} data not found')
 
         df = pd.DataFrame.from_dict(data, orient='index')
@@ -60,34 +56,31 @@ class AlphaVantageConnection(object):
         df['Ticker'] = ticker
         df.to_csv(f"{directory}/{filename}")
         request_limit(ticker)
-        return df.loc[(df.index >= start) & (df.index <= end)]
+        return df
 
     def get_fx(self,
                currency: str,
-               start: datetime,
-               end: datetime,
                read: bool = True) -> pd.DataFrame:
-        start = start.strftime("%Y-%m-%d")
-        end = end.strftime("%Y-%m-%d")
+
         filename = f"{self.FILE_PREFIX}_{currency}CAD_fx.csv"
         directory = self.FX_DIRECTORY
+
         if read:
             if check_file(directory=directory, file=filename):
                 df = pd.read_csv(f"{directory}/{filename}")
-                # print(f"{currency}: last date retrieved: {df.Date.max()}")
-                return df.loc[(df.Date >= start) & (df.Date <= end)].set_index('Date')
+                df = df.set_index('Date')
+                return df
         pair = f"{currency}CAD"
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={pair}&outputsize=full&apikey={self.api_key}"
 
         request = requests.get(request_url)
 
         data = request.json()
-        # metadata = data.get('Meta Data')
         data = data.get('Time Series (Daily)')
-        # data = pd.DataFrame.from_dict(data, orient='index')
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
+            logger.logging.error(f'api error, {currency} data not found')
             raise Exception(f'api error, {currency} data not found')
 
         df = pd.DataFrame.from_dict(data, orient='index')
@@ -97,4 +90,4 @@ class AlphaVantageConnection(object):
 
         df.to_csv(f"{directory}/{filename}")
         request_limit('fx')
-        return df.loc[(df.index >= start) & (df.index <= end)]
+        return df

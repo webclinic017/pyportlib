@@ -39,21 +39,17 @@ class DataSourceManager(object):
 
     def prices_local(self,
                      ticker: str,
-                     start: datetime,
-                     end: datetime,
                      read: bool = True):
-        return self._prices_data_source.get_prices(ticker=ticker, start=start, end=end, read=read)
+        return self._prices_data_source.get_prices(ticker=ticker, read=read)
 
     def fx(self,
            currency: str,
-           start: datetime,
-           end: datetime,
            read: bool = True):
-        return self._prices_data_source.get_fx(currency=currency, start=start, end=end, read=read)
+        return self._prices_data_source.get_fx(currency=currency, read=read)
 
     def refresh_fx(self,
                    currency: str) -> None:
-        self._prices_data_source.get_fx(currency=currency, start=datetime(1999, 1, 1), end=datetime.today(), read=False)
+        self._prices_data_source.get_fx(currency=currency, read=False)
 
     def statements(self):
         raise NotImplemented
