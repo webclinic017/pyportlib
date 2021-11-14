@@ -28,10 +28,7 @@ class Position(object):
 
     def load_prices_cad(self,
                         start: datetime = datetime(1999, 1, 1),
-                        end: datetime = datetime.today(),
-                        read: bool = True):
-        if not read and self.currency != 'CAD':
-            self.connection.refresh_fx(self.currency)
+                        end: datetime = datetime.today()):
 
         if self.prices_local is None:
             raise AttributeError('load local prices before CAD prices')

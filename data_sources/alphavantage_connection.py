@@ -43,7 +43,7 @@ class AlphaVantageConnection(object):
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={ticker}&outputsize=full&apikey={self.api_key}"
 
         request = requests.get(request_url)
-        request_limit('prices')
+
         data = request.json()
         # metadata = data.get('Meta Data')
         data = data.get('Time Series (Daily)')
@@ -51,15 +51,15 @@ class AlphaVantageConnection(object):
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
-            return pd.DataFrame()
+            raise Exception(f'api error, {currency} data not found')
 
         df = pd.DataFrame.from_dict(data, orient='index')
         df.columns = columns
         df.index.name = 'Date'
         df['Currency'] = currency
         df['Ticker'] = ticker
-
         df.to_csv(f"{directory}/{filename}")
+        request_limit(ticker)
         return df.loc[(df.index >= start) & (df.index <= end)]
 
     def get_fx(self,
@@ -80,7 +80,7 @@ class AlphaVantageConnection(object):
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={pair}&outputsize=full&apikey={self.api_key}"
 
         request = requests.get(request_url)
-        request_limit('fx')
+
         data = request.json()
         # metadata = data.get('Meta Data')
         data = data.get('Time Series (Daily)')
@@ -88,7 +88,7 @@ class AlphaVantageConnection(object):
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
-            return pd.DataFrame()
+            raise Exception(f'api error, {currency} data not found')
 
         df = pd.DataFrame.from_dict(data, orient='index')
         df.columns = columns
@@ -96,4 +96,5 @@ class AlphaVantageConnection(object):
         df['Ticker'] = pair
 
         df.to_csv(f"{directory}/{filename}")
+        request_limit('fx')
         return df.loc[(df.index >= start) & (df.index <= end)]
