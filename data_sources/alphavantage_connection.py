@@ -46,8 +46,9 @@ class AlphaVantageConnection(object):
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
-            logger.logging.error(f'api error, {currency} data not found')
-            raise Exception(f'api error, {currency} data not found')
+            logger.logging.error(f'request limit reached ({ticker}), trying again')
+            request_limit(ticker, restarted=True)
+            return self.get_prices(ticker=ticker, read=read)
 
         df = pd.DataFrame.from_dict(data, orient='index')
         df.columns = columns
@@ -80,8 +81,9 @@ class AlphaVantageConnection(object):
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
-            logger.logging.error(f'api error, {currency} data not found')
-            raise Exception(f'api error, {currency} data not found')
+            logger.logging.error(f'request limit reached ({currency}), trying again')
+            request_limit(currency, restarted=True)
+            return self.get_fx(currency=currency, read=read)
 
         df = pd.DataFrame.from_dict(data, orient='index')
         df.columns = columns
