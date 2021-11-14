@@ -74,7 +74,6 @@ class TransactionManager(object):
 
     def total_fees(self) -> float:
         return self.transactions.Fees.sum()
-
-    def summary(self):
-        tickers = self.all_tickers()
-        df = pd.DataFrame(index=tickers, columns=[])
+    
+    def first_trx_date(self):
+        return self.transactions.idxmin()

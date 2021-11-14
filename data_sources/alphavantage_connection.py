@@ -36,16 +36,16 @@ class AlphaVantageConnection(object):
         if read:
             if check_file(directory=directory, file=filename):
                 df = pd.read_csv(f"{directory}/{filename}")
-                print(f"{ticker}: last date retrieved: {df.Date.max()}")
+                # print(f"{ticker}: last date retrieved: {df.Date.max()}")
                 return df.loc[(df.Date >= start) & (df.Date <= end)].set_index('Date')
 
         currency = 'CAD' if ticker[-4:] == '.TRT' else 'USD'
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={ticker}&outputsize=full&apikey={self.api_key}"
 
         request = requests.get(request_url)
-        request_limit()
+        request_limit('prices')
         data = request.json()
-        metadata = data.get('Meta Data')
+        # metadata = data.get('Meta Data')
         data = data.get('Time Series (Daily)')
         # data = pd.DataFrame.from_dict(data, orient='index')
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
@@ -74,15 +74,15 @@ class AlphaVantageConnection(object):
         if read:
             if check_file(directory=directory, file=filename):
                 df = pd.read_csv(f"{directory}/{filename}")
-                print(f"{currency}: last date retrieved: {df.Date.max()}")
+                # print(f"{currency}: last date retrieved: {df.Date.max()}")
                 return df.loc[(df.Date >= start) & (df.Date <= end)].set_index('Date')
         pair = f"{currency}CAD"
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={pair}&outputsize=full&apikey={self.api_key}"
 
         request = requests.get(request_url)
-        request_limit()
+        request_limit('fx')
         data = request.json()
-        metadata = data.get('Meta Data')
+        # metadata = data.get('Meta Data')
         data = data.get('Time Series (Daily)')
         # data = pd.DataFrame.from_dict(data, orient='index')
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
