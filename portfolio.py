@@ -54,4 +54,3 @@ class Portfolio(object):
             self.prices_df = df.dropna(how='all').sort_index()
             print(f'most recent data point: {self.prices_df.index.max()}')
         return self.prices_df
-
