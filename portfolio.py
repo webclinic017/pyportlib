@@ -10,11 +10,11 @@ class Portfolio(object):
     def __init__(self, account: str):
 
         self.account = account
-        self.transaction_manager = TransactionManager(account=self.account)
         self.positions = {}
+        self.connection = DataSourceManager()
+        self.transaction_manager = TransactionManager(account=self.account, connection=self.connection)
         self.load_positions()
         self.prices_df = pd.DataFrame()
-        self.connection = DataSourceManager()
 
     def __repr__(self):
         return self.account
@@ -26,7 +26,7 @@ class Portfolio(object):
         tickers = self.transaction_manager.all_tickers()
         for ticker in tickers:
             currency = 'CAD' if ticker[-4:] == '.TRT' else 'USD'
-            self.positions[ticker] = Position(ticker, currency=currency)
+            self.positions[ticker] = Position(ticker, currency=currency, connection=self.connection)
         logger.logging.info(f'positions for {self.account} loaded')
 
     def load_prices(self, read: bool):

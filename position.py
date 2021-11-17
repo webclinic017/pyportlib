@@ -5,10 +5,10 @@ from utils.dates_utils import get_market_days
 
 class Position(object):
 
-    def __init__(self, ticker: str, currency: str):
+    def __init__(self, ticker: str, currency: str, connection: DataSourceManager):
         self.ticker = ticker
         self.currency = currency
-        self.connection = DataSourceManager()
+        self.connection = connection
         self.prices_local = None
         self.prices_cad = None
 

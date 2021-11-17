@@ -1,3 +1,4 @@
+from data_sources.data_source_manager import DataSourceManager
 from transaction import Transaction
 from utils.df_utils import check_csv
 from utils.files_utils import check_file, check_dir, make_dir
@@ -8,11 +9,12 @@ class TransactionManager(object):
     name = "Transactions Manager"
     ACCOUNTS_DIRECTORY = "client_data/accounts/"
 
-    def __init__(self, account):
+    def __init__(self, account, connection: DataSourceManager):
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
         self.filename = f"{self.account}_transactions.csv"
         self.transactions = self.fetch()
+        self.connection = connection
 
     def __repr__(self):
         return self.name
@@ -77,3 +79,14 @@ class TransactionManager(object):
     
     def first_trx_date(self):
         return self.transactions.idxmin()
+
+    # FIXME compute cad when trx are fetched
+    def compute_wac(self):
+        tickers = self.live_tickers()
+        buys = self.transactions.loc[(self.transactions.Ticker.isin(tickers)) & (self.transactions.Type == 'Buy')]
+        fx = self.connection.fx(read=True, currency='USD')
+        fx = fx.loc[fx.index.isin(buys.index)]['Close']
+        for date in set(buys.index):
+            buys.loc[(buys.Currency == 'USD') & (buys.index == date), 'PriceCad'] = buys.loc[(buys.Currency == 'USD') & (buys.index == date), 'Price'] * fx.loc[date]
+        buys.loc[buys.Currency == 'CAD', 'PriceCad'] = buys.loc[buys.Currency == 'CAD', 'Price']
+        print('')
