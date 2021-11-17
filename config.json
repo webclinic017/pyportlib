@@ -5,8 +5,8 @@
         "AlphaVantage": 5
       },
     "api_keys": {
-        "SimFin": "iPRrXC0W6Ar2TFb8dpWehXy79E9wtldG",
-        "AlphaVantage": "QZNH103OFC75BZJQ"
+        "SimFin": "",
+        "AlphaVantage": ""
       }
     },
   "datasource": {
