@@ -1,9 +1,13 @@
 # PortfolioCore
 
-Python package used to build stock portfolios based on transaction data.
+Python package used to build equity portfolios based on transaction data. 
+Built around AlphaVantage API, but more data sources can be implemented
 
 ###  Planned Functionalities
-    - Portfolio analytics
     - Performance tracking
+    - Portfolio analytics
     - Quantitative research
+    - Portfolio Construction
     - Optimisation
+    - Backtesting
+    
