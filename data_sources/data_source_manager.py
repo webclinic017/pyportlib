@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from data_sources.alphavantage_connection import AlphaVantageConnection
 from data_sources.simfin_connection import SimFinConnection
-from utils.config_utils import fetch_data_sources
+from config.config_utils import fetch_data_sources
 
 
 class DataSourceManager(object):

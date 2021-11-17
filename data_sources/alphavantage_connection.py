@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from data_sources.av_request_manager import request_limit
 from utils import logger
-from utils.config_utils import fetch_key
+from config.config_utils import fetch_key
 from utils.files_utils import check_file
 
 

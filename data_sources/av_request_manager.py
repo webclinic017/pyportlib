@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from time import sleep
 from utils import logger
-from utils.config_utils import fetch_max_rpm
+from config.config_utils import fetch_max_rpm
 
 MAX_RPM = fetch_max_rpm('AlphaVantage')
 count = 0
