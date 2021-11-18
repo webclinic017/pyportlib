@@ -12,9 +12,7 @@ class Portfolio(object):
         self.account = account
         self.positions = {}
         self.connection = DataSourceManager()
-        self.transaction_manager = TransactionManager(account=self.account, connection=self.connection)
-        self.load_positions()
-        self.prices_df = pd.DataFrame()
+        self.transaction_manager = TransactionManager(account=self.account)
 
     def __repr__(self):
         return self.account
