@@ -1,3 +1,35 @@
-2021-11-17 23:20:06,530:INFO:positions for tfsa loaded:load_positions
-2021-11-17 23:20:06,531:INFO:no price data to read for HTGC, now fetching new data from api:read_prices
-2021-11-17 23:20:07,336:INFO:AV request made for HTGC at 2021-11-17 23:20:07.336766:request_limit_manager
+2021-11-18 10:51:48,962:INFO:positions for tfsa loaded: in load_positions
+2021-11-18 10:51:48,977:INFO:PPL.TRT loaded: in load_prices
+2021-11-18 10:51:48,991:INFO:VOOV loaded: in load_prices
+2021-11-18 10:51:49,002:INFO:NWH-UN.TRT loaded: in load_prices
+2021-11-18 10:51:49,014:INFO:KBWD loaded: in load_prices
+2021-11-18 10:51:49,028:INFO:XDV.TRT loaded: in load_prices
+2021-11-18 10:51:49,038:INFO:SCYX loaded: in load_prices
+2021-11-18 10:51:49,047:INFO:VBU.TRT loaded: in load_prices
+2021-11-18 10:51:49,060:INFO:HTGC loaded: in load_prices
+2021-11-18 10:51:49,070:INFO:VOO loaded: in load_prices
+2021-11-18 10:51:49,083:INFO:XIU.TRT loaded: in load_prices
+2021-11-18 10:51:49,097:INFO:MSFT loaded: in load_prices
+2021-11-18 10:51:49,109:INFO:VO loaded: in load_prices
+2021-11-18 10:51:49,124:INFO:CDZ.TRT loaded: in load_prices
+2021-11-18 10:51:49,134:INFO:VAB.TRT loaded: in load_prices
+2021-11-18 10:51:49,145:INFO:VSB.TRT loaded: in load_prices
+2021-11-18 10:51:49,159:INFO:TM loaded: in load_prices
+2021-11-18 10:51:49,170:INFO:VDY.TRT loaded: in load_prices
+2021-11-18 10:51:49,193:INFO:VB loaded: in load_prices
+2021-11-18 10:51:49,211:INFO:MFC.TRT loaded: in load_prices
+2021-11-18 10:51:49,221:INFO:ARKF loaded: in load_prices
+2021-11-18 10:51:49,232:INFO:LIT loaded: in load_prices
+2021-11-18 10:51:49,245:INFO:T.TRT loaded: in load_prices
+2021-11-18 10:51:49,259:INFO:BIP-UN.TRT loaded: in load_prices
+2021-11-18 10:51:49,282:INFO:TCPC loaded: in load_prices
+2021-11-18 10:51:49,313:INFO:MRK loaded: in load_prices
+2021-11-18 10:51:49,328:INFO:GRT-UN.TRT loaded: in load_prices
+2021-11-18 10:51:49,342:INFO:LQD loaded: in load_prices
+2021-11-18 10:51:49,355:INFO:SRU-UN.TRT loaded: in load_prices
+2021-11-18 10:51:49,367:INFO:AQN.TRT loaded: in load_prices
+2021-11-18 10:51:49,382:INFO:IBB loaded: in load_prices
+2021-11-18 10:51:49,389:INFO:PLTR loaded: in load_prices
+2021-11-18 10:51:49,403:INFO:NA.TRT loaded: in load_prices
+2021-11-18 10:51:49,417:INFO:SLV loaded: in load_prices
+2021-11-18 10:51:58,634:INFO:fx for tfsa loaded: in load_fx

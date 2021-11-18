@@ -13,7 +13,8 @@ class Position(object):
     def __repr__(self):
         return f"{self.ticker} - Equity"
 
-    def get_prices(self, start_date: datetime, end_date: datetime = None):
+    def get_prices(self, start_date: datetime = None, end_date: datetime = None):
         if self.prices is None:
-            self.prices = self.datareader.read_prices(ticker=self.ticker).loc[:, ['Close']].astype(float)
-        return self.prices.loc[start_date: end_date]
+            prices = self.datareader.read_prices(ticker=self.ticker).astype(float)
+            self.prices = prices.loc[end_date: start_date]
+        return self.prices

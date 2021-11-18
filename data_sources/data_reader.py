@@ -44,14 +44,14 @@ class DataReader():
             df = pd.read_csv(f"{dir}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
-            return df
+            return df[['Close']]
         else:
             logger.logging.info(f'no price data to read for {ticker}, now fetching new data from api')
             self.update_prices(ticker=ticker)
             return self.read_prices(ticker)
 
     def read_fx(self, currency: str):
-        dir = self._market_data_source.PRICES_DIRECTORY
+        dir = self._market_data_source.FX_DIRECTORY
         filename = f"{self._market_data_source.FILE_PREFIX}_{currency}CAD_fx.csv"
 
         if files_utils.check_file(directory=dir,
@@ -59,7 +59,7 @@ class DataReader():
             df = pd.read_csv(f"{dir}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
-            return df
+            return df[['Close']]
         else:
             logger.logging.info(f'no fx data to read for {currency}, now fetching new data from api')
             self.update_fx(currency=currency)
