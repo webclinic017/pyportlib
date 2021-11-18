@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Union, List
 from transaction import Transaction
 from utils import logger, files_utils, df_utils
