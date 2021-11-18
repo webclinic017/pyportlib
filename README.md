@@ -11,3 +11,4 @@ Built around AlphaVantage API, but more data sources can be implemented
     - Optimisation
     - Backtesting
     
+
