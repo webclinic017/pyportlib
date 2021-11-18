@@ -5,13 +5,16 @@ from utils import logger, files_utils
 import pandas as pd
 
 
-class DataReader():
+class DataReader(object):
     NAME = 'Data Reader'
 
     def __init__(self):
         _prices_data_source = None
         _statements_data_source = None
         self._set_sources()
+
+    def __repr__(self):
+        return self.NAME
 
     def _set_sources(self) -> None:
         prices_data_source = config_utils.fetch_data_sources('market_data')
@@ -36,12 +39,12 @@ class DataReader():
         self._statements_data_source = statements
 
     def read_prices(self, ticker):
-        dir = self._market_data_source.PRICES_DIRECTORY
+        directory = self._market_data_source.PRICES_DIRECTORY
         filename = f"{self._market_data_source.FILE_PREFIX}_{ticker.replace('.TRT', '_TRT')}_prices.csv"
 
-        if files_utils.check_file(directory=dir,
+        if files_utils.check_file(directory=directory,
                                   file=filename):
-            df = pd.read_csv(f"{dir}/{filename}")
+            df = pd.read_csv(f"{directory}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
             return df[['Close']]
@@ -51,12 +54,12 @@ class DataReader():
             return self.read_prices(ticker)
 
     def read_fx(self, currency: str):
-        dir = self._market_data_source.FX_DIRECTORY
+        directory = self._market_data_source.FX_DIRECTORY
         filename = f"{self._market_data_source.FILE_PREFIX}_{currency}CAD_fx.csv"
 
-        if files_utils.check_file(directory=dir,
+        if files_utils.check_file(directory=directory,
                                   file=filename):
-            df = pd.read_csv(f"{dir}/{filename}")
+            df = pd.read_csv(f"{directory}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
             return df[['Close']]
@@ -70,5 +73,3 @@ class DataReader():
 
     def update_fx(self, currency: str):
         self._market_data_source.get_fx(currency=currency)
-
-
