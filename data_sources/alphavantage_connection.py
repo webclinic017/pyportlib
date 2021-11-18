@@ -1,9 +1,8 @@
 import pandas as pd
 import requests
-from data_sources.av_request_manager import request_limit_manager
+from data_sources.alpha_vantage_request_manager import request_limit_manager
 from utils import logger
 from config.config_utils import fetch_key
-from utils.files_utils import check_file
 
 
 class AlphaVantageConnection(object):

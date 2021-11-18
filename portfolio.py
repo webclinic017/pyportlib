@@ -1,8 +1,6 @@
 from data_sources.data_reader import DataReader
-from data_sources.data_source_manager import DataSourceManager
 from position import Position
 from transaction_manager import TransactionManager
-import pandas as pd
 from utils import logger
 
 

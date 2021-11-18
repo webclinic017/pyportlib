@@ -1,6 +1,5 @@
 from datetime import datetime
 from data_sources.data_reader import DataReader
-from utils import dates_utils
 
 
 class Position(object):
