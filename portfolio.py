@@ -9,12 +9,13 @@ import pandas as pd
 
 class Portfolio(object):
 
-    def __init__(self, account: str, load_data: bool = False):
+    def __init__(self, account: str, cash: float, load_data: bool = False):
 
         self.account = account
         self.positions = {}
         self.fx = {}
         self.prices_df = None
+        self.cash = 0.
         self.datareader = DataReader()
         self.transaction_manager = TransactionManager(account=self.account)
         self.load_positions()

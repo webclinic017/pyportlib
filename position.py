@@ -12,7 +12,7 @@ class Position(object):
         self.prices_cad = None
 
     def __repr__(self):
-        return f"{self.ticker} - Equity"
+        return f"{self.ticker}"
 
     def get_prices(self, start_date: datetime = None, end_date: datetime = None):
         if self.prices is None:
