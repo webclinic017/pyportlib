@@ -1,1 +1,36 @@
-2021-11-14 18:09:58,702:INFO:positions for tfsa loaded:load_positions
+2021-11-18 14:55:09,835:INFO:positions for tfsa loaded: in load_positions
+2021-11-18 14:55:09,860:INFO:PLTR loaded: in load_position_prices
+2021-11-18 14:55:09,890:INFO:MRK loaded: in load_position_prices
+2021-11-18 14:55:09,903:INFO:GRT-UN.TRT loaded: in load_position_prices
+2021-11-18 14:55:09,933:INFO:VB loaded: in load_position_prices
+2021-11-18 14:55:09,960:INFO:LIT loaded: in load_position_prices
+2021-11-18 14:55:09,986:INFO:SLV loaded: in load_position_prices
+2021-11-18 14:55:09,997:INFO:VSB.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,012:INFO:XIU.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,025:INFO:MFC.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,052:INFO:SCYX loaded: in load_position_prices
+2021-11-18 14:55:10,085:INFO:MSFT loaded: in load_position_prices
+2021-11-18 14:55:10,114:INFO:TM loaded: in load_position_prices
+2021-11-18 14:55:10,141:INFO:VOO loaded: in load_position_prices
+2021-11-18 14:55:10,155:INFO:VBU.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,167:INFO:VDY.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,191:INFO:ARKF loaded: in load_position_prices
+2021-11-18 14:55:10,207:INFO:NA.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,233:INFO:VOOV loaded: in load_position_prices
+2021-11-18 14:55:10,247:INFO:XDV.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,261:INFO:AQN.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,273:INFO:VAB.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,301:INFO:VO loaded: in load_position_prices
+2021-11-18 14:55:10,312:INFO:NWH-UN.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,343:INFO:LQD loaded: in load_position_prices
+2021-11-18 14:55:10,373:INFO:HTGC loaded: in load_position_prices
+2021-11-18 14:55:10,386:INFO:T.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,416:INFO:IBB loaded: in load_position_prices
+2021-11-18 14:55:10,430:INFO:CDZ.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,446:INFO:PPL.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,473:INFO:KBWD loaded: in load_position_prices
+2021-11-18 14:55:10,500:INFO:TCPC loaded: in load_position_prices
+2021-11-18 14:55:10,514:INFO:BIP-UN.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,529:INFO:SRU-UN.TRT loaded: in load_position_prices
+2021-11-18 14:55:10,538:INFO:fx for tfsa loaded: in load_fx
+2021-11-18 14:55:10,795:INFO:tfsa" transactions from 2021-09-30 to 2021-11-17: in load_prices_df

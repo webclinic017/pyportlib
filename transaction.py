@@ -2,13 +2,15 @@ from datetime import datetime
 
 import pandas as pd
 
+from utils import logger
+
 
 class Transaction(object):
     TRANSACTIONS_INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
-    name = 'Transaction'
+    NAME = 'Transaction'
 
     def __init__(self,
-                 date: str,
+                 date: datetime,
                  ticker: str,
                  type: str,
                  quantity: int,
@@ -23,36 +25,37 @@ class Transaction(object):
         self.price = price
         self.fees = fees
         self.currency = currency
-
         self.check()
 
     def __repr__(self):
-        return f"{self.name} {self.date} {self.ticker}"
+        return f"{self.NAME} - {self.date.date()} - {self.ticker}"
 
-    def get(self):
+    def get(self) -> pd.DataFrame:
         columns = ['Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
         data = [self.ticker, self.type, self.quantity, self.price, self.fees, self.currency]
         new = pd.DataFrame(index=[self.date], columns=columns)
         new.loc[self.date] = data
+        new.index.name = 'Date'
 
         return new
 
-    def check(self):
+    def check(self) -> None:
+        """
+        checks if transaction object is valid
+        :return:
+        """
         types = ['Buy', 'Sell', 'Dividend']
         condition1 = self.type in types
-
         currencies = ['USD', 'CAD']
         condition2 = self.currency in currencies
-
-        condition3 = len(self.date) == 10
-
+        condition3 = isinstance(self.date, datetime)
         condition4 = (self.quantity > 0 and self.type == 'Buy') or (self.quantity == 0 and self.type == 'Dividend') or (self.quantity < 0 and self.type == 'Sell')
 
         if not condition1:
-            raise ValueError(f'transaction type {self.type} is invalid, must be in {types}')
+            logger.logging.error(f'transaction type {self.type} is invalid, must be in {types}')
         if not condition2:
-            raise ValueError(f'transaction currency {self.type} is invalid, must be in {currencies}')
+            logger.logging.error(f'transaction currency {self.type} is invalid, must be in {currencies}')
         if not condition3:
-            raise ValueError(f'transaction date {self.date} is invalid, must be in YYYY-mm-dd format')
+            logger.logging.error(f'transaction date {self.date} is invalid, must be in YYYY-mm-dd format')
         if not condition4:
-            raise ValueError(f'transaction type {self.type} and quantity {self.quantity} are invalid')
+            logger.logging.error(f'transaction type {self.type} and quantity {self.quantity} are invalid')

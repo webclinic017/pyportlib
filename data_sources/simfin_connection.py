@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 import pandas as pd
 import requests
-from utils.config_utils import fetch_key
+from config.config_utils import fetch_key
 from utils.files_utils import check_file
 
 

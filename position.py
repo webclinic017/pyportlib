@@ -1,34 +1,31 @@
 from datetime import datetime
-from data_sources.data_source_manager import DataSourceManager
-from utils.dates_utils import get_market_days
+from data_sources.data_reader import DataReader
 
 
 class Position(object):
 
-    def __init__(self, ticker: str, currency: str, connection: DataSourceManager):
+    def __init__(self, ticker: str, currency: str, datareader: DataReader):
         self.ticker = ticker
         self.currency = currency
-        self.connection = connection
-        self.prices_local = None
+        self.datareader = datareader
+        self.prices = None
         self.prices_cad = None
 
     def __repr__(self):
-        return f"{self.ticker} - Equity"
+        return f"{self.ticker}"
 
-    def load_prices_local(self, read: bool = True):
-        if self.prices_local is None or not read:
-            self.prices_local = self.connection.prices_local(ticker=self.ticker, read=read).loc[:, ['Close']]
-            self.prices_local.loc[:, 'Close'] = self.prices_local.Close.astype(float)
+    def get_prices(self, start_date: datetime = None, end_date: datetime = None):
+        if self.prices is None:
+            prices = self.datareader.read_prices(ticker=self.ticker).astype(float)
+            self.prices = prices.loc[end_date: start_date].sort_index()
+        return self.prices
 
-    def load_prices_cad(self, read: bool = True):
+    def get_prices_cad(self, start_date: datetime = None, end_date: datetime = None):
+        prices = self.get_prices(start_date=start_date, end_date=end_date)
 
-        if self.prices_local is None:
-            self.load_prices_local(read=read)
-
-        if self.currency == 'CAD':
-            self.prices_cad = self.prices_local
+        if self.prices_cad is None and self.currency != 'CAD':
+            fx = self.datareader.read_fx(currency=self.currency).loc[end_date: start_date]
+            self.prices_cad = (prices * fx).dropna().sort_index()
         else:
-            fx = self.connection.fx(currency=self.currency, read=True).loc[:, ['Close']]
-            fx.Close = fx.Close.astype(float)
-            if self.prices_cad is None:
-                self.prices_cad = self.prices_local * fx.loc[fx.index.isin(self.prices_local.index)]
+            self.prices_cad = prices
+        return self.prices_cad

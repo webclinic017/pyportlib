@@ -2,5 +2,4 @@
 /venv/
 .DS_Store
 .idea
-config.json
 config/config.json

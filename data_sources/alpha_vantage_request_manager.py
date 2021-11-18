@@ -2,14 +2,14 @@ import json
 from datetime import datetime
 from time import sleep
 from utils import logger
-from utils.config_utils import fetch_max_rpm
+from config.config_utils import fetch_max_rpm
 
 MAX_RPM = fetch_max_rpm('AlphaVantage')
 count = 0
 request_log = {}
 
 
-def request_limit(name: str = '', restarted: bool = False):
+def request_limit_manager(name: str = '', restarted: bool = False):
     global count
     count += 1
     now = datetime.now()
