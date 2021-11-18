@@ -1,2 +1,3 @@
-2021-11-17 20:35:45,979:INFO:transactions file updated:__write_trx
-2021-11-17 20:35:45,980:INFO:Transaction - 2021-11-17 - AAPL was added to account: test:add
+2021-11-17 23:20:06,530:INFO:positions for tfsa loaded:load_positions
+2021-11-17 23:20:06,531:INFO:no price data to read for HTGC, now fetching new data from api:read_prices
+2021-11-17 23:20:07,336:INFO:AV request made for HTGC at 2021-11-17 23:20:07.336766:request_limit_manager

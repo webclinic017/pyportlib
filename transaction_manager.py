@@ -42,14 +42,14 @@ class TransactionManager(object):
             empty_transactions.to_csv(f"{self.directory}/{self.filename}")
             return empty_transactions
 
-    def __write_trx(self, transaction: Transaction) -> None:
+    def _write_trx(self, transaction: Transaction) -> None:
         new = transaction.get()
         self.transactions = pd.concat([self.transactions, new])
 
         self.transactions.to_csv(f"{self.directory}/{self.filename}")
         logger.logging.info('transactions file updated')
 
-    def __check_trx(self, transaction: Transaction) -> bool:
+    def _check_trx(self, transaction: Transaction) -> bool:
         new_qty = self.transactions.Quantity.loc[self.transactions.Ticker == transaction.ticker].sum() + transaction.quantity
 
         if new_qty < 0:
@@ -59,8 +59,8 @@ class TransactionManager(object):
             return True
 
     def add(self, transaction: Union[Transaction, List[Transaction]]) -> None:
-        if self.__check_trx(transaction):
-            self.__write_trx(transaction)
+        if self._check_trx(transaction):
+            self._write_trx(transaction)
 
         logger.logging.info(f'{transaction} was added to account: {self.account}')
 

@@ -9,7 +9,7 @@ count = 0
 request_log = {}
 
 
-def request_limit(name: str = '', restarted: bool = False):
+def request_limit_manager(name: str = '', restarted: bool = False):
     global count
     count += 1
     now = datetime.now()
