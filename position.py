@@ -29,3 +29,6 @@ class Position(object):
         else:
             self.prices_cad = prices
         return self.prices_cad
+
+    def set_quantities(self, quantities):
+        self.quantities = quantities

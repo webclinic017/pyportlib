@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from config import config_utils
 from data_sources.alphavantage_connection import AlphaVantageConnection
 from data_sources.simfin_connection import SimFinConnection
@@ -73,3 +75,10 @@ class DataReader(object):
 
     def update_fx(self, currency: str):
         self._market_data_source.get_fx(currency=currency)
+
+    def last_data_point(self):
+        last = self.read_fx('USD').sort_index().index[-2:]
+
+        if last[-1].strftime("%Y%m%d") == datetime.today().strftime("%Y%m%d"):
+            return last[-2]
+        return last[-1]
