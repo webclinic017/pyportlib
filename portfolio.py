@@ -2,6 +2,7 @@ from typing import List, Union
 
 from data_sources.data_reader import DataReader
 from position import Position
+from transaction import Transaction
 from transaction_manager import TransactionManager
 from utils import logger
 import pandas as pd
@@ -9,13 +10,13 @@ import pandas as pd
 
 class Portfolio(object):
 
-    def __init__(self, account: str, cash: float, load_data: bool = False):
+    def __init__(self, account: str, load_data: bool = False):
 
         self.account = account
         self.positions = {}
         self.fx = {}
         self.prices_df = None
-        self.cash = 0.
+        self.cash = 1000000000  # self.load_cash()  # TODO make cash management so changes are saved, and cash can be tracked like a position
         self.datareader = DataReader()
         self.transaction_manager = TransactionManager(account=self.account)
         self.load_positions()
@@ -75,3 +76,16 @@ class Portfolio(object):
             prices.columns = [pos.ticker]
             df = pd.merge(df, prices, how='outer', on='Date')
         return df
+
+    def add_transaction(self, transaction: Transaction) -> None:
+        value = transaction.quantity * transaction.price
+
+        if transaction.currency != 'CAD':
+            value = (value * self.fx.get(transaction.currency).loc[transaction.date] + transaction.fees).iloc[0]
+        new_cash = self.cash - value
+        if value > self.cash:
+            logger.logging.error(f'Not enough funds to perform this transaction, missing {-1*new_cash} to complete')
+        else:
+            self.cash = new_cash
+            self.transaction_manager.add(transaction=transaction)
+

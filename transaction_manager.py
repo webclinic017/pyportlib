@@ -60,8 +60,7 @@ class TransactionManager(object):
     def add(self, transaction: Union[Transaction, List[Transaction]]) -> None:
         if self._check_trx(transaction):
             self._write_trx(transaction)
-
-        logger.logging.info(f'{transaction} was added to account: {self.account}')
+            logger.logging.info(f'{transaction} was added to account: {self.account}')
 
     def all_positions(self) -> list:
         try:

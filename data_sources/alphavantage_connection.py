@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 from data_sources.alpha_vantage_request_manager import request_limit_manager
-from utils import logger
+from utils import logger, files_utils
 from config.config_utils import fetch_key
 
 
@@ -46,6 +46,8 @@ class AlphaVantageConnection(object):
         df.index.name = 'Date'
         df['Currency'] = currency
         df['Ticker'] = ticker
+        if not files_utils.check_dir(directory):
+            files_utils.make_dir(directory)
         df.to_csv(f"{directory}/{filename}")
         request_limit_manager(ticker)
 
@@ -72,6 +74,7 @@ class AlphaVantageConnection(object):
         df.columns = columns
         df.index.name = 'Date'
         df['Ticker'] = pair
-
+        if not files_utils.check_dir(directory):
+            files_utils.make_dir(directory)
         df.to_csv(f"{directory}/{filename}")
         request_limit_manager('fx')
