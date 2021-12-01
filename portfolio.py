@@ -41,10 +41,8 @@ class Portfolio(object):
             return self.positions
 
     def refresh_all(self):
-        for ticker, position in self.positions.items():
-            position = self.get_position(position)
+        for ticker in self.positions.keys():
             self.datareader.update_prices(ticker=ticker)
-
 
         self.datareader.update_fx(currency='USD')
         self.load_positions()
