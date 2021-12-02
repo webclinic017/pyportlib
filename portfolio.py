@@ -132,6 +132,7 @@ class Portfolio(object):
     def _make_position_qty(transactions: pd.DataFrame, start: datetime, end: datetime):
         date = dates_utils.get_market_days(start=start, end=end)
         quantity = pd.DataFrame(index=date, columns=['Quantity'])
+        # TODO optimise, maybe do cumsum in get_quantities (only once), etc
         return pd.concat([transactions['Quantity'], quantity], axis=1).fillna(0).cumsum().iloc[:, 0]
 
     @staticmethod
