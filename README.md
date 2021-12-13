@@ -1,4 +1,4 @@
-# PortfolioCore
+# PortoFolio
 
 Python package used to build equity portfolios based on transaction data. 
 Built around AlphaVantage API, but more data sources can be implemented.
