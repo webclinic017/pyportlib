@@ -15,6 +15,7 @@ class Position(object):
         return f"{self.ticker}"
 
     def get_prices(self, start_date: datetime = None, end_date: datetime = None):
+        # TODO make reload argument that rereads data
         if self.prices is None:
             prices = self.datareader.read_prices(ticker=self.ticker).astype(float)
             self.prices = prices.loc[end_date: start_date].sort_index()
@@ -22,7 +23,7 @@ class Position(object):
 
     def get_prices_cad(self, start_date: datetime = None, end_date: datetime = None):
         prices = self.get_prices(start_date=start_date, end_date=end_date)
-
+        # TODO make reload argument that rereads data
         if self.prices_cad is None and self.currency != 'CAD':
             fx = self.datareader.read_fx(currency=self.currency).loc[end_date: start_date]
             self.prices_cad = (prices * fx).dropna().sort_index()

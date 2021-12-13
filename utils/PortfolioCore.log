@@ -1,70 +1,40 @@
-2021-12-02 13:33:21,670:INFO:positions for tfsa loaded: in load_positions
-2021-12-02 13:33:21,699:INFO:HTGC loaded: in load_position_prices
-2021-12-02 13:33:21,726:INFO:VOO loaded: in load_position_prices
-2021-12-02 13:33:21,747:INFO:PLTR loaded: in load_position_prices
-2021-12-02 13:33:21,775:INFO:SCYX loaded: in load_position_prices
-2021-12-02 13:33:21,804:INFO:MRK loaded: in load_position_prices
-2021-12-02 13:33:21,817:INFO:NA.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,827:INFO:VDY.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,854:INFO:LQD loaded: in load_position_prices
-2021-12-02 13:33:21,868:INFO:XIU.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,893:INFO:ARKF loaded: in load_position_prices
-2021-12-02 13:33:21,904:INFO:AQN.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,917:INFO:XDV.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,928:INFO:VAB.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,940:INFO:VBU.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,951:INFO:T.TRT loaded: in load_position_prices
-2021-12-02 13:33:21,976:INFO:TCPC loaded: in load_position_prices
-2021-12-02 13:33:21,989:INFO:SRU-UN.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,017:INFO:MSFT loaded: in load_position_prices
-2021-12-02 13:33:22,045:INFO:IBB loaded: in load_position_prices
-2021-12-02 13:33:22,073:INFO:TM loaded: in load_position_prices
-2021-12-02 13:33:22,100:INFO:VOOV loaded: in load_position_prices
-2021-12-02 13:33:22,112:INFO:GRT-UN.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,141:INFO:LIT loaded: in load_position_prices
-2021-12-02 13:33:22,166:INFO:KBWD loaded: in load_position_prices
-2021-12-02 13:33:22,195:INFO:VO loaded: in load_position_prices
-2021-12-02 13:33:22,207:INFO:CDZ.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,235:INFO:SLV loaded: in load_position_prices
-2021-12-02 13:33:22,244:INFO:VSB.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,256:INFO:MFC.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,286:INFO:VB loaded: in load_position_prices
-2021-12-02 13:33:22,300:INFO:PPL.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,312:INFO:NWH-UN.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,323:INFO:BIP-UN.TRT loaded: in load_position_prices
-2021-12-02 13:33:22,336:INFO:fx for tfsa loaded: in load_fx
-2021-12-02 13:33:22,556:INFO:tfsa" transactions from 2021-09-30 to 2021-12-01: in load_prices_df
-2021-12-02 13:33:23,018:INFO:quantities computed for HTGC: in get_quantities
-2021-12-02 13:33:23,464:INFO:quantities computed for VOO: in get_quantities
-2021-12-02 13:33:23,899:INFO:quantities computed for PLTR: in get_quantities
-2021-12-02 13:33:24,336:INFO:quantities computed for SCYX: in get_quantities
-2021-12-02 13:33:24,769:INFO:quantities computed for MRK: in get_quantities
-2021-12-02 13:33:25,218:INFO:quantities computed for NA.TRT: in get_quantities
-2021-12-02 13:33:25,661:INFO:quantities computed for VDY.TRT: in get_quantities
-2021-12-02 13:33:26,103:INFO:quantities computed for LQD: in get_quantities
-2021-12-02 13:33:26,541:INFO:quantities computed for XIU.TRT: in get_quantities
-2021-12-02 13:33:27,009:INFO:quantities computed for ARKF: in get_quantities
-2021-12-02 13:33:27,487:INFO:quantities computed for AQN.TRT: in get_quantities
-2021-12-02 13:33:27,983:INFO:quantities computed for XDV.TRT: in get_quantities
-2021-12-02 13:33:28,437:INFO:quantities computed for VAB.TRT: in get_quantities
-2021-12-02 13:33:28,900:INFO:quantities computed for VBU.TRT: in get_quantities
-2021-12-02 13:33:29,357:INFO:quantities computed for T.TRT: in get_quantities
-2021-12-02 13:33:29,818:INFO:quantities computed for TCPC: in get_quantities
-2021-12-02 13:33:30,257:INFO:quantities computed for SRU-UN.TRT: in get_quantities
-2021-12-02 13:33:30,698:INFO:quantities computed for MSFT: in get_quantities
-2021-12-02 13:33:31,132:INFO:quantities computed for IBB: in get_quantities
-2021-12-02 13:33:31,568:INFO:quantities computed for TM: in get_quantities
-2021-12-02 13:33:32,008:INFO:quantities computed for VOOV: in get_quantities
-2021-12-02 13:33:32,442:INFO:quantities computed for GRT-UN.TRT: in get_quantities
-2021-12-02 13:33:32,877:INFO:quantities computed for LIT: in get_quantities
-2021-12-02 13:33:33,318:INFO:quantities computed for KBWD: in get_quantities
-2021-12-02 13:33:33,759:INFO:quantities computed for VO: in get_quantities
-2021-12-02 13:33:34,193:INFO:quantities computed for CDZ.TRT: in get_quantities
-2021-12-02 13:33:34,625:INFO:quantities computed for SLV: in get_quantities
-2021-12-02 13:33:35,060:INFO:quantities computed for VSB.TRT: in get_quantities
-2021-12-02 13:33:35,497:INFO:quantities computed for MFC.TRT: in get_quantities
-2021-12-02 13:33:35,929:INFO:quantities computed for VB: in get_quantities
-2021-12-02 13:33:36,360:INFO:quantities computed for PPL.TRT: in get_quantities
-2021-12-02 13:33:36,798:INFO:quantities computed for NWH-UN.TRT: in get_quantities
-2021-12-02 13:33:37,235:INFO:quantities computed for BIP-UN.TRT: in get_quantities
-2021-12-02 13:33:37,771:INFO:tfsa market_value computed: in get_market_value
+2021-12-02 14:25:19,212:INFO:positions for tfsa loaded: in load_positions
+2021-12-02 14:25:19,870:INFO:tfsa position prices loaded: in load_position_prices
+2021-12-02 14:25:24,689:INFO:fx for tfsa loaded: in load_fx
+2021-12-02 14:25:24,905:INFO:tfsa" transactions from 2021-09-30 to 2021-12-01: in load_prices_df
+2021-12-02 14:25:25,377:INFO:quantities computed for SLV: in get_quantities
+2021-12-02 14:25:25,837:INFO:quantities computed for PPL.TRT: in get_quantities
+2021-12-02 14:25:26,282:INFO:quantities computed for VO: in get_quantities
+2021-12-02 14:25:26,730:INFO:quantities computed for VOO: in get_quantities
+2021-12-02 14:25:27,165:INFO:quantities computed for MFC.TRT: in get_quantities
+2021-12-02 14:25:27,606:INFO:quantities computed for PLTR: in get_quantities
+2021-12-02 14:25:28,046:INFO:quantities computed for CDZ.TRT: in get_quantities
+2021-12-02 14:25:28,499:INFO:quantities computed for XIU.TRT: in get_quantities
+2021-12-02 14:25:28,962:INFO:quantities computed for VBU.TRT: in get_quantities
+2021-12-02 14:25:29,427:INFO:quantities computed for MRK: in get_quantities
+2021-12-02 14:25:29,898:INFO:quantities computed for KBWD: in get_quantities
+2021-12-02 14:25:30,365:INFO:quantities computed for VB: in get_quantities
+2021-12-02 14:25:30,824:INFO:quantities computed for TM: in get_quantities
+2021-12-02 14:25:31,360:INFO:quantities computed for SCYX: in get_quantities
+2021-12-02 14:25:31,835:INFO:quantities computed for VDY.TRT: in get_quantities
+2021-12-02 14:25:32,304:INFO:quantities computed for LQD: in get_quantities
+2021-12-02 14:25:32,758:INFO:quantities computed for LIT: in get_quantities
+2021-12-02 14:25:33,221:INFO:quantities computed for NWH-UN.TRT: in get_quantities
+2021-12-02 14:25:33,692:INFO:quantities computed for HTGC: in get_quantities
+2021-12-02 14:25:34,143:INFO:quantities computed for T.TRT: in get_quantities
+2021-12-02 14:25:34,618:INFO:quantities computed for VSB.TRT: in get_quantities
+2021-12-02 14:25:35,078:INFO:quantities computed for NA.TRT: in get_quantities
+2021-12-02 14:25:35,553:INFO:quantities computed for ARKF: in get_quantities
+2021-12-02 14:25:36,007:INFO:quantities computed for GRT-UN.TRT: in get_quantities
+2021-12-02 14:25:36,465:INFO:quantities computed for BIP-UN.TRT: in get_quantities
+2021-12-02 14:25:36,922:INFO:quantities computed for IBB: in get_quantities
+2021-12-02 14:25:37,419:INFO:quantities computed for TCPC: in get_quantities
+2021-12-02 14:25:37,891:INFO:quantities computed for SRU-UN.TRT: in get_quantities
+2021-12-02 14:25:38,352:INFO:quantities computed for VAB.TRT: in get_quantities
+2021-12-02 14:25:38,813:INFO:quantities computed for MSFT: in get_quantities
+2021-12-02 14:25:39,268:INFO:quantities computed for VOOV: in get_quantities
+2021-12-02 14:25:39,731:INFO:quantities computed for XDV.TRT: in get_quantities
+2021-12-02 14:25:40,186:INFO:quantities computed for AQN.TRT: in get_quantities
+2021-12-02 14:25:40,718:INFO:tfsa market_value computed: in get_market_value
+2021-12-02 14:25:41,454:INFO:AV request made for fx at 2021-12-02 14:25:41.454772: in request_limit_manager
+2021-12-02 14:25:41,467:INFO:fx for tfsa loaded: in load_fx

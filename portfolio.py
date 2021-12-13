@@ -44,13 +44,18 @@ class Portfolio(object):
         for ticker in self.positions.keys():
             self.datareader.update_prices(ticker=ticker)
 
-        self.datareader.update_fx(currency='USD')
+        self.refresh_fx()
         self.load_positions()
         self.load_position_prices()
-        self.load_fx()
         self.load_prices_df()
         self.get_quantities()
         logger.logging.info(f'{self.account} refreshed')
+
+    def refresh_fx(self):
+        currencies = self.transaction_manager.get_currencies()
+        for curr in currencies:
+            self.fx[curr] = self.datareader.update_fx(currency=curr)
+        self.load_fx(reload=True)
 
     def get_market_value(self):
         if self.market_value.empty:
@@ -76,13 +81,14 @@ class Portfolio(object):
 
     def load_positions(self):
         tickers = self.transaction_manager.all_positions()
+        # TODO make reload argument that rereads data
         for ticker in tickers:
             currency = 'CAD' if ticker[-4:] == '.TRT' else 'USD'
             self.positions[ticker] = Position(ticker, currency=currency, datareader=self.datareader)
         logger.logging.info(f'positions for {self.account} loaded')
 
-    def load_fx(self):
-        if not self.fx:
+    def load_fx(self, reload: bool = False):
+        if not self.fx or reload:
             currencies = self.transaction_manager.get_currencies()
 
             for curr in currencies:
@@ -95,7 +101,7 @@ class Portfolio(object):
         for position in self.positions.keys():
             pos = self.get_position(position)
             pos.get_prices_cad(start_date=first_trx)
-            logger.logging.info(f'{position} loaded')
+        logger.logging.info(f'{self.account} position prices loaded')
 
     def load_prices_df(self):
         if self.prices_df.empty:
