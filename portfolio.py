@@ -28,7 +28,7 @@ class Portfolio(object):
             self.load_position_prices()
             self.load_fx()
             self.load_prices_df()
-            self.get_quantities()
+            self.load_quantities()
             self.get_market_value()
 
     def __repr__(self):
@@ -41,6 +41,8 @@ class Portfolio(object):
             return self.positions
 
     def refresh_all(self):
+        # TODO make reload argument that rereads data
+
         for ticker in self.positions.keys():
             self.datareader.update_prices(ticker=ticker)
 
@@ -48,7 +50,7 @@ class Portfolio(object):
         self.load_positions()
         self.load_position_prices()
         self.load_prices_df()
-        self.get_quantities()
+        self.load_quantities()
         logger.logging.info(f'{self.account} refreshed')
 
     def refresh_fx(self):
@@ -58,6 +60,8 @@ class Portfolio(object):
         self.load_fx(reload=True)
 
     def get_market_value(self):
+        # TODO make reload argument that rereads data
+
         if self.market_value.empty:
             last_date = self.datareader.last_data_point()
             first_date = self.transaction_manager.first_trx_date()
@@ -97,6 +101,8 @@ class Portfolio(object):
         return self.fx
 
     def load_position_prices(self):
+        # TODO make reload argument that rereads data
+
         first_trx = self.transaction_manager.first_trx_date()
         for position in self.positions.keys():
             pos = self.get_position(position)
@@ -104,6 +110,8 @@ class Portfolio(object):
         logger.logging.info(f'{self.account} position prices loaded')
 
     def load_prices_df(self):
+        # TODO make reload argument that rereads data
+
         if self.prices_df.empty:
             pos = list(self.get_position().values())
             df = self._make_df(pos)
@@ -124,7 +132,9 @@ class Portfolio(object):
             self.cash = new_cash
             self.transaction_manager.add(transaction=transaction)
 
-    def get_quantities(self):
+    def load_quantities(self):
+        # TODO make reload argument that rereads data
+
         last_date = self.datareader.last_data_point()
         first_date = self.transaction_manager.first_trx_date()
         dates = dates_utils.get_market_days(start=first_date, end=last_date)
