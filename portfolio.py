@@ -127,19 +127,16 @@ class Portfolio(object):
     def get_quantities(self):
         last_date = self.datareader.last_data_point()
         first_date = self.transaction_manager.first_trx_date()
+        dates = dates_utils.get_market_days(start=first_date, end=last_date)
+        self.quantities.index = dates
+
         for position in self.positions.keys():
             trx = self.transaction_manager.transactions.loc[(self.transaction_manager.transactions.Ticker == position)
                                                             & (self.transaction_manager.transactions.Type != 'Dividend')]
-            quantity = self._make_position_qty(trx, first_date, last_date)
-            self.quantities[position] = quantity
+            self.quantities[position] = trx['Quantity']
             logger.logging.info(f'quantities computed for {position}')
 
-    @staticmethod
-    def _make_position_qty(transactions: pd.DataFrame, start: datetime, end: datetime):
-        date = dates_utils.get_market_days(start=start, end=end)
-        quantity = pd.DataFrame(index=date, columns=['Quantity'])
-        # TODO optimise, maybe do cumsum in get_quantities (only once), etc
-        return pd.concat([transactions['Quantity'], quantity], axis=1).fillna(0).cumsum().iloc[:, 0]
+        self.quantities = self.quantities.fillna(0).cumsum()
 
     @staticmethod
     def _make_df(positions: List[Position]):
