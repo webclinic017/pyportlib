@@ -6,6 +6,7 @@ qs.extend_pandas()
 
 
 ptf = Portfolio(account='tfsa', load_data=True)
+ptf.refresh_all()
 print('')
 
 

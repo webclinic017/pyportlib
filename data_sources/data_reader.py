@@ -79,6 +79,4 @@ class DataReader(object):
     def last_data_point(self):
         last = self.read_fx('USD').sort_index().index[-2:]
 
-        if last[-1].strftime("%Y%m%d") == datetime.today().strftime("%Y%m%d"):
-            return last[-2]
         return last[-1]
