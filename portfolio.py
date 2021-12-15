@@ -21,7 +21,7 @@ class Portfolio(object):
         self.prices = pd.DataFrame()
         self.quantities = pd.DataFrame()
         self.market_value = pd.DataFrame()
-        self.cash = CashAccount(account=self.account)  # TODO make cash management so changes are saved, and cash can be tracked like a position
+        self.cash = CashAccount(account=self.account)
         self.datareader = DataReader()
         self.transaction_manager = TransactionManager(account=self.account)
         self.start = self.transaction_manager.first_trx_date()
@@ -35,7 +35,7 @@ class Portfolio(object):
         self._load_fx(reload=reload)
         self._load_positions(reload=reload)
         self._load_prices(reload=reload)
-        self._load_quantities()
+        self._load_quantities(reload=reload)
         self._load_market_value(reload=reload)
         logger.logging.info(f'{self.account} data loaded')
 
@@ -141,7 +141,7 @@ class Portfolio(object):
 
         if transaction.currency != 'CAD':
             value = (value * self.fx.get(transaction.currency).loc[transaction.date] + transaction.fees).iloc[0]
-        new_cash = self.cash - value
+        new_cash = self.cash - value  # TODO cash calc
         if value > self.cash:
             logger.logging.error(f'Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
         else:
