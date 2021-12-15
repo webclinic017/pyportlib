@@ -131,7 +131,6 @@ class Portfolio(object):
                 self.quantities[position] = trx['Quantity']
                 logger.logging.info(f'quantities computed for {position}')
 
-            # TODO do sep method for getting the value
             self.quantities = self.quantities.fillna(0).cumsum()
 
     def get_quantities(self):
