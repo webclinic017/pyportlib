@@ -1,38 +1,12 @@
-2021-12-14 20:02:34,053:INFO:fx for tfsa loaded: in _load_fx
-2021-12-14 20:02:34,705:INFO:positions for tfsa loaded: in _load_positions
-2021-12-14 20:02:34,876:INFO:tfsa transactions from 2021-09-30 to 2021-12-14: in _load_prices
-2021-12-14 20:02:35,271:INFO:quantities computed for PPL.TRT: in _load_quantities
-2021-12-14 20:02:35,274:INFO:quantities computed for VOO: in _load_quantities
-2021-12-14 20:02:35,276:INFO:quantities computed for HTGC: in _load_quantities
-2021-12-14 20:02:35,279:INFO:quantities computed for NA.TRT: in _load_quantities
-2021-12-14 20:02:35,281:INFO:quantities computed for NWH-UN.TRT: in _load_quantities
-2021-12-14 20:02:35,284:INFO:quantities computed for ARKF: in _load_quantities
-2021-12-14 20:02:35,286:INFO:quantities computed for MFC.TRT: in _load_quantities
-2021-12-14 20:02:35,288:INFO:quantities computed for MSFT: in _load_quantities
-2021-12-14 20:02:35,291:INFO:quantities computed for VOOV: in _load_quantities
-2021-12-14 20:02:35,294:INFO:quantities computed for XDV.TRT: in _load_quantities
-2021-12-14 20:02:35,296:INFO:quantities computed for VO: in _load_quantities
-2021-12-14 20:02:35,299:INFO:quantities computed for BIP-UN.TRT: in _load_quantities
-2021-12-14 20:02:35,301:INFO:quantities computed for LQD: in _load_quantities
-2021-12-14 20:02:35,303:INFO:quantities computed for SLV: in _load_quantities
-2021-12-14 20:02:35,306:INFO:quantities computed for PLTR: in _load_quantities
-2021-12-14 20:02:35,308:INFO:quantities computed for VAB.TRT: in _load_quantities
-2021-12-14 20:02:35,311:INFO:quantities computed for KBWD: in _load_quantities
-2021-12-14 20:02:35,313:INFO:quantities computed for TM: in _load_quantities
-2021-12-14 20:02:35,316:INFO:quantities computed for AQN.TRT: in _load_quantities
-2021-12-14 20:02:35,318:INFO:quantities computed for TCPC: in _load_quantities
-2021-12-14 20:02:35,320:INFO:quantities computed for LIT: in _load_quantities
-2021-12-14 20:02:35,323:INFO:quantities computed for VBU.TRT: in _load_quantities
-2021-12-14 20:02:35,326:INFO:quantities computed for XIU.TRT: in _load_quantities
-2021-12-14 20:02:35,328:INFO:quantities computed for VDY.TRT: in _load_quantities
-2021-12-14 20:02:35,331:INFO:quantities computed for MRK: in _load_quantities
-2021-12-14 20:02:35,333:INFO:quantities computed for SRU-UN.TRT: in _load_quantities
-2021-12-14 20:02:35,335:INFO:quantities computed for T.TRT: in _load_quantities
-2021-12-14 20:02:35,338:INFO:quantities computed for CDZ.TRT: in _load_quantities
-2021-12-14 20:02:35,340:INFO:quantities computed for GRT-UN.TRT: in _load_quantities
-2021-12-14 20:02:35,343:INFO:quantities computed for VSB.TRT: in _load_quantities
-2021-12-14 20:02:35,345:INFO:quantities computed for IBB: in _load_quantities
-2021-12-14 20:02:35,348:INFO:quantities computed for VB: in _load_quantities
-2021-12-14 20:02:35,350:INFO:quantities computed for SCYX: in _load_quantities
-2021-12-14 20:02:35,834:INFO:tfsa market_value computed: in _load_market_value
-2021-12-14 20:02:35,834:INFO:tfsa data loaded: in load_data
+2021-12-14 22:06:54,020:INFO:no fx data to read for USD, now fetching new data from api: in read_fx
+2021-12-14 22:06:55,414:INFO:AV request made for fx at 2021-12-14 22:06:55.414893: in request_limit_manager
+2021-12-14 22:06:55,427:INFO:fx for tfsa loaded: in _load_fx
+2021-12-14 22:06:55,428:INFO:no price data to read for XIU.TRT, now fetching new data from api: in read_prices
+2021-12-14 22:06:56,064:INFO:AV request made for XIU.TRT at 2021-12-14 22:06:56.064319: in request_limit_manager
+2021-12-14 22:06:56,077:INFO:no price data to read for VB, now fetching new data from api: in read_prices
+2021-12-14 22:06:57,706:INFO:AV request made for VB at 2021-12-14 22:06:57.706296: in request_limit_manager
+2021-12-14 22:06:57,735:INFO:no price data to read for XDV.TRT, now fetching new data from api: in read_prices
+2021-12-14 22:06:58,247:INFO:AV request made for XDV.TRT at 2021-12-14 22:06:58.247889: in request_limit_manager
+2021-12-14 22:06:58,260:INFO:no price data to read for VAB.TRT, now fetching new data from api: in read_prices
+2021-12-14 22:06:58,705:INFO:AV request made for VAB.TRT at 2021-12-14 22:06:58.705273: in request_limit_manager
+2021-12-14 22:06:58,705:INFO:waiting for api... 57 seconds before next request: in request_limit_manager
