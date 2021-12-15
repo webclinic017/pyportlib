@@ -22,7 +22,7 @@ class Portfolio(object):
         self.cash = 1000000000  # TODO make cash management so changes are saved, and cash can be tracked like a position
         self.datareader = DataReader()
         self.transaction_manager = TransactionManager(account=self.account)
-        self.start = None
+        self.start = self.transaction_manager.first_trx_date()
         if load_data:
             self.load_data()
 
@@ -69,21 +69,19 @@ class Portfolio(object):
 
     def _load_market_value(self, reload: bool = False) -> None:
         if self.market_value.empty or reload:
-            last_date = self.datareader.last_data_point()
-            first_date = self.transaction_manager.first_trx_date()
-            date = dates_utils.get_market_days(start=first_date, end=last_date)
-            market_value = pd.Series(index=date, data=[0 for _ in range(len(date))])
+            last_date = self.datareader.last_data_point(self.account)
+            first_date = self.start
+            dates = dates_utils.get_market_days(start=first_date, end=last_date)
+            market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
             for position in self.positions.keys():
                 pos = self.get_position(position)
-                pos_val = self.quantities[position] * pos.prices_cad.iloc[:, 0]
+                pos_val = self.quantities[position] * pos.get_prices_cad().iloc[:, 0]
 
-                if pos_val.iloc[0] == np.nan:
-                    pos_val.iloc[0] = 0
                 pos_val = pos_val.fillna(method='ffill')
-                pos.market_val = pos_val
+                # pos.set_market_value(market_value=pos_val)
                 market_value += pos_val
-                market_value = market_value.fillna(0)
+                market_value = market_value.fillna(method='ffill')
             self.market_value = market_value
             logger.logging.info(f'{self.account} market_value computed')
 
@@ -119,7 +117,7 @@ class Portfolio(object):
 
     def _load_quantities(self, reload: bool = False) -> None:
         if self.quantities.empty or reload:
-            last_date = self.datareader.last_data_point()
+            last_date = self.datareader.last_data_point(account=self.account)
             first_date = self.transaction_manager.first_trx_date()
             dates = dates_utils.get_market_days(start=first_date, end=last_date)
             self.quantities.index = dates

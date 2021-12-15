@@ -10,7 +10,7 @@ class Position(object):
         self.currency = currency
         self.datareader = datareader
         self.prices = pd.Series()
-        self.prices_cad = pd.Series()
+        self.prices_cad = pd.DataFrame()
         self.quantities = pd.Series()
 
     def __repr__(self):
@@ -26,8 +26,8 @@ class Position(object):
         prices = self.get_prices(start_date=start_date, end_date=end_date, reload=reload)
         if (self.prices_cad.empty or reload) and self.currency != 'CAD':
             fx = self.datareader.read_fx(currency=self.currency).loc[end_date: start_date]
-            self.prices_cad = (prices * fx).dropna().sort_index()
-        else:
+            self.prices_cad = (prices * fx).sort_index()
+        elif (self.prices_cad.empty or reload) and self.currency == 'CAD':
             self.prices_cad = prices
         return self.prices_cad
 
