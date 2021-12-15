@@ -3,3 +3,5 @@
 .DS_Store
 .idea
 config/config.json
+/client_data/data/prices/
+/client_data/data/fx/
