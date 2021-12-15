@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Union
 import numpy as np
+
+from cash_account import CashAccount
 from data_sources.data_reader import DataReader
 from position import Position
 from transaction import Transaction
@@ -19,7 +21,7 @@ class Portfolio(object):
         self.prices = pd.DataFrame()
         self.quantities = pd.DataFrame()
         self.market_value = pd.DataFrame()
-        self.cash = 1000000000  # TODO make cash management so changes are saved, and cash can be tracked like a position
+        self.cash = CashAccount(account=self.account)  # TODO make cash management so changes are saved, and cash can be tracked like a position
         self.datareader = DataReader()
         self.transaction_manager = TransactionManager(account=self.account)
         self.start = self.transaction_manager.first_trx_date()
