@@ -140,7 +140,7 @@ class Portfolio(object):
 
         if transaction.currency != 'CAD':
             value = (value * self.fx.get(transaction.currency).loc[transaction.date] + transaction.fees).iloc[0]
-        new_cash = self.cash_account - value  # TODO cash calc
+        new_cash = self.cash(date=transaction.date) - value
         if value > self.cash_account:
             logger.logging.error(f'Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
         else:
