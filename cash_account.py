@@ -13,12 +13,13 @@ class CashAccount:
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
         self.filename = f"{self.account}_cash.csv"
-        self.cash_account = self.fetch()
+        self.cash_changes = self._load_cash()
+        self.cash_series = pd.Series()
 
     def __repr__(self):
         return self.NAME
 
-    def fetch(self):
+    def _load_cash(self):
         if files_utils.check_file(self.directory, self.filename):
             cash = pd.read_csv(f"{self.directory}/{self.filename}")
             try:
@@ -32,12 +33,18 @@ class CashAccount:
                     cash.index = pd.to_datetime(cash.index)
                     return cash
                 else:
-                    logger.logging.error(f'transactions do not match requirements for account: {self.account}')
+                    logger.logging.info(f'cash file does not match requirements: {self.account}')
         else:
             # if new ptf, create required files to use it
             if not files_utils.check_dir(self.directory):
                 files_utils.make_dir(self.directory)
             # create empty transaction file in new directory
-            empty_transactions = pd.DataFrame(columns=self.CASH_INFO).set_index('Date')
-            empty_transactions.to_csv(f"{self.directory}/{self.filename}")
-            return empty_transactions
+            empty_cash = pd.DataFrame(columns=self.CASH_INFO).set_index('Date')
+            empty_cash.to_csv(f"{self.directory}/{self.filename}")
+            return empty_cash
+
+    def get_cash_changes(self):
+        return self.cash_changes
+
+    def get_cash_change(self, date):
+        return self.get_cash_changes().loc[self.get_cash_changes().index <= date, 'Amount'].sum()

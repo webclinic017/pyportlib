@@ -21,7 +21,7 @@ class Portfolio(object):
         self.prices = pd.DataFrame()
         self.quantities = pd.DataFrame()
         self.market_value = pd.DataFrame()
-        self.cash = CashAccount(account=self.account)
+        self.cash_account = CashAccount(account=self.account)
         self.datareader = DataReader()
         self.transaction_manager = TransactionManager(account=self.account)
         self.start = self.transaction_manager.first_trx_date()
@@ -32,6 +32,7 @@ class Portfolio(object):
         return self.account
 
     def load_data(self, reload: bool = False) -> None:
+        self.transaction_manager.fetch()
         self._load_fx(reload=reload)
         self._load_positions(reload=reload)
         self._load_prices(reload=reload)
@@ -39,24 +40,21 @@ class Portfolio(object):
         self._load_market_value(reload=reload)
         logger.logging.info(f'{self.account} data loaded')
 
-    def refresh_all(self) -> None:
+    def update_data(self) -> None:
         self._refresh_prices()
         self._refresh_fx()
-        self._load_prices()
-        self._load_quantities()
-        self._load_market_value(reload=False)
+        self.load_data(reload=True)
+        self.transaction_manager.fetch()
         logger.logging.info(f'{self.account} refreshed')
 
     def _refresh_fx(self) -> None:
         currencies = self.transaction_manager.get_currencies()
         for curr in currencies:
             self.fx[curr] = self.datareader.update_fx(currency=curr)
-        self._load_fx(reload=True)
 
     def _refresh_prices(self) -> None:
         for ticker in self.positions.keys():
             self.datareader.update_prices(ticker=ticker)
-        self._load_positions(reload=True)
 
     def _load_fx(self, reload: bool = False) -> None:
         if not self.fx or reload:
@@ -112,13 +110,14 @@ class Portfolio(object):
             self.prices = self._make_prices_df(pos)
 
             logger.logging.info(
-                f'{self.account} transactions from {self.prices.index.min().date()} to {self.prices.index.max().date()}')
+                f'{self.account} prices from {self.prices.index.min().date()} to {self.prices.index.max().date()}')
 
     def get_prices(self):
         return self.prices
 
     def _load_quantities(self, reload: bool = False) -> None:
         if self.quantities.empty or reload:
+            self.quantities = pd.DataFrame()
             last_date = self.datareader.last_data_point(account=self.account)
             first_date = self.transaction_manager.first_trx_date()
             dates = dates_utils.get_market_days(start=first_date, end=last_date)
@@ -141,15 +140,42 @@ class Portfolio(object):
 
         if transaction.currency != 'CAD':
             value = (value * self.fx.get(transaction.currency).loc[transaction.date] + transaction.fees).iloc[0]
-        new_cash = self.cash - value  # TODO cash calc
-        if value > self.cash:
+        new_cash = self.cash_account - value  # TODO cash calc
+        if value > self.cash_account:
             logger.logging.error(f'Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
         else:
-            self.cash = new_cash
+            self.cash_account = new_cash
             self.transaction_manager.add(transaction=transaction)
 
+    def cash(self, date: datetime = None):
+        if date is None:
+            date = self.datareader.last_data_point(account=self.account)
+
+        live_fx = self.fx.get('USD').loc[date].iloc[0]
+        changes = self.cash_account.get_cash_change(date)
+
+        transactions = self.transaction_manager.get_transactions().loc[self.transaction_manager.get_transactions().index <= date, ]
+        transactions.loc[:, 'Value'] = transactions.Quantity*transactions.Price
+        transactions.loc[transactions.Currency == 'USD', 'Value'] *= live_fx
+        values = transactions['Value'].sum()*-1
+
+        dividends = self.dividends(end_date=date)
+
+        return values+changes+dividends
+
+    def dividends(self, start_date: datetime = None, end_date: datetime = None):
+        if end_date is None:
+            end_date = self.datareader.last_data_point(account=self.account)
+        if start_date is None:
+            start_date = self.transaction_manager.first_trx_date()
+        live_fx = self.fx.get('USD').loc[end_date].iloc[0]
+        transactions = self.transaction_manager.get_transactions().loc[(self.transaction_manager.get_transactions().index <= end_date) & (self.transaction_manager.get_transactions().index >= start_date), ]
+        dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
+        dividends.loc[dividends.Currency == 'USD', 'Price'] *= live_fx
+        return dividends['Price'].sum()
+
     @staticmethod
-    def _make_prices_df(positions: List[Position]):
+    def _make_prices_df(positions: List[Position]):  # TODO add date to get prices from a further date
         df = positions[0].get_prices_cad()
         df.columns = [positions[0].ticker]
 
