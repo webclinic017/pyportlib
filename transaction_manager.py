@@ -86,9 +86,12 @@ class TransactionManager(object):
         return self.transactions.Fees.sum()
     
     def first_trx_date(self, ticker: str = None):
-        if ticker:
-            return self.transactions.loc[self.transactions.Ticker == ticker].index.min()
-        return self.transactions.index.min()
+        if len(self.get_transactions()):
+            if ticker:
+                return self.transactions.loc[self.transactions.Ticker == ticker].index.min()
+            return self.get_transactions().index.min()
+        else:
+            return None
 
     def get_currencies(self):
         currencies = set(self.transactions.Currency) - {'CAD'}

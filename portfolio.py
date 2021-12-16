@@ -71,26 +71,28 @@ class Portfolio(object):
         if self.market_value.empty or reload:
             last_date = self.datareader.last_data_point(self.account)
             first_date = self.start
-            dates = dates_utils.get_market_days(start=first_date, end=last_date)
-            market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
+            if first_date is not None:
+                dates = dates_utils.get_market_days(start=first_date, end=last_date)
+                market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
-            for position in self.positions.keys():
-                pos = self.get_position(position)
-                pos_val = self.quantities[position] * pos.get_prices_cad().iloc[:, 0]
+                for position in self.positions.keys():
+                    pos = self.get_position(position)
+                    pos_val = self.quantities[position] * pos.get_prices_cad().iloc[:, 0]
 
-                pos_val = pos_val.fillna(method='ffill')
-                # pos.set_market_value(market_value=pos_val)
-                market_value += pos_val
-                market_value = market_value.fillna(method='ffill')
-            self.market_value = market_value
-            logger.logging.info(f'{self.account} market_value computed')
-
+                    pos_val = pos_val.fillna(method='ffill')
+                    # pos.set_market_value(market_value=pos_val)
+                    market_value += pos_val
+                    market_value = market_value.fillna(method='ffill')
+                self.market_value = market_value
+                logger.logging.info(f'{self.account} market_value computed')
+        else:
+            logger.logging.info(f"{self.account} no positions in portfolio")
     def get_market_value(self):
         return self.market_value
 
     def _load_positions(self, reload: bool = False) -> None:
         first_trx = self.transaction_manager.first_trx_date()
-        tickers = self.transaction_manager.all_positions()
+        tickers = self.transaction_manager.live_positions()
         for ticker in tickers:
             currency = 'CAD' if ticker[-4:] == '.TRT' else 'USD'
             pos = Position(ticker, currency=currency, datareader=self.datareader)
@@ -107,10 +109,14 @@ class Portfolio(object):
     def _load_prices(self, reload: bool = False) -> None:
         if self.prices.empty or reload:
             pos = list(self.get_position().values())
-            self.prices = self._make_prices_df(pos)
+            if len(pos):
+                self.prices = self._make_prices_df(pos)
 
-            logger.logging.info(
-                f'{self.account} prices from {self.prices.index.min().date()} to {self.prices.index.max().date()}')
+                logger.logging.info(
+                    f'{self.account} prices from {self.prices.index.min().date()} to {self.prices.index.max().date()}')
+            else:
+                logger.logging.info(
+                    f'{self.account} no positions in portfolio')
 
     def get_prices(self):
         return self.prices
@@ -119,32 +125,36 @@ class Portfolio(object):
         if self.quantities.empty or reload:
             self.quantities = pd.DataFrame()
             last_date = self.datareader.last_data_point(account=self.account)
-            first_date = self.transaction_manager.first_trx_date()
-            dates = dates_utils.get_market_days(start=first_date, end=last_date)
-            self.quantities.index = dates
+            first_date = self.start
+            if len(self.positions):
+                dates = dates_utils.get_market_days(start=first_date, end=last_date)
+                self.quantities.index = dates
 
-            for position in self.positions.keys():
-                trx = self.transaction_manager.transactions.loc[(self.transaction_manager.transactions.Ticker == position)
-                                                                & (
-                                                                            self.transaction_manager.transactions.Type != 'Dividend')]
-                self.quantities[position] = trx['Quantity']
-                logger.logging.info(f'quantities computed for {position}')
+                for position in self.positions.keys():
+                    trx = self.transaction_manager.transactions.loc[(self.transaction_manager.transactions.Ticker == position)
+                                                                    & (
+                                                                                self.transaction_manager.transactions.Type != 'Dividend')]
+                    self.quantities[position] = trx['Quantity']
+                    logger.logging.info(f'quantities computed for {position}')
 
-            self.quantities = self.quantities.fillna(0).cumsum()
+                self.quantities = self.quantities.fillna(0).cumsum()
+            else:
+                logger.logging.info(f'{self.account} no positions in portfolio')
 
     def get_quantities(self):
         return self.quantities
 
     def add_transaction(self, transaction: Transaction) -> None:
         value = transaction.quantity * transaction.price
-
+        if not len(self.fx):
+            self.fx[transaction.currency] = self.datareader.read_fx(currency=transaction.currency)
         if transaction.currency != 'CAD':
             value = (value * self.fx.get(transaction.currency).loc[transaction.date] + transaction.fees).iloc[0]
-        new_cash = self.cash(date=transaction.date) - value
-        if value > self.cash_account:
+        live_cash = self.cash(date=transaction.date)
+        new_cash = live_cash - value
+        if value > live_cash:
             logger.logging.error(f'Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
         else:
-            self.cash_account = new_cash
             self.transaction_manager.add(transaction=transaction)
 
     def cash(self, date: datetime = None):
@@ -164,15 +174,18 @@ class Portfolio(object):
         return values+changes+dividends
 
     def dividends(self, start_date: datetime = None, end_date: datetime = None):
-        if end_date is None:
-            end_date = self.datareader.last_data_point(account=self.account)
-        if start_date is None:
-            start_date = self.transaction_manager.first_trx_date()
-        live_fx = self.fx.get('USD').loc[end_date].iloc[0]
-        transactions = self.transaction_manager.get_transactions().loc[(self.transaction_manager.get_transactions().index <= end_date) & (self.transaction_manager.get_transactions().index >= start_date), ]
-        dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
-        dividends.loc[dividends.Currency == 'USD', 'Price'] *= live_fx
-        return dividends['Price'].sum()
+        if len(self.positions):
+            if end_date is None:
+                end_date = self.datareader.last_data_point(account=self.account)
+            if start_date is None:
+                start_date = self.transaction_manager.first_trx_date()
+            live_fx = self.fx.get('USD').loc[end_date].iloc[0]
+            transactions = self.transaction_manager.get_transactions().loc[(self.transaction_manager.get_transactions().index <= end_date) & (self.transaction_manager.get_transactions().index >= start_date), ]
+            dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
+            dividends.loc[dividends.Currency == 'USD', 'Price'] *= live_fx
+            return dividends['Price'].sum()
+        else:
+            return 0
 
     @staticmethod
     def _make_prices_df(positions: List[Position]):  # TODO add date to get prices from a further date
