@@ -37,7 +37,7 @@ class AlphaVantageConnection(object):
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
-            logger.logging.error(f'request limit reached ({ticker}), trying again')
+            logger.logging.info(f'request limit reached ({ticker}), trying again')
             request_limit_manager(ticker, restarted=True)
             return self.get_prices(ticker=ticker)
 

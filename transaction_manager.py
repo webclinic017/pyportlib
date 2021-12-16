@@ -12,7 +12,8 @@ class TransactionManager(object):
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
         self.filename = f"{self.account}_transactions.csv"
-        self.transactions = self.fetch()
+        self.transactions = pd.DataFrame()
+        self.fetch()
 
     def __repr__(self):
         return self.NAME
@@ -29,6 +30,7 @@ class TransactionManager(object):
                     trx.set_index('Date', inplace=True)
                     trx.index.name = 'Date'
                     trx.index = pd.to_datetime(trx.index)
+                    self.transactions = trx
                     return trx
                 else:
                     logger.logging.error(f'transactions do not match requirements for account: {self.account}')
@@ -39,6 +41,7 @@ class TransactionManager(object):
             # create empty transaction file in new directory
             empty_transactions = pd.DataFrame(columns=Transaction.TRANSACTIONS_INFO).set_index('Date')
             empty_transactions.to_csv(f"{self.directory}/{self.filename}")
+            self.transactions = empty_transactions
             return empty_transactions
 
     def _write_trx(self, transaction: Transaction) -> None:
@@ -83,11 +86,17 @@ class TransactionManager(object):
         return self.transactions.Fees.sum()
     
     def first_trx_date(self, ticker: str = None):
-        if ticker:
-            return self.transactions.loc[self.transactions.Ticker == ticker].index.min()
-        return self.transactions.index.min()
+        if len(self.get_transactions()):
+            if ticker:
+                return self.transactions.loc[self.transactions.Ticker == ticker].index.min()
+            return self.get_transactions().index.min()
+        else:
+            return None
 
     def get_currencies(self):
         currencies = set(self.transactions.Currency) - {'CAD'}
 
         return currencies
+
+    def get_transactions(self):
+        return self.transactions

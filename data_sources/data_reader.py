@@ -3,6 +3,7 @@ from datetime import datetime
 from config import config_utils
 from data_sources.alphavantage_connection import AlphaVantageConnection
 from data_sources.simfin_connection import SimFinConnection
+from transaction_manager import TransactionManager
 from utils import logger, files_utils
 import pandas as pd
 
@@ -76,7 +77,7 @@ class DataReader(object):
     def update_fx(self, currency: str):
         self._market_data_source.get_fx(currency=currency)
 
-    def last_data_point(self):
-        last = self.read_fx('USD').sort_index().index[-2:]
-
-        return last[-1]
+    def last_data_point(self, account: str):
+        last_data = self.read_fx('USD').sort_index().index[-1]
+        last_trade = TransactionManager(account=account).transactions.index.max()
+        return max(last_data, last_trade)
