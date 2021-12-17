@@ -94,9 +94,11 @@ class TransactionManager(object):
             return None
 
     def get_currencies(self):
-        currencies = set(self.transactions.Currency) - {'CAD'}
-
+        currencies = set(self.transactions.Currency)
         return currencies
+
+    def get_currency(self, ticker: str):
+        return self.get_transactions().loc[self.get_transactions()['Ticker'] == ticker, 'Currency'].iloc[0]
 
     def get_transactions(self):
         return self.transactions

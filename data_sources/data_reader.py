@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from config import config_utils
 from data_sources.alphavantage_connection import AlphaVantageConnection
 from data_sources.simfin_connection import SimFinConnection
@@ -56,9 +54,9 @@ class DataReader(object):
             self.update_prices(ticker=ticker)
             return self.read_prices(ticker)
 
-    def read_fx(self, currency: str):
+    def read_fx(self, currency_pair: str):
         directory = self._market_data_source.FX_DIRECTORY
-        filename = f"{self._market_data_source.FILE_PREFIX}_{currency}CAD_fx.csv"
+        filename = f"{self._market_data_source.FILE_PREFIX}_{currency_pair}_fx.csv"
 
         if files_utils.check_file(directory=directory,
                                   file=filename):
@@ -67,15 +65,15 @@ class DataReader(object):
             df.index = pd.to_datetime(df.index)
             return df[['Close']]
         else:
-            logger.logging.info(f'no fx data to read for {currency}, now fetching new data from api')
-            self.update_fx(currency=currency)
-            return self.read_fx(currency)
+            logger.logging.info(f'no fx data to read for {currency_pair}, now fetching new data from api')
+            self.update_fx(currency_pair=currency_pair)
+            return self.read_fx(currency_pair)
 
     def update_prices(self, ticker: str):
         self._market_data_source.get_prices(ticker=ticker)
 
-    def update_fx(self, currency: str):
-        self._market_data_source.get_fx(currency=currency)
+    def update_fx(self, currency_pair: str):
+        self._market_data_source.get_fx(currency_pair=currency_pair)
 
     def last_data_point(self, account: str):
         last_data = self.read_fx('USD').sort_index().index[-1]

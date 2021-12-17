@@ -5,31 +5,27 @@ import pandas as pd
 
 class Position(object):
 
-    def __init__(self, ticker: str, currency: str, datareader: DataReader):
+    def __init__(self, ticker: str, currency: str, ptf_currency: str, datareader: DataReader):
         self.ticker = ticker
         self.currency = currency
         self.datareader = datareader
         self.prices = pd.Series()
-        self.prices_cad = pd.DataFrame()
         self.quantities = pd.Series()
+        self.pair = f"{currency}{ptf_currency}"
+
+        self._load_prices()
 
     def __repr__(self):
         return f"{self.ticker}"
 
-    def get_prices(self, start_date: datetime = None, end_date: datetime = None, reload: bool = False):
-        if self.prices.empty or reload:
-            prices = self.datareader.read_prices(ticker=self.ticker).astype(float)
-            self.prices = prices.loc[end_date: start_date].sort_index()
+    def _load_prices(self):
+        self.prices = self.datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
+
+    def get_prices(self):  # FIXME ptf should convert the fx??
         return self.prices
 
-    def get_prices_cad(self, start_date: datetime = None, end_date: datetime = None, reload: bool = False):
-        prices = self.get_prices(start_date=start_date, end_date=end_date, reload=reload)
-        if (self.prices_cad.empty or reload) and self.currency != 'CAD':
-            fx = self.datareader.read_fx(currency=self.currency).loc[end_date: start_date]
-            self.prices_cad = (prices * fx).sort_index()
-        elif (self.prices_cad.empty or reload) and self.currency == 'CAD':
-            self.prices_cad = prices
-        return self.prices_cad
+    def set_prices(self, prices: pd.Series):
+        self.prices = prices
 
     def set_quantities(self, quantities):
         self.quantities = quantities

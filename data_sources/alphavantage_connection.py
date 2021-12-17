@@ -51,12 +51,12 @@ class AlphaVantageConnection(object):
         df.to_csv(f"{directory}/{filename}")
         request_limit_manager(ticker)
 
-    def get_fx(self, currency: str) -> None:
+    def get_fx(self, currency_pair: str) -> None:
 
-        filename = f"{self.FILE_PREFIX}_{currency}CAD_fx.csv"
+        filename = f"{self.FILE_PREFIX}_{currency_pair}_fx.csv"
         directory = self.FX_DIRECTORY
 
-        pair = f"{currency}CAD"
+        pair = currency_pair
         request_url = f"{self.URL}function=TIME_SERIES_DAILY&symbol={pair}&outputsize=full&apikey={self.api_key}"
 
         request = requests.get(request_url)
@@ -66,9 +66,9 @@ class AlphaVantageConnection(object):
         columns = ['Open', 'High', 'Low', 'Close', 'Volume']
 
         if data is None or request.status_code != 200:
-            logger.logging.error(f'request limit reached ({currency}), trying again')
-            request_limit_manager(currency, restarted=True)
-            return self.get_fx(currency=currency)
+            logger.logging.error(f'request limit reached ({currency_pair}), trying again')
+            request_limit_manager(currency_pair, restarted=True)
+            return self.get_fx(currency_pair=currency_pair)
 
         df = pd.DataFrame.from_dict(data, orient='index')
         df.columns = columns
