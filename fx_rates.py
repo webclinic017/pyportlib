@@ -36,7 +36,7 @@ class FxRates:
                 last_date = self.datareader.read_fx(currency_pair=pair).index.max()
                 dates = get_market_days(start=datetime(2000, 1, 1), end=last_date)
                 self.rates[curr] = pd.DataFrame(index=dates, columns=['Close'], data=[1 for _ in range(len(dates))])
-
-            self.rates[curr] = self.datareader.read_fx(currency_pair=pair)
+            else:
+                self.rates[curr] = self.datareader.read_fx(currency_pair=pair)
         logger.logging.info(f'fx rates loaded')
 
