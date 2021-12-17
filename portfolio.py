@@ -69,7 +69,7 @@ class Portfolio(object):
             for position in self.positions.values():
                 fx = self.fx.get(position.currency).loc[self.start_date:]
                 pos_val = self.quantities[position.ticker].multiply(position.get_prices().iloc[:, 0], fill_value=0).multiply(fx.iloc[:, 0], fill_value=0)
-                # TODO try to make fx mult, cad fx is 1 so no need to check fx, just * by rate
+                # TODO try to make fx mult, cad fx is 1 so no need to check fx, just * by rate WIPPPPPP
                 pos_val = pos_val.fillna(method='ffill')
                 market_value += pos_val
                 market_value = market_value.fillna(method='ffill')
