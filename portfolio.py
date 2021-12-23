@@ -147,7 +147,7 @@ class Portfolio(object):
         if date is None:
             date = self.datareader.last_data_point(account=self.account)
 
-        live_fx = self.fx.get('USD').loc[date].iloc[0]  # FIXME for any ptf fx.. vectorized
+        live_fx = self.fx.get(f'USD{self.currency}').loc[date].iloc[0]  # FIXME for any ptf fx.. vectorized
         changes = self.cash_account.get_cash_change(date)
 
         trx = self.transaction_manager.get_transactions()
@@ -168,7 +168,7 @@ class Portfolio(object):
                 end_date = self.datareader.last_data_point(account=self.account)
             if start_date is None:
                 start_date = self.start_date
-            live_fx = self.fx.get('USDCAD').loc[end_date].iloc[0]
+            live_fx = self.fx.get(f'USD{self.currency}').loc[end_date].iloc[0]
             transactions = self.transaction_manager.get_transactions().loc[
                 (self.transaction_manager.get_transactions().index <= end_date) & (
                             self.transaction_manager.get_transactions().index >= start_date),]
