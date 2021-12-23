@@ -47,4 +47,5 @@ class CashAccount:
         return self.cash_changes
 
     def get_cash_change(self, date):
-        return self.get_cash_changes().loc[self.get_cash_changes().index <= date, 'Amount'].sum()
+        c_ch = self.get_cash_changes()
+        return c_ch.loc[self.get_cash_changes().index <= date, 'Amount'].sum()
