@@ -10,33 +10,28 @@ from utils.dates_utils import get_market_days
 
 class FxRates:
     def __init__(self, ptf_currency: str, currencies: List[str]):
-        self.currencies = currencies
+        self.pairs = [f"{curr}{ptf_currency}" for curr in currencies]
         self.rates = {}
         self.datareader = DataReader()
         self.ptf_currency = ptf_currency
         self._load()
 
-    def set(self, currencies: List[str]):
-        self.currencies = currencies
+    def set(self, pairs: List[str]):
+        self.pairs = pairs
         self._load()
 
     def refresh(self):
-        for curr in self.currencies:
-            pair = f'{curr}{self.ptf_currency}'
+        for pair in self.pairs:
             self.datareader.update_fx(currency_pair=pair)
         self._load()
 
-    def get(self, currency: str):
-        return self.rates.get(currency)
+    def get(self, pair: str):
+        if len(pair) != 6:
+            logger.logging.error('enter valid currency pair')
+        return self.rates.get(pair)
 
     def _load(self):
-        for curr in self.currencies:
-            pair = f'{curr}{self.ptf_currency}'
-            if self.ptf_currency == curr:
-                last_date = self.datareader.read_fx(currency_pair=pair).index.max()
-                dates = get_market_days(start=datetime(2000, 1, 1), end=last_date)
-                self.rates[curr] = pd.DataFrame(index=dates, columns=['Close'], data=[1 for _ in range(len(dates))])
-            else:
-                self.rates[curr] = self.datareader.read_fx(currency_pair=pair)
+        for pair in self.pairs:
+            self.rates[pair] = self.datareader.read_fx(currency_pair=pair)
         logger.logging.info(f'fx rates loaded')
 

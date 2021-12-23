@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Union
 from cash_account import CashAccount
 from data_sources.data_reader import DataReader
+from data_sources.yfinance_connection import YFinanceConnection
 from fx_rates import FxRates
 from position import Position
 from transaction import Transaction
@@ -37,9 +38,8 @@ class Portfolio(object):
     def load_data(self) -> None:
         self.transaction_manager.fetch()
         self._load_positions()
-        # self._load_prices()  # TODO fx
         self._load_quantities()
-        self._load_market_value() # TODO fx
+        self._load_market_value()
         logger.logging.info(f'{self.account} data loaded')
 
     def update_data(self) -> None:
@@ -56,10 +56,6 @@ class Portfolio(object):
         for ticker in self.positions.keys():
             self.datareader.update_prices(ticker=ticker)
 
-    def _get_fx(self, currency):
-        pair = f"{currency}{self.currency}"
-        return self.fx.get(pair)
-
     def _load_market_value(self) -> None:  # FIXME make for a specific date, not a time series
         if len(self.positions):
             last_date = self.datareader.last_data_point(self.account)
@@ -67,13 +63,11 @@ class Portfolio(object):
             market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
             for position in self.positions.values():
-                fx = self.fx.get(position.currency).loc[self.start_date:]
-                pos_val = self.quantities[position.ticker].multiply(position.get_prices().iloc[:, 0], fill_value=0).multiply(fx.iloc[:, 0], fill_value=0)
-                # TODO try to make fx mult, cad fx is 1 so no need to check fx, just * by rate WIPPPPPP
+                pos_val = self.quantities[position.ticker].multiply(position.get_prices().iloc[:, 0])
                 pos_val = pos_val.fillna(method='ffill')
-                market_value += pos_val
+                market_value = market_value.add(pos_val)
                 market_value = market_value.fillna(method='ffill')
-            self.market_value = market_value
+            self.market_value = market_value.dropna()
             logger.logging.info(f'{self.account} market_value computed')
         else:
             logger.logging.info(f"{self.account} no positions in portfolio")
@@ -85,7 +79,11 @@ class Portfolio(object):
         tickers = self.transaction_manager.live_positions()
         for ticker in tickers:
             currency = self.transaction_manager.get_currency(ticker=ticker)
-            pos = Position(ticker, currency=currency, ptf_currency=self.currency, datareader=self.datareader)
+            pos = Position(ticker, currency=currency, datareader=self.datareader)
+
+            if self.currency != pos.currency:
+                prices = pos.get_prices().multiply(self.fx.get(f"{pos.currency}{self.currency}")).dropna()
+                pos.set_prices(prices=prices)
             self.positions[ticker] = pos
         logger.logging.info(f'positions for {self.account} loaded')
 
@@ -95,7 +93,7 @@ class Portfolio(object):
         else:
             return self.positions
 
-    def _load_prices(self) -> None:  # FIXME FXXXXX 
+    def _load_prices(self) -> None:
         pos = list(self.get_position().values())
         if len(pos):
             self.prices = self._make_prices_df(pos, start_date=self.start_date)
@@ -145,30 +143,32 @@ class Portfolio(object):
         else:
             self.transaction_manager.add(transaction=transaction)
 
-    def cash(self, date: datetime = None):  # FIXME for new fx module
+    def cash(self, date: datetime = None):
         if date is None:
             date = self.datareader.last_data_point(account=self.account)
 
-        live_fx = self.fx.get('USD').loc[date].iloc[0]
+        live_fx = self.fx.get('USD').loc[date].iloc[0]  # FIXME for any ptf fx.. vectorized
         changes = self.cash_account.get_cash_change(date)
 
-        transactions = self.transaction_manager.get_transactions().loc[
-            self.transaction_manager.get_transactions().index <= date,]
-        transactions.loc[:, 'Value'] = transactions.Quantity * transactions.Price
-        transactions.loc[transactions.Currency == 'USD', 'Value'] *= live_fx
-        values = transactions['Value'].sum() * -1
+        trx = self.transaction_manager.get_transactions()
+        trx = trx.loc[trx.index <= date,]
+        trx.loc[:, 'Value'] = trx.Quantity * trx.Price
+        trx.loc[trx.Currency == 'USD', 'Value'] *= live_fx
+        values = trx['Value'].sum() * -1
+
+        fees = trx.Fees.sum()
 
         dividends = self.dividends(end_date=date)
 
-        return values + changes + dividends
+        return values + changes + dividends - fees
 
-    def dividends(self, start_date: datetime = None, end_date: datetime = None):  # FIXME for new fx module
+    def dividends(self, start_date: datetime = None, end_date: datetime = None):  # FIXME for any ptf fx
         if len(self.positions):
             if end_date is None:
                 end_date = self.datareader.last_data_point(account=self.account)
             if start_date is None:
                 start_date = self.start_date
-            live_fx = self.fx.get('USD').loc[end_date].iloc[0]
+            live_fx = self.fx.get('USDCAD').loc[end_date].iloc[0]
             transactions = self.transaction_manager.get_transactions().loc[
                 (self.transaction_manager.get_transactions().index <= end_date) & (
                             self.transaction_manager.get_transactions().index >= start_date),]
@@ -180,7 +180,6 @@ class Portfolio(object):
 
     @staticmethod
     def _make_prices_df(positions: List[Position], start_date: datetime = None):
-        # FIXME FXXX
         df = positions[0].get_prices().loc[start_date:]
         df.columns = [positions[0].ticker]
 
