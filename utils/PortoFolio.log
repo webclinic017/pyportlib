@@ -1,0 +1,4 @@
+2021-12-22 21:23:43,958:INFO:fx rates loaded: in _load
+2021-12-22 21:23:44,422:INFO:positions for tfsa loaded: in _load_positions
+2021-12-22 21:23:45,443:INFO:tfsa market_value computed: in _load_market_value
+2021-12-22 21:23:45,443:INFO:tfsa data loaded: in load_data
