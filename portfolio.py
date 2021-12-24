@@ -47,7 +47,7 @@ class Portfolio(object):
         self._refresh_fx()
         self.load_data()
         self.transaction_manager.fetch()
-        logger.logging.info(f'{self.account} refreshed')
+        logger.logging.info(f'{self.account} updated')
 
     def _refresh_fx(self) -> None:
         self.fx.refresh()
@@ -68,7 +68,7 @@ class Portfolio(object):
                 market_value = market_value.add(pos_val)
                 market_value = market_value.fillna(method='ffill')
             self.market_value = market_value.dropna()
-            logger.logging.info(f'{self.account} market_value computed')
+            logger.logging.debug(f'{self.account} market_value computed')
         else:
             logger.logging.info(f"{self.account} no positions in portfolio")
 
@@ -85,7 +85,7 @@ class Portfolio(object):
                 prices = pos.get_prices().multiply(self.fx.get(f"{pos.currency}{self.currency}")).dropna()
                 pos.set_prices(prices=prices)
             self.positions[ticker] = pos
-        logger.logging.info(f'positions for {self.account} loaded')
+        logger.logging.debug(f'positions for {self.account} loaded')
 
     def get_position(self, ticker: str = None) -> Union[Position, dict]:
         if ticker:
@@ -98,10 +98,9 @@ class Portfolio(object):
         if len(pos):
             self.prices = self._make_prices_df(pos, start_date=self.start_date)
 
-            logger.logging.info(f'{self.account} position prices loaded')
+            logger.logging.debug(f'{self.account} position prices loaded')
         else:
-            logger.logging.info(
-                f'{self.account} no positions in portfolio')
+            logger.logging.info(f'{self.account} no positions in portfolio')
 
     def get_prices(self):
         return self.prices

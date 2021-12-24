@@ -33,5 +33,5 @@ class FxRates:
     def _load(self):
         for pair in self.pairs:
             self.rates[pair] = self.datareader.read_fx(currency_pair=pair)
-        logger.logging.info(f'fx rates loaded')
+        logger.logging.debug(f'fx rates loaded')
 
