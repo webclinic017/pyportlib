@@ -1,29 +1,5 @@
-2021-12-23 22:46:05,888:DEBUG:CACHEDIR=/Users/Philippe/.matplotlib: in wrapper
-2021-12-23 22:46:05,892:DEBUG:Using fontManager instance from /Users/Philippe/.matplotlib/fontlist-v330.json: in _load_fontmanager
-2021-12-23 22:46:06,135:DEBUG:Loaded backend module://backend_interagg version unknown.: in switch_backend
-2021-12-23 22:46:06,240:DEBUG:fx rates loaded: in _load
-2021-12-23 22:46:06,747:DEBUG:positions for tfsa loaded: in _load_positions
-2021-12-23 22:46:07,195:DEBUG:quantities computed for BIP-UN.TO: in _load_quantities
-2021-12-23 22:46:07,198:DEBUG:quantities computed for GRT-UN.TO: in _load_quantities
-2021-12-23 22:46:07,201:DEBUG:quantities computed for HTGC: in _load_quantities
-2021-12-23 22:46:07,204:DEBUG:quantities computed for LQD: in _load_quantities
-2021-12-23 22:46:07,207:DEBUG:quantities computed for MRK: in _load_quantities
-2021-12-23 22:46:07,209:DEBUG:quantities computed for MSFT: in _load_quantities
-2021-12-23 22:46:07,212:DEBUG:quantities computed for NWH-UN.TO: in _load_quantities
-2021-12-23 22:46:07,215:DEBUG:quantities computed for PLTR: in _load_quantities
-2021-12-23 22:46:07,218:DEBUG:quantities computed for PPL.TO: in _load_quantities
-2021-12-23 22:46:07,221:DEBUG:quantities computed for SCYX: in _load_quantities
-2021-12-23 22:46:07,223:DEBUG:quantities computed for SKYY: in _load_quantities
-2021-12-23 22:46:07,226:DEBUG:quantities computed for SRU-UN.TO: in _load_quantities
-2021-12-23 22:46:07,229:DEBUG:quantities computed for TCPC: in _load_quantities
-2021-12-23 22:46:07,232:DEBUG:quantities computed for TM: in _load_quantities
-2021-12-23 22:46:07,235:DEBUG:quantities computed for VBU.TO: in _load_quantities
-2021-12-23 22:46:07,239:DEBUG:quantities computed for VDY.TO: in _load_quantities
-2021-12-23 22:46:07,242:DEBUG:quantities computed for VNQ: in _load_quantities
-2021-12-23 22:46:07,247:DEBUG:quantities computed for VO: in _load_quantities
-2021-12-23 22:46:07,253:DEBUG:quantities computed for VOO: in _load_quantities
-2021-12-23 22:46:07,258:DEBUG:quantities computed for VOOV: in _load_quantities
-2021-12-23 22:46:07,261:DEBUG:quantities computed for VSB.TO: in _load_quantities
-2021-12-23 22:46:07,264:DEBUG:quantities computed for XIU.TO: in _load_quantities
-2021-12-23 22:46:07,800:DEBUG:tfsa market_value computed: in _load_market_value
-2021-12-23 22:46:07,801:INFO:tfsa data loaded: in load_data
+2021-12-26 11:12:39,592:DEBUG:fx rates loaded: in _load
+2021-12-26 11:12:40,089:DEBUG:positions for tfsa loaded: in _load_positions
+2021-12-26 11:12:40,670:DEBUG:tfsa quantities computed: in _load_position_quantities
+2021-12-26 11:12:41,186:DEBUG:tfsa market_value computed: in _load_market_value
+2021-12-26 11:12:41,186:INFO:tfsa data loaded: in load_data

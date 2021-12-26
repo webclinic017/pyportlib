@@ -53,7 +53,7 @@ class DataReader(object):
             df = pd.read_csv(f"{directory}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
-            return df[['Close']]
+            return df['Close']
         else:
             logger.logging.info(f'no price data to read for {ticker}, now fetching new data from api')
             self.update_prices(ticker=ticker)
@@ -68,7 +68,7 @@ class DataReader(object):
             df = pd.read_csv(f"{directory}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
-            return df[['Close']]
+            return df['Close']
         else:
             logger.logging.info(f'no fx data to read for {currency_pair}, now fetching new data from api')
             self.update_fx(currency_pair=currency_pair)

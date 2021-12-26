@@ -9,12 +9,17 @@ from utils.dates_utils import get_market_days
 
 
 class FxRates:
+    NAME = "FX Rates"
+
     def __init__(self, ptf_currency: str, currencies: List[str]):
         self.pairs = [f"{curr}{ptf_currency}" for curr in currencies]
         self.rates = {}
         self.datareader = DataReader()
         self.ptf_currency = ptf_currency
         self._load()
+
+    def __repr__(self):
+        return self.NAME
 
     def set(self, pairs: List[str]):
         self.pairs = pairs
@@ -27,7 +32,7 @@ class FxRates:
 
     def get(self, pair: str):
         if len(pair) != 6:
-            logger.logging.error('enter valid currency pair')
+            logger.logging.error(f'enter valid currency pair')
         return self.rates.get(pair)
 
     def _load(self):

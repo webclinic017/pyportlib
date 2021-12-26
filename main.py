@@ -1,9 +1,11 @@
 from portfolio import Portfolio
-import quantstats as qs
-qs.extend_pandas()
+import utils.timing as timing
 
 ptf = Portfolio(account='tfsa', currency="CAD")
-ptf.update_data()
+timing.midlog("ptf loaded")
+c = ptf.get_position("SCYX").daily_price_diff()
+timing.midlog("pnl")
+
 print('')
 
 
