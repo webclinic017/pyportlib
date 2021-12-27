@@ -10,7 +10,7 @@ from config.config_utils import fetch_key
 class AlphaVantageConnection(object):
     STATEMENT_DIRECTORY = 'client_data/data/statements'
     PRICES_DIRECTORY = 'client_data/data/prices'
-    FX_DIRECTORY = 'client_data/data/fx'
+    FX_DIRECTORY = 'client_data/data/_fx'
     FILE_PREFIX = 'AV'
     NAME = 'AlphaVantage'
     URL = 'https://www.alphavantage.co/query?'
@@ -74,7 +74,7 @@ class AlphaVantageConnection(object):
         if not files_utils.check_dir(directory):
             files_utils.make_dir(directory)
         data.to_csv(f"{directory}/{filename}")
-        request_limit_manager('fx')
+        request_limit_manager('_fx')
 
     @staticmethod
     def _make_ptf_currency_df():

@@ -1,7 +1,7 @@
 import logging
 
 logger = logging.getLogger()
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s',
                     filename='utils/PortoFolio.log',
                     filemode="w")
