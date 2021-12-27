@@ -14,3 +14,11 @@ def check_df_columns(df, columns: List[str]) -> bool:
         return True
     else:
         return False
+
+
+def pnl_dict_map(func, d, start_date, end_date, factory=dict):
+    """ Apply function to values of dictionary
+    """
+    pnl = {k: v.daily_unrealized_pnl(start_date, end_date) for k, v in d.items()}
+
+    return pnl

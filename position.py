@@ -1,7 +1,7 @@
 from datetime import datetime
+from typing import Union, List
 
 from pandas._libs.tslibs.offsets import BDay
-
 from data_sources.data_reader import DataReader
 import pandas as pd
 
@@ -36,15 +36,18 @@ class Position(object):
     def set_quantities(self, quantities: pd.Series) -> None:
         self._quantities = quantities
 
-    def daily_price_diff(self, date: datetime = None) -> pd.Series:
-        """
-        gives position price difference from last close to date param
-        :param date: datetime of date of price difference
-        :return: pd.Series of the price difference for given date
-        """
-        if date is None:
-            date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-        start_date = date - BDay(4)
-        dates = dates_utils.get_market_days(start=start_date, end=date)[-2:]
-        pnl = self.get_prices().loc[dates].diff().dropna()
+    def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None) -> pd.Series:
+        if end_date is None:
+            end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        if start_date is None:
+            start_date = end_date
+
+        search_date = start_date - BDay(4)
+        try:
+            diff = self.get_prices().loc[search_date:end_date].diff().dropna()
+        except KeyError:
+            raise KeyError("pnl error")
+
+        pnl = diff.multiply(self.get_quantities().loc[search_date:end_date]).dropna().loc[start_date:end_date]
+
         return pnl

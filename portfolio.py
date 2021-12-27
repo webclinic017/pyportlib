@@ -1,12 +1,13 @@
 from datetime import datetime
 from typing import List, Union
+
 from cash_account import CashAccount
 from data_sources.data_reader import DataReader
 from fx_rates import FxRates
 from position import Position
 from transaction import Transaction
 from transaction_manager import TransactionManager
-from utils import logger, dates_utils
+from utils import logger, dates_utils, df_utils
 import pandas as pd
 
 
@@ -156,11 +157,17 @@ class Portfolio(object):
         else:
             return 0
 
-    def total_pnl(self):
-        raise NotImplementedError
+    def total_daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None):
+        pnl = self.daily_unrealized_pnl(start_date=start_date, end_date=end_date)
+        return pnl.sum(axis=1)
 
-    def pnl(self):
-        raise NotImplementedError
+    def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None):
+        pnl = df_utils.pnl_dict_map(Position.daily_unrealized_pnl, self._positions, start_date, end_date)
+        return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
+
+    def daily_daily_unrealized_pnl_pct(self, start_date: datetime = None, end_date: datetime = None):
+        pnl = self.daily_unrealized_pnl(start_date, end_date).sum(axis=1).divide(self.get_market_value().loc[start_date:end_date])
+        return pnl
 
     @staticmethod
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
