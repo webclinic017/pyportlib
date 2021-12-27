@@ -7,8 +7,7 @@ from reports import portfolio_reports
 ptf = Portfolio(account='tfsa', currency="CAD")
 timing.midlog("loading")
 
-x = ptf.daily_daily_unrealized_pnl_pct(start_date=ptf.start_date)
-
+x = ptf.daily_unrealized_pnl_pct(start_date=ptf.start_date)
 portfolio_reports.report(x, "XIU.TO", name="test")
 
 print('')

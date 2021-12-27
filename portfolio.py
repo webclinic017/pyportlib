@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Union
+from typing import Union
 
 from cash_account import CashAccount
 from data_sources.data_reader import DataReader
@@ -127,10 +127,10 @@ class Portfolio(object):
             date = self._datareader.last_data_point(account=self.account)
 
         live_fx = self._fx.get(f'USD{self.currency}').loc[date].iloc[0]  # FIXME for any ptf _fx.. vectorized
-        changes = self.cash_account.get_cash_change(date)
+        changes = self._cash_account.get_cash_change(date)
 
         trx = self._transaction_manager.get_transactions()
-        trx = trx.loc[trx.index <= date,]
+        trx = trx.loc[trx.index <= date]
         trx.loc[:, 'Value'] = trx.Quantity * trx.Price
         trx.loc[trx.Currency == 'USD', 'Value'] *= live_fx
         values = trx['Value'].sum() * -1
@@ -141,16 +141,15 @@ class Portfolio(object):
 
         return values + changes + dividends - fees
 
-    def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:  # FIXME for any ptf _fx
+    def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
         if len(self._positions):
             if end_date is None:
                 end_date = self._datareader.last_data_point(account=self.account)
             if start_date is None:
                 start_date = self.start_date
-            live_fx = self._fx.get(f'USD{self.currency}').loc[end_date].iloc[0]
+            live_fx = self._fx.get(f'USD{self.currency}').loc[end_date].iloc[0]  # FIXME for any ptf _fx
             transactions = self._transaction_manager.get_transactions().loc[
-                (self._transaction_manager.get_transactions().index <= end_date) & (
-                        self._transaction_manager.get_transactions().index >= start_date),]
+                (self._transaction_manager.get_transactions().index <= end_date) & (self._transaction_manager.get_transactions().index >= start_date)]
             dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
             dividends.loc[dividends.Currency == 'USD', 'Price'] *= live_fx
             return dividends['Price'].sum()
@@ -165,11 +164,10 @@ class Portfolio(object):
         pnl = df_utils.pnl_dict_map(Position.daily_unrealized_pnl, self._positions, start_date, end_date)
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
 
-    def daily_daily_unrealized_pnl_pct(self, start_date: datetime = None, end_date: datetime = None):
+    def daily_unrealized_pnl_pct(self, start_date: datetime = None, end_date: datetime = None):
         pnl = self.daily_unrealized_pnl(start_date, end_date).sum(axis=1).divide(self.get_market_value().loc[start_date:end_date])
         return pnl
 
     @staticmethod
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
         return quantities.fillna(0).cumsum()
-

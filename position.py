@@ -37,6 +37,13 @@ class Position(object):
         self._quantities = quantities
 
     def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None) -> pd.Series:
+        """
+        gives unrealized pnl of position in $ amount, without checking transaction prices
+        :param start_date: start date of series (if only param, end_date is last date)
+        :param end_date: start date of series (if only param, end_date the only date given in series)
+        :return: series of position pnl in $ amount
+        """
+
         if end_date is None:
             end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         if start_date is None:
