@@ -11,5 +11,3 @@ x = ptf.daily_unrealized_pnl_pct(start_date=ptf.start_date)
 portfolio_reports.report(x, "XIU.TO", name="test")
 
 print('')
-
-
