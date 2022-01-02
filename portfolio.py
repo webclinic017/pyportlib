@@ -126,7 +126,7 @@ class Portfolio(object):
         if date is None:
             date = self._datareader.last_data_point(account=self.account)
 
-        live_fx = self._fx.get(f'USD{self.currency}').loc[date].iloc[0]  # FIXME for any ptf _fx.. vectorized
+        live_fx = self._fx.get(f'USD{self.currency}').loc[date].iloc[0]  # FIXME for any ptf fx.. vectorized?
         changes = self._cash_account.get_cash_change(date)
 
         trx = self._transaction_manager.get_transactions()
@@ -147,7 +147,7 @@ class Portfolio(object):
                 end_date = self._datareader.last_data_point(account=self.account)
             if start_date is None:
                 start_date = self.start_date
-            live_fx = self._fx.get(f'USD{self.currency}').loc[end_date].iloc[0]  # FIXME for any ptf _fx
+            live_fx = self._fx.get(f'USD{self.currency}').loc[end_date].iloc[0]  # FIXME for any ptf fx
             transactions = self._transaction_manager.get_transactions().loc[
                 (self._transaction_manager.get_transactions().index <= end_date) & (self._transaction_manager.get_transactions().index >= start_date)]
             dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
@@ -161,7 +161,7 @@ class Portfolio(object):
         return pnl.sum(axis=1)
 
     def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None):
-        pnl = df_utils.pnl_dict_map(Position.daily_unrealized_pnl, self._positions, start_date, end_date)
+        pnl = df_utils.pnl_dict_map(d=self.get_position(), start_date=start_date, end_date=end_date)
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
 
     def daily_unrealized_pnl_pct(self, start_date: datetime = None, end_date: datetime = None):
