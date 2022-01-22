@@ -16,9 +16,9 @@ def check_df_columns(df, columns: List[str]) -> bool:
         return False
 
 
-def pnl_dict_map(d, start_date, end_date):
+def pnl_dict_map(d, start_date, end_date, transactions, fx: dict):
     """ Apply function to values of position dictionary
     """
-    pnl = {k: v.daily_unrealized_pnl(start_date, end_date) for k, v in d.items()}
+    pnl = {k: v.daily_unrealized_pnl(start_date, end_date, transactions.loc[transactions.Ticker == k], fx) for k, v in d.items()}
 
     return pnl

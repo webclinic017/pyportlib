@@ -7,11 +7,11 @@ import utils.timing as timing
 from reports import portfolio_reports
 
 ptf = Portfolio(account='tfsa', currency="CAD")
-# ptf.update_data()
 timing.midlog("loading")
 
 x = ptf.daily_unrealized_pnl_pct(start_date=ptf.start_date)
+timing.midlog("pnl compute")
 
-portfolio_reports.report(x, "SPY", name="tfsa_2022-01-19", rf=0.)
+portfolio_reports.report(x, "SPY", name="tfsa_jan21-2022", rf=0.)
 
 print('')

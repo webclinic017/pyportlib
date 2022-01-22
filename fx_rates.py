@@ -1,11 +1,6 @@
-from datetime import datetime
 from typing import List, Union
-
-import pandas as pd
-
 from data_sources.data_reader import DataReader
 from utils import logger
-from utils.dates_utils import get_market_days
 
 
 class FxRates:
@@ -39,4 +34,3 @@ class FxRates:
         for pair in self.pairs:
             self.rates[pair] = self.datareader.read_fx(currency_pair=pair)
         logger.logging.debug(f'fx rates loaded')
-

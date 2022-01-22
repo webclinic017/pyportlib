@@ -161,7 +161,8 @@ class Portfolio(object):
         return pnl.sum(axis=1)
 
     def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None):
-        pnl = df_utils.pnl_dict_map(d=self.get_position(), start_date=start_date, end_date=end_date)
+        transactions = self._transaction_manager.get_transactions()
+        pnl = df_utils.pnl_dict_map(d=self.get_position(), start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
 
     def daily_unrealized_pnl_pct(self, start_date: datetime = None, end_date: datetime = None):
