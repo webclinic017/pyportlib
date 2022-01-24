@@ -30,7 +30,7 @@ class YFinanceConnection(object):
         if not files_utils.check_dir(directory):
             files_utils.make_dir(directory)
         data.to_csv(f"{directory}/{filename}")
-        logger.logging.info(f"{ticker} loaded from yfinance api")
+        logger.logging.debug(f"{ticker} loaded from yfinance api")
 
     def get_fx(self, currency_pair: str) -> None:
         filename = f"{self.FILE_PREFIX}_{currency_pair}_fx.csv"
@@ -45,7 +45,7 @@ class YFinanceConnection(object):
         if not files_utils.check_dir(directory):
             files_utils.make_dir(directory)
         data.to_csv(f"{directory}/{filename}")
-        logger.logging.info(f"{currency_pair} loaded from yfinance api")
+        logger.logging.debug(f"{currency_pair} loaded from yfinance api")
 
     @staticmethod
     def _make_ptf_currency_df():

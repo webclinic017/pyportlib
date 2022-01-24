@@ -53,7 +53,7 @@ class DataReader(object):
             df = pd.read_csv(f"{directory}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
-            return df[['Close']]
+            return df['Close']
         else:
             logger.logging.info(f'no price data to read for {ticker}, now fetching new data from api')
             self.update_prices(ticker=ticker)
@@ -68,7 +68,7 @@ class DataReader(object):
             df = pd.read_csv(f"{directory}/{filename}")
             df = df.set_index('Date')
             df.index = pd.to_datetime(df.index)
-            return df[['Close']]
+            return df['Close']
         else:
             logger.logging.info(f'no fx data to read for {currency_pair}, now fetching new data from api')
             self.update_fx(currency_pair=currency_pair)
@@ -80,7 +80,7 @@ class DataReader(object):
     def update_fx(self, currency_pair: str):
         self._market_data_source.get_fx(currency_pair=currency_pair)
 
-    def last_data_point(self, account: str):
-        last_data = self.read_fx('CADCAD').sort_index().index[-1]
+    def last_data_point(self, account: str, ptf_currency: str = 'CAD'):
+        last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]
         last_trade = TransactionManager(account=account).transactions.index.max()
         return max(last_data, last_trade)
