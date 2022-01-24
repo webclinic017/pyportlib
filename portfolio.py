@@ -54,9 +54,9 @@ class Portfolio(object):
         for ticker in self._positions.keys():
             self._datareader.update_prices(ticker=ticker)
 
-    def _load_market_value(self) -> None:  # FIXME make for a specific date, not a time series, attribute?
+    def _load_market_value(self) -> None:
         if len(self._positions):
-            last_date = self._datareader.last_data_point(self.account)
+            last_date = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
             dates = dates_utils.get_market_days(start=self.start_date, end=last_date)
             market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
@@ -94,7 +94,7 @@ class Portfolio(object):
     def _load_position_quantities(self) -> None:
         if len(self._positions):
 
-            last_date = self._datareader.last_data_point(account=self.account)
+            last_date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
             dates = dates_utils.get_market_days(start=self.start_date, end=last_date)
             date_merge = pd.DataFrame(index=dates, columns=['qty'])
 
@@ -124,7 +124,7 @@ class Portfolio(object):
 
     def cash(self, date: datetime = None) -> float:
         if date is None:
-            date = self._datareader.last_data_point(account=self.account)
+            date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
 
         changes = self._cash_account.get_cash_change(date)
 
@@ -147,16 +147,16 @@ class Portfolio(object):
     def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
         if len(self._positions):
             if end_date is None:
-                end_date = self._datareader.last_data_point(account=self.account)
+                end_date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
             if start_date is None:
                 start_date = self.start_date
             transactions = self._transaction_manager.get_transactions().loc[start_date:]
             transactions = transactions.loc[transactions.index <= end_date]
             dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
+
             trx_currencies = set(transactions.Currency)
-            # FIXME for any ptf fx
             for curr in trx_currencies:
-                live_fx = self._fx.get(f'{curr}{self.currency}').loc[end_date]  # FIXME for any ptf fx
+                live_fx = self._fx.get(f'{curr}{self.currency}').loc[end_date]
                 dividends.loc[dividends.Currency == curr, 'Price'] *= live_fx
             return round(dividends['Price'].sum(), 2)
         else:

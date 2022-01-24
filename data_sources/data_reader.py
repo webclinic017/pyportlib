@@ -80,10 +80,7 @@ class DataReader(object):
     def update_fx(self, currency_pair: str):
         self._market_data_source.get_fx(currency_pair=currency_pair)
 
-    # def read_transactions(self):
-    #     pass
-
-    def last_data_point(self, account: str):
-        last_data = self.read_fx('CADCAD').sort_index().index[-1]
+    def last_data_point(self, account: str, ptf_currency: str = 'CAD'):
+        last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]
         last_trade = TransactionManager(account=account).transactions.index.max()
         return max(last_data, last_trade)
