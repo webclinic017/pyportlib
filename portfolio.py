@@ -126,20 +126,23 @@ class Portfolio(object):
         if date is None:
             date = self._datareader.last_data_point(account=self.account)
 
-        live_fx = self._fx.get(f'USD{self.currency}').loc[date]  # FIXME for any ptf fx.. vectorized?
         changes = self._cash_account.get_cash_change(date)
 
         trx = self._transaction_manager.get_transactions()
         trx = trx.loc[trx.index <= date]
         trx.loc[:, 'Value'] = trx.Quantity * trx.Price
-        trx.loc[trx.Currency == 'USD', 'Value'] *= live_fx
+
+        trx_currencies = set(trx.Currency)
+        for curr in trx_currencies:
+            live_fx = self._fx.get(f'{curr}{self.currency}').loc[date]
+            trx.loc[trx.Currency == curr, 'Value'] *= live_fx
         values = trx['Value'].sum() * -1
 
         fees = trx.Fees.sum()
 
         dividends = self.dividends(end_date=date)
-
-        return values + changes + dividends - fees
+        cash = values + changes + dividends - fees
+        return round(cash, 2)
 
     def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
         if len(self._positions):
@@ -147,14 +150,15 @@ class Portfolio(object):
                 end_date = self._datareader.last_data_point(account=self.account)
             if start_date is None:
                 start_date = self.start_date
-            live_fx = self._fx.get(f'USD{self.currency}').loc[end_date]  # FIXME for any ptf fx
             transactions = self._transaction_manager.get_transactions().loc[start_date:]
             transactions = transactions.loc[transactions.index <= end_date]
             dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
-
+            trx_currencies = set(transactions.Currency)
             # FIXME for any ptf fx
-            dividends.loc[dividends.Currency == 'USD', 'Price'] *= live_fx
-            return dividends['Price'].sum()
+            for curr in trx_currencies:
+                live_fx = self._fx.get(f'{curr}{self.currency}').loc[end_date]  # FIXME for any ptf fx
+                dividends.loc[dividends.Currency == curr, 'Price'] *= live_fx
+            return round(dividends['Price'].sum(), 2)
         else:
             return 0
 

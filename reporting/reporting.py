@@ -6,7 +6,7 @@ import quantstats as qs
 from data_sources.data_reader import DataReader
 
 
-def report(strategy_returns: pd.Series, benchmark: Union[pd.Series, str], name: str, rf=None):
+def full_html(strategy_returns: pd.Series, benchmark: Union[pd.Series, str], name: str, rf=None):
     """
     produces quantstats html report
     :param rf: riskfree rate
