@@ -1,11 +1,7 @@
 from datetime import datetime
-from typing import Union, List
-
 from pandas._libs.tslibs.offsets import BDay
 from data_sources.data_reader import DataReader
 import pandas as pd
-
-from utils import dates_utils
 from utils import logger
 
 
@@ -37,7 +33,7 @@ class Position(object):
     def set_quantities(self, quantities: pd.Series) -> None:
         self._quantities = quantities
 
-    def daily_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = {}) -> pd.DataFrame:
+    def daily_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = None) -> pd.DataFrame:
         """
                 gives all pnl of position in $ amount
                 :param fx: dict of fx pairs for conversion
@@ -93,10 +89,10 @@ class Position(object):
                 pnl.loc[trx.Date, 'total'] -= trx.Fees
         return pnl
 
-    def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = {}) -> pd.DataFrame:
+    def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = None) -> pd.DataFrame:
         unreal_pnl = self.daily_pnl(start_date=start_date, end_date=end_date, transactions=transactions, fx=fx)['unrealized']
         return unreal_pnl
 
-    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = {}) -> pd.DataFrame:
+    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = None) -> pd.DataFrame:
         unreal_pnl = self.daily_pnl(start_date=start_date, end_date=end_date, transactions=transactions, fx=fx)['total']
         return unreal_pnl
