@@ -61,7 +61,7 @@ class Portfolio(object):
             market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
             for position in self._positions.values():
-                pos_val = position.get_quantities().multiply(position.get_prices().loc[self.start_date:])
+                pos_val = position.get_quantities().shift(1).fillna(method="backfill").multiply(position.get_prices().loc[self.start_date:])
                 pos_val = pos_val.fillna(method='ffill')
                 market_value = market_value.add(pos_val)
                 market_value = market_value.fillna(method='ffill')
