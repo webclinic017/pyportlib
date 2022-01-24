@@ -15,7 +15,7 @@ def request_limit_manager(name: str = '', restarted: bool = False):
     now = datetime.now()
 
     if restarted:
-        count = 5
+        count = MAX_RPM
         with open('data_sources/logs/av_last_request.json') as f:
             last_request = datetime.strptime(json.loads(f.read())['last_request'], "%Y-%m-%d, %H:%M:%S")
 

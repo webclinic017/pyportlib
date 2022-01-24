@@ -14,6 +14,7 @@ class DataReader(object):
         _prices_data_source = None
         _statements_data_source = None
         self._set_sources()
+        config_utils.create_default_config()
 
     def __repr__(self):
         return self.NAME

@@ -10,7 +10,11 @@ def check_file(directory: str, file: str) -> bool:
     :param file: filename in specified directory
     :return: True if file exists
     """
-    my_file = Path(f"{directory}/{file}")
+    if len(directory):
+        my_file = Path(f"{directory}/{file}")
+    else:
+        my_file = Path(f"{file}")
+
     try:
         if my_file.is_file():
             return True
