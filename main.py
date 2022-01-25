@@ -10,6 +10,6 @@ timing.midlog("cash compute")
 pnl = ptf.pct_daily_total_pnl(start_date=ptf.start_date).iloc[1:]
 timing.midlog("pnl compute")
 
-# reporting.full_html(pnl, "SPY", name="tfsa_jan24-2022", rf=0.)
+reporting.full_html(pnl, "SPY", name="tfsa_jan25-2022", rf=0.)
 
 print('')
