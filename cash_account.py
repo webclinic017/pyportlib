@@ -49,3 +49,8 @@ class CashAccount:
     def get_cash_change(self, date):
         c_ch = self.get_cash_changes()
         return c_ch.loc[self.get_cash_changes().index <= date, 'Amount'].sum()
+
+    def add_cash_change(self, direction: str, amount: float):
+        # TODO add cash change directly to cash changes and to saved .csv
+
+        self._load_cash()

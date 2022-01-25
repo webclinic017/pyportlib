@@ -34,6 +34,10 @@ class Portfolio(object):
         return self.account
 
     def load_data(self) -> None:
+        """
+
+        :return:
+        """
         self._transaction_manager.fetch()
         self._load_positions()
         self._load_position_quantities()
@@ -41,6 +45,10 @@ class Portfolio(object):
         logger.logging.info(f'{self.account} data loaded')
 
     def update_data(self) -> None:
+        """
+
+        :return:
+        """
         self._refresh_prices()
         self._refresh_fx()
         self.load_data()
@@ -86,6 +94,11 @@ class Portfolio(object):
         logger.logging.debug(f'positions for {self.account} loaded')
 
     def get_position(self, ticker: str = None) -> Union[Position, dict]:
+        """
+
+        :param ticker:
+        :return:
+        """
         if ticker:
             return self._positions.get(ticker)
         else:
@@ -111,6 +124,11 @@ class Portfolio(object):
             logger.logging.info(f'{self.account} no positions in portfolio')
 
     def add_transaction(self, transaction: Transaction) -> None:
+        """
+
+        :param transaction:
+        :return:
+        """
         value = transaction.quantity * transaction.price
         pair = f"{transaction.currency}{self.currency}"
         if transaction.currency != self.currency:
@@ -122,7 +140,16 @@ class Portfolio(object):
         else:
             self._transaction_manager.add(transaction=transaction)
 
+    @property
+    def transactions(self):
+        return self._transaction_manager.get_transactions()
+
     def cash(self, date: datetime = None) -> float:
+        """
+
+        :param date:
+        :return:
+        """
         if date is None:
             date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
 
@@ -145,6 +172,12 @@ class Portfolio(object):
         return round(cash, 2)
 
     def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
+        """
+
+        :param start_date:
+        :param end_date:
+        :return:
+        """
         if len(self._positions):
             if end_date is None:
                 end_date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
@@ -163,11 +196,23 @@ class Portfolio(object):
             return 0
 
     def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None):
+        """
+
+        :param start_date:
+        :param end_date:
+        :return:
+        """
         transactions = self._transaction_manager.get_transactions()
         pnl = df_utils.pnl_dict_map(d=self.get_position(), start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
 
-    def daily_total_pnl_pct(self, start_date: datetime = None, end_date: datetime = None):
+    def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None):
+        """
+
+        :param start_date:
+        :param end_date:
+        :return:
+        """
         pnl = self.daily_total_pnl(start_date, end_date).sum(axis=1).divide(self.get_market_value().loc[start_date:end_date])
         return pnl
 

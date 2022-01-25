@@ -6,9 +6,10 @@ ptf = Portfolio(account='tfsa', currency="CAD")
 # ptf.update_data()
 timing.midlog("loading")
 print(ptf.cash())
-pnl = ptf.daily_total_pnl_pct(start_date=ptf.start_date).iloc[1:]
+timing.midlog("cash compute")
+pnl = ptf.pct_daily_total_pnl(start_date=ptf.start_date).iloc[1:]
 timing.midlog("pnl compute")
 
-reporting.full_html(pnl, "SPY", name="tfsa_jan24-2022", rf=0.)
+# reporting.full_html(pnl, "SPY", name="tfsa_jan24-2022", rf=0.)
 
 print('')

@@ -16,7 +16,7 @@ class FxRates:
     def __repr__(self):
         return self.NAME
 
-    def set(self, pairs: List[str]):
+    def set_pairs(self, pairs: List[str]):
         self.pairs = pairs
         self._load()
 

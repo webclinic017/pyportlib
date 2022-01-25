@@ -35,13 +35,13 @@ class Position(object):
 
     def daily_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = None) -> pd.DataFrame:
         """
-                gives all pnl of position in $ amount
-                :param fx: dict of fx pairs for conversion
-                :param transactions: transactions from a portfolio, if none transactions are not considered
-                :param start_date: start date of series (if only param, end_date is last date)
-                :param end_date: start date of series (if only param, end_date the only date given in series)
-                :return: series of position pnl in $ amount
-                """
+        gives all pnl of position in $ amount
+        :param fx: dict of fx pairs for conversion
+        :param transactions: transactions from a portfolio, if none transactions are not considered
+        :param start_date: start date of series (if only param, end_date is last date)
+        :param end_date: start date of series (if only param, end_date the only date given in series)
+        :return: series of position pnl in $ amount
+        """
 
         if end_date is None:
             end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -89,10 +89,14 @@ class Position(object):
                 pnl.loc[trx.Date, 'total'] -= trx.Fees
         return pnl
 
-    def daily_unrealized_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = None) -> pd.DataFrame:
-        unreal_pnl = self.daily_pnl(start_date=start_date, end_date=end_date, transactions=transactions, fx=fx)['unrealized']
-        return unreal_pnl
-
     def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, transactions: pd.DataFrame = pd.DataFrame(), fx: dict = None) -> pd.DataFrame:
+        """
+
+        :param start_date:
+        :param end_date:
+        :param transactions:
+        :param fx:
+        :return:
+        """
         unreal_pnl = self.daily_pnl(start_date=start_date, end_date=end_date, transactions=transactions, fx=fx)['total']
         return unreal_pnl
