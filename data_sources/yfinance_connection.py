@@ -2,7 +2,7 @@ from datetime import datetime
 import pandas as pd
 from pandas_datareader import data as pdr
 import yfinance as yfin
-from utils import logger, files_utils, dates_utils
+from utils import logger, files_utils
 
 
 class YFinanceConnection(object):
@@ -24,7 +24,7 @@ class YFinanceConnection(object):
         filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_prices.csv"
         directory = self.PRICES_DIRECTORY
         ticker = self._convert_ticker(ticker)
-        data = pdr.get_data_yahoo(ticker)
+        data = pdr.get_data_yahoo(ticker, progress=False)
         data.columns = ['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']
 
         if not files_utils.check_dir(directory):
@@ -39,7 +39,7 @@ class YFinanceConnection(object):
         if currency_pair[:3] == currency_pair[-3:]:
             data = self._make_ptf_currency_df()
         else:
-            data = pdr.get_data_yahoo(f'{currency_pair}=X')
+            data = pdr.get_data_yahoo(f'{currency_pair}=X', progress=False)
             data.columns = ['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']
 
         if not files_utils.check_dir(directory):
