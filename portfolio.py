@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union
+from typing import Union, List
 
 from cash_account import CashAccount
 from data_sources.data_reader import DataReader
@@ -123,32 +123,29 @@ class Portfolio(object):
         else:
             logger.logging.info(f'{self.account} no positions in portfolio')
 
-    def add_transaction(self, transaction: Transaction) -> None:
+    def add_transaction(self, transactions: List[Transaction]) -> None:
         """
+        add transactions to portfolio
+        :param transactions: portofolio transaction object list
+        :return: None
+        """
+        for trx in transactions:
+            ok, new_cash = self.check_trx(transaction=trx)
 
-        :param transaction:
-        :return:
-        """
-        value = transaction.quantity * transaction.price
-        pair = f"{transaction.currency}{self.currency}"
-        if transaction.currency != self.currency:
-            value = (value * self._fx.get(pair).loc[transaction.date] + transaction.fees).iloc[0]
-        live_cash = self.cash(date=transaction.date)
-        new_cash = live_cash - value
-        if value > live_cash:
-            logger.logging.error(f'{self.account}: Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
-        else:
-            self._transaction_manager.add(transaction=transaction)
+            if not ok:
+                logger.logging.error(f'{self.account}: Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
+            else:
+                self._transaction_manager.add(transaction=trx)
 
     @property
-    def transactions(self):
+    def transactions(self) -> pd.DataFrame:
         return self._transaction_manager.get_transactions()
 
     def cash(self, date: datetime = None) -> float:
         """
-
-        :param date:
-        :return:
+        cash available on given date
+        :param date: datetime object
+        :return: float
         """
         if date is None:
             date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
@@ -173,9 +170,9 @@ class Portfolio(object):
 
     def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
         """
-
-        :param start_date:
-        :param end_date:
+        accumulated dividend over date range
+        :param start_date: start date of series (if only param, end_date is last date)
+        :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
         """
         if len(self._positions):
@@ -195,27 +192,49 @@ class Portfolio(object):
         else:
             return 0
 
-    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None):
+    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
         """
-
-        :param start_date:
-        :param end_date:
+        portfolio return in $ amount
+        :param start_date: start date of series (if only param, end_date is last date)
+        :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
         """
-        transactions = self._transaction_manager.get_transactions()
+        if end_date is None:
+            end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        if start_date is None:
+            start_date = end_date
+
+        transactions = self._transaction_manager.get_transactions().loc[start_date:end_date]
         pnl = df_utils.pnl_dict_map(d=self.get_position(), start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
 
-    def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None):
+    def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
         """
-
-        :param start_date:
-        :param end_date:
+        portfolio return in % of market value
+        :param start_date: start date of series (if only param, end_date is last date)
+        :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
         """
+        if end_date is None:
+            end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        if start_date is None:
+            start_date = end_date
+
         pnl = self.daily_total_pnl(start_date, end_date).sum(axis=1).divide(self.get_market_value().loc[start_date:end_date])
         return pnl
 
     @staticmethod
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
         return quantities.fillna(0).cumsum()
+
+    def check_trx(self, transaction) -> tuple:
+        value = transaction.quantity * transaction.price
+
+        if transaction.currency != self.currency:
+            pair = f"{transaction.currency}{self.currency}"
+            value = (value * self._fx.get(pair).loc[transaction.date] + transaction.fees).iloc[0]
+        live_cash = self.cash(date=transaction.date)
+        new_cash = live_cash - value
+
+        # TODO check if works properly
+        return value > live_cash, new_cash

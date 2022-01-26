@@ -49,7 +49,7 @@ class YFinanceConnection(object):
 
     @staticmethod
     def _make_ptf_currency_df():
-        dates = dates_utils.get_market_days(start=datetime(2000, 1, 1))
+        dates = pd.date_range(start=datetime(2000, 1, 1), end=datetime.today())
         data = [1 for _ in range(len(dates))]
         return pd.DataFrame(data=data, index=pd.Index(name='Date', data=dates), columns=['Close'])
 

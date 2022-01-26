@@ -1,0 +1,9 @@
+2022-01-25 22:31:10,240:DEBUG:CACHEDIR=/Users/Philippe/.matplotlib: in wrapper
+2022-01-25 22:31:10,245:DEBUG:Using fontManager instance from /Users/Philippe/.matplotlib/fontlist-v330.json: in _load_fontmanager
+2022-01-25 22:31:10,443:DEBUG:Loaded backend module://backend_interagg version unknown.: in switch_backend
+2022-01-25 22:31:10,702:DEBUG:fx rates loaded: in _load
+2022-01-25 22:31:11,240:DEBUG:positions for tfsa loaded: in _load_positions
+2022-01-25 22:31:11,882:DEBUG:tfsa quantities computed: in _load_position_quantities
+2022-01-25 22:31:12,431:DEBUG:tfsa market_value computed: in _load_market_value
+2022-01-25 22:31:12,431:INFO:tfsa data loaded: in load_data
+2022-01-25 22:31:13,088:INFO:SRU-UN.TO: error in trx date (2022-01-17 00:00:00), NYSE market not open. open qty set to 0: in daily_pnl
