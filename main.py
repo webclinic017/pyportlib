@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from portfolio import Portfolio
 import utils.timing as timing
 from reporting import reporting

@@ -102,3 +102,6 @@ class TransactionManager(object):
 
     def get_transactions(self):
         return self.transactions
+
+    def from_csv(self, filename) -> List[Transaction]:
+        raise NotImplementedError()
