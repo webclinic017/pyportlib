@@ -27,7 +27,15 @@ class FxRates:
 
     def get(self, pair: str):
         if len(pair) != 6:
-            logger.logging.error(f'enter valid currency pair')
+            logger.logging.error(f'{pair} is not a valid pair, enter valid currency pair')
+
+        if pair not in self.pairs and not self.pairs:
+            self.set_pairs([pair])
+            logger.logging.debug(f'setting pairs')
+        elif pair not in self.pairs:
+            self.pairs.append(pair)
+            self._load()
+
         return self.rates.get(pair)
 
     def _load(self):

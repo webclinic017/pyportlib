@@ -129,6 +129,7 @@ class Portfolio(object):
                 logger.logging.error(f'{self.account}: Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
             else:
                 self._transaction_manager.add(transaction=trx)
+        self.load_data()
 
     @property
     def transactions(self) -> pd.DataFrame:
@@ -140,6 +141,11 @@ class Portfolio(object):
         cash = [self.cash(date) for date in dates]
         cash_c = pd.Series(data=cash, index=dates)
         return cash_c
+
+    def add_cash_change(self, date: datetime, direction: str, amount: float) -> None:
+        self._cash_account.add_cash_change(date=date, direction=direction, amount=amount)
+        logger.logging.info(f'transactions for {self.account} have been reset')
+        self.load_data()
 
     def cash(self, date: datetime = None) -> float:
         """
@@ -234,6 +240,11 @@ class Portfolio(object):
         pnl = self.daily_total_pnl(start_date, end_date).sum(axis=1).divide(market_vals)
         return pnl
 
+    def reset_transactions(self) -> None:
+        self._transaction_manager.reset_transactions()
+        logger.logging.info(f'transactions for {self.account} have been reset')
+        self.load_data()
+
     @staticmethod
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
         return quantities.fillna(0).cumsum()
@@ -243,9 +254,9 @@ class Portfolio(object):
 
         if transaction.currency != self.currency:
             pair = f"{transaction.currency}{self.currency}"
-            value = (value * self._fx.get(pair).loc[transaction.date] + transaction.fees).iloc[0]
+            value = (value * self._fx.get(pair).loc[transaction.date] + transaction.fees)
         live_cash = self.cash(date=transaction.date)
         new_cash = live_cash - value
 
         # TODO check if works properly
-        return value > live_cash, new_cash
+        return value < live_cash, new_cash

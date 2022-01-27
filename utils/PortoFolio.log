@@ -1,91 +1,19 @@
-2022-01-26 18:38:48,057:DEBUG:CACHEDIR=/Users/Philippe/.matplotlib: in wrapper
-2022-01-26 18:38:48,062:DEBUG:Using fontManager instance from /Users/Philippe/.matplotlib/fontlist-v330.json: in _load_fontmanager
-2022-01-26 18:38:48,275:DEBUG:Loaded backend module://backend_interagg version unknown.: in switch_backend
-2022-01-26 18:38:48,554:DEBUG:fx rates loaded: in _load
-2022-01-26 18:38:49,096:DEBUG:positions for tfsa loaded: in _load_positions
-2022-01-26 18:38:49,777:DEBUG:tfsa quantities computed: in _load_position_quantities
-2022-01-26 18:38:50,344:DEBUG:tfsa market_value computed: in _load_market_value
-2022-01-26 18:38:50,344:INFO:tfsa data loaded: in load_data
-2022-01-26 18:38:50,379:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:50,574:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/HTGC?period1=-631159200&period2=1643240330&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:50,807:DEBUG:HTGC loaded from yfinance api: in get_prices
-2022-01-26 18:38:50,820:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:50,957:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/VOOV?period1=-631159200&period2=1643240330&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:51,134:DEBUG:VOOV loaded from yfinance api: in get_prices
-2022-01-26 18:38:51,146:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:51,333:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/T.TO?period1=-631159200&period2=1643240331&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:51,572:DEBUG:T.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:51,583:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:51,717:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/CLVS?period1=-631159200&period2=1643240331&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:51,891:DEBUG:CLVS loaded from yfinance api: in get_prices
-2022-01-26 18:38:51,903:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:52,083:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/LQD?period1=-631159200&period2=1643240331&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:52,328:DEBUG:LQD loaded from yfinance api: in get_prices
-2022-01-26 18:38:52,339:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:52,486:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/VO?period1=-631159200&period2=1643240332&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:52,729:DEBUG:VO loaded from yfinance api: in get_prices
-2022-01-26 18:38:52,741:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:52,899:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/VSB.TO?period1=-631159200&period2=1643240332&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:53,029:DEBUG:VSB.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:53,040:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:53,210:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/SRU-UN.TO?period1=-631159200&period2=1643240333&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:53,427:DEBUG:SRU-UN.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:53,438:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:53,583:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/VBU.TO?period1=-631159200&period2=1643240333&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:53,694:DEBUG:VBU.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:53,706:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:53,921:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/TM?period1=-631159200&period2=1643240333&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:54,222:DEBUG:TM loaded from yfinance api: in get_prices
-2022-01-26 18:38:54,234:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:54,392:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/MFC.TO?period1=-631159200&period2=1643240334&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:54,595:DEBUG:MFC.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:54,607:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:54,768:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/SLV?period1=-631159200&period2=1643240334&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:54,956:DEBUG:SLV loaded from yfinance api: in get_prices
-2022-01-26 18:38:54,968:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:55,132:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/LIT?period1=-631159200&period2=1643240334&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:55,271:DEBUG:LIT loaded from yfinance api: in get_prices
-2022-01-26 18:38:55,283:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:55,432:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/KBWD?period1=-631159200&period2=1643240335&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:55,580:DEBUG:KBWD loaded from yfinance api: in get_prices
-2022-01-26 18:38:55,592:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:55,801:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/IBB?period1=-631159200&period2=1643240335&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:56,012:DEBUG:IBB loaded from yfinance api: in get_prices
-2022-01-26 18:38:56,024:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:56,185:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/BIP-UN.TO?period1=-631159200&period2=1643240336&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:56,323:DEBUG:BIP-UN.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:56,335:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:56,469:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/NWH-UN.TO?period1=-631159200&period2=1643240336&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:56,612:DEBUG:NWH-UN.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:56,624:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:56,743:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/PLTR?period1=-631159200&period2=1643240336&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:56,776:DEBUG:PLTR loaded from yfinance api: in get_prices
-2022-01-26 18:38:56,787:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:56,935:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/XDV.TO?period1=-631159200&period2=1643240336&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:57,097:DEBUG:XDV.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:57,108:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:57,344:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/MSFT?period1=-631159200&period2=1643240337&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:57,661:DEBUG:MSFT loaded from yfinance api: in get_prices
-2022-01-26 18:38:57,673:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:57,842:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/VAB.TO?period1=-631159200&period2=1643240337&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:57,974:DEBUG:VAB.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:57,986:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:58,339:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/MRK?period1=-631159200&period2=1643240337&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:58,804:DEBUG:MRK loaded from yfinance api: in get_prices
-2022-01-26 18:38:58,816:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:58,996:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/NA.TO?period1=-631159200&period2=1643240338&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:59,232:DEBUG:NA.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:59,243:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:59,426:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/CDZ.TO?period1=-631159200&period2=1643240339&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:59,590:DEBUG:CDZ.TO loaded from yfinance api: in get_prices
-2022-01-26 18:38:59,603:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:38:59,740:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/SKYY?period1=-631159200&period2=1643240339&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:38:59,899:DEBUG:SKYY loaded from yfinance api: in get_prices
-2022-01-26 18:38:59,911:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:39:00,104:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/VOO?period1=-631159200&period2=1643240339&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:39:00,237:DEBUG:VOO loaded from yfinance api: in get_prices
-2022-01-26 18:39:00,249:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:39:00,426:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/AQN.TO?period1=-631159200&period2=1643240340&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
-2022-01-26 18:39:00,631:DEBUG:AQN.TO loaded from yfinance api: in get_prices
-2022-01-26 18:39:00,645:DEBUG:Starting new HTTPS connection (1): query2.finance.yahoo.com:443: in _new_conn
-2022-01-26 18:39:00,869:DEBUG:https://query2.finance.yahoo.com:443 "GET /v8/finance/chart/PPL.TO?period1=-631159200&period2=1643240340&interval=1d&includePrePost=False&events=div%2Csplits HTTP/1.1" 200 None: in _make_request
+2022-01-27 10:53:20,007:DEBUG:CACHEDIR=/Users/Philippe/.matplotlib: in wrapper
+2022-01-27 10:53:20,012:DEBUG:Using fontManager instance from /Users/Philippe/.matplotlib/fontlist-v330.json: in _load_fontmanager
+2022-01-27 10:53:20,233:DEBUG:Loaded backend module://backend_interagg version unknown.: in switch_backend
+2022-01-27 10:53:20,511:DEBUG:fx rates loaded: in _load
+2022-01-27 10:53:20,531:DEBUG:positions for TEST111 loaded: in _load_positions
+2022-01-27 10:53:21,094:DEBUG:TEST111 quantities computed: in _load_position_quantities
+2022-01-27 10:53:21,580:DEBUG:TEST111 market_value computed: in _load_market_value
+2022-01-27 10:53:21,580:INFO:TEST111 data loaded: in load_data
+2022-01-27 10:53:33,347:INFO:transactions file updated: in _write_trx
+2022-01-27 10:53:33,347:INFO:Transaction - 2022-01-07 - VOO was added to account: TEST111: in add
+2022-01-27 10:53:33,362:DEBUG:positions for TEST111 loaded: in _load_positions
+2022-01-27 10:53:33,678:DEBUG:TEST111 quantities computed: in _load_position_quantities
+2022-01-27 10:53:34,008:DEBUG:TEST111 market_value computed: in _load_market_value
+2022-01-27 10:53:34,008:INFO:TEST111 data loaded: in load_data
+2022-01-27 10:53:52,026:INFO:transactions for TEST111 have been reset: in reset_transactions
+2022-01-27 10:53:52,032:DEBUG:positions for TEST111 loaded: in _load_positions
+2022-01-27 10:53:52,331:DEBUG:TEST111 quantities computed: in _load_position_quantities
+2022-01-27 10:53:52,619:DEBUG:TEST111 market_value computed: in _load_market_value
+2022-01-27 10:53:52,619:INFO:TEST111 data loaded: in load_data

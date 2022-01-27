@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas as pd
 
 from utils import files_utils, df_utils
@@ -50,7 +52,12 @@ class CashAccount:
         c_ch = self.get_cash_changes()
         return c_ch.loc[self.get_cash_changes().index <= date, 'Amount'].sum()
 
-    def add_cash_change(self, direction: str, amount: float):
-        # TODO add cash change directly to cash changes and to saved .csv
+    def add_cash_change(self, date: datetime, direction: str, amount: float):
+        if direction not in ['Deposit', 'Withdrawal']:
+            raise Exception(f'cash direction type not supported {direction}')
 
+        self.cash_changes.loc[date, "Type"] = direction
+        self.cash_changes.loc[date, "Amount"] = amount
+
+        self.cash_changes.to_csv(f"{self.directory}/{self.filename}")
         self._load_cash()
