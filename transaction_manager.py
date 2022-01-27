@@ -102,3 +102,11 @@ class TransactionManager(object):
 
     def get_transactions(self):
         return self.transactions
+
+    def from_csv(self, filename) -> List[Transaction]:
+        raise NotImplementedError()
+
+    def reset_transactions(self):
+        empty_transactions = pd.DataFrame(columns=Transaction.TRANSACTIONS_INFO).set_index('Date')
+        empty_transactions.to_csv(f"{self.directory}/{self.filename}")
+        self.transactions = empty_transactions
