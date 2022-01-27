@@ -7,10 +7,10 @@ from utils import logger
 
 class Position(object):
 
-    def __init__(self, ticker: str, currency: str, datareader: DataReader):
+    def __init__(self, ticker: str, currency: str):
         self.ticker = ticker
         self.currency = currency
-        self.datareader = datareader
+        self.datareader = DataReader()
         self._prices = pd.Series()
         self._quantities = pd.Series()
         self._load_prices()

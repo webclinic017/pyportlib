@@ -85,7 +85,7 @@ class Portfolio(object):
         tickers = self._transaction_manager.all_positions()
         for ticker in tickers:
             currency = self._transaction_manager.get_currency(ticker=ticker)
-            pos = Position(ticker, currency=currency, datareader=self._datareader)
+            pos = Position(ticker, currency=currency)
 
             if self.currency != pos.currency:
                 prices = pos.get_prices().multiply(self._fx.get(f"{pos.currency}{self.currency}")).dropna()
