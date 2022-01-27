@@ -258,5 +258,4 @@ class Portfolio(object):
         live_cash = self.cash(date=transaction.date)
         new_cash = live_cash - value
 
-        # TODO check if works properly
         return value < live_cash, new_cash
