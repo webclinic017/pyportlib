@@ -3,8 +3,8 @@ from typing import Union
 import pandas as pd
 import quantstats as qs
 
-from data_sources.data_reader import DataReader
-from utils import files_utils
+from portofolio.data_sources.data_reader import DataReader
+from portofolio.utils import files_utils
 
 OUT_DIR = "client_data/outputs/"
 if not files_utils.check_dir(OUT_DIR):
@@ -21,7 +21,7 @@ def full_html(strategy_returns: pd.Series, benchmark: Union[pd.Series, str], nam
     :return: None
     """
     if rf is None:
-        rf = 1.5
+        rf = 0.
     if isinstance(benchmark, str):
         dr = DataReader()
         dr.update_prices(ticker=benchmark)

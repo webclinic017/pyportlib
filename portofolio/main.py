@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from helpers.transaction import Transaction
-from portfolio import Portfolio
+from portofolio.helpers.transaction import Transaction
+from portofolio.portfolio import Portfolio
 
 new_ptf = Portfolio("TEST111", currency="USD")
 print(new_ptf.transactions)

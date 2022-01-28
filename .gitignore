@@ -5,4 +5,5 @@
 config/config.json
 /client_data/data/prices/
 /client_data/data/fx/
-/utils/PortoFolio.log
+/portofolio/utils/PortoFolio.log
+/client_data/data/statements/

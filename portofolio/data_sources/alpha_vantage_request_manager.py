@@ -1,8 +1,8 @@
 import json
 from datetime import datetime
 from time import sleep
-from utils import logger
-from config.config_utils import fetch_max_rpm
+from portofolio.utils import logger
+from portofolio.utils.config_utils import fetch_max_rpm
 
 MAX_RPM = fetch_max_rpm('AlphaVantage')
 count = 0
@@ -32,6 +32,6 @@ def request_limit_manager(name: str = '', restarted: bool = False):
         delta = (now - last).seconds
         if delta < 60:
 
-            logger.logging.info(f'waiting for api... {60-delta} seconds before next request')
+            logger.logging.info(f'waiting for api... {60 - delta} seconds before next request')
             sleep(60-delta)
         count = 0
