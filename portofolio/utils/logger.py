@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger('portofolio')
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s',
                     )
