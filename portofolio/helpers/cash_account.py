@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pandas as pd
 
-from utils import files_utils, df_utils
-from utils.logger import logger
+from portofolio.utils import df_utils, files_utils
+from portofolio.utils.logger import logger
 
 
 class CashAccount:
@@ -16,7 +16,6 @@ class CashAccount:
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
         self.filename = f"{self.account}_cash.csv"
         self.cash_changes = self._load_cash()
-        self.cash_series = pd.Series()
 
     def __repr__(self):
         return self.NAME
@@ -41,7 +40,7 @@ class CashAccount:
             if not files_utils.check_dir(self.directory):
                 files_utils.make_dir(self.directory)
             # create empty transaction file in new directory
-            empty_cash = pd.DataFrame(columns=self.CASH_INFO).set_index('Date')
+            empty_cash = self.empty_cash()
             empty_cash.to_csv(f"{self.directory}/{self.filename}")
             return empty_cash
 
@@ -61,3 +60,11 @@ class CashAccount:
 
         self.cash_changes.to_csv(f"{self.directory}/{self.filename}")
         self._load_cash()
+
+    def reset_cash(self):
+        empty_cash = self.empty_cash()
+        empty_cash.to_csv(f"{self.directory}/{self.filename}")
+        self.cash_changes = empty_cash
+
+    def empty_cash(self):
+        return pd.DataFrame(columns=self.CASH_INFO).set_index('Date')

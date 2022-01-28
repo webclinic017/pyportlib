@@ -1,6 +1,10 @@
 import json
+from portofolio.utils import files_utils
 
-from utils import files_utils
+
+def make_config_dir():
+    if not files_utils.check_dir('config/'):
+        files_utils.make_dir('config/')
 
 
 def fetch_key(api: str):
@@ -29,6 +33,7 @@ def create_default_config():
     # create default config file
     file_name = 'config.json'
     dir = 'config'
+
     if not files_utils.check_file(dir, file_name):
         default_config = {
             "api": {
@@ -47,3 +52,4 @@ def create_default_config():
         }
         with open(f'{dir}/{file_name}', 'w', encoding='utf-8') as f:
             json.dump(default_config, f, ensure_ascii=False, indent=1)
+

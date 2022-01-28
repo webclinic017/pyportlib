@@ -1,8 +1,8 @@
 from datetime import datetime
 import pandas as pd
+from portofolio.utils import logger
 from pandas_datareader import data as pdr
 import yfinance as yfin
-from utils import logger, files_utils
 
 
 class YFinanceConnection(object):
@@ -27,8 +27,6 @@ class YFinanceConnection(object):
         data = pdr.get_data_yahoo(ticker, progress=False)
         data.columns = ['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']
 
-        if not files_utils.check_dir(directory):
-            files_utils.make_dir(directory)
         data.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{ticker} loaded from yfinance api")
 
@@ -42,8 +40,6 @@ class YFinanceConnection(object):
             data = pdr.get_data_yahoo(f'{currency_pair}=X', progress=False)
             data.columns = ['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']
 
-        if not files_utils.check_dir(directory):
-            files_utils.make_dir(directory)
         data.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{currency_pair} loaded from yfinance api")
 

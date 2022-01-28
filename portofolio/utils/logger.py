@@ -1,10 +1,9 @@
 import logging
 
 logger = logging.getLogger()
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s',
-                    filename='utils/PortoFolio.log',
-                    filemode="w")
+                    )
 
 log_format = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s")
 

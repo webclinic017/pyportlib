@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from utils import logger
+from portofolio.utils import logger
 
 
 def check_file(directory: str, file: str) -> bool:

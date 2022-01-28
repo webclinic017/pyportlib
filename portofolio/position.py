@@ -1,8 +1,8 @@
 from datetime import datetime
 from pandas._libs.tslibs.offsets import BDay
-from data_sources.data_reader import DataReader
+from portofolio.data_sources.data_reader import DataReader
 import pandas as pd
-from utils import logger
+from portofolio.utils import logger
 
 
 class Position(object):
@@ -28,7 +28,10 @@ class Position(object):
         self._prices = prices
 
     def get_quantities(self) -> pd.Series:
-        return self._quantities
+        if not self._quantities.empty:
+            return self._quantities
+        else:
+            return pd.Series(index=self._prices.index, data=[1 for _ in range(len(self._prices))])
 
     def set_quantities(self, quantities: pd.Series) -> None:
         self._quantities = quantities
@@ -90,9 +93,9 @@ class Position(object):
 
                 elif trx.Type == 'Dividend':
                     pnl.loc[trx.Date, 'dividend'] = trx.Price * trx_fx
-
-                pnl.loc[:, 'total'] = pnl[['unrealized', 'realized', 'dividend']].sum(axis=1)
                 pnl.loc[trx.Date, 'total'] -= trx.Fees
+        pnl.loc[:, 'total'] = pnl[['unrealized', 'realized', 'dividend']].sum(axis=1)
+
         return pnl.fillna(0)
 
     def daily_total_pnl(self,

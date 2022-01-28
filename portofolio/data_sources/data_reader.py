@@ -1,9 +1,8 @@
-from config import config_utils
-from data_sources.alphavantage_connection import AlphaVantageConnection
-from data_sources.simfin_connection import SimFinConnection
-from data_sources.yfinance_connection import YFinanceConnection
-from transaction_manager import TransactionManager
-from utils import logger, files_utils
+from portofolio.utils import logger, files_utils, config_utils
+from portofolio.data_sources.alphavantage_connection import AlphaVantageConnection
+from portofolio.data_sources.simfin_connection import SimFinConnection
+from portofolio.data_sources.yfinance_connection import YFinanceConnection
+from portofolio.helpers.transaction_manager import TransactionManager
 import pandas as pd
 
 
@@ -14,7 +13,6 @@ class DataReader(object):
         _prices_data_source = None
         _statements_data_source = None
         self._set_sources()
-        config_utils.create_default_config()
 
     def __repr__(self):
         return self.NAME

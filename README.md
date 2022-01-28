@@ -12,5 +12,3 @@ Package/Project uses and structure is entirely designed based on my needs. quant
     - Portfolio Construction
     - Optimisation
     - Backtesting
-    
-
