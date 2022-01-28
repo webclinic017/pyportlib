@@ -1,6 +1,6 @@
-from typing import List, Union
-from data_sources.data_reader import DataReader
-from utils import logger
+from typing import List
+from portofolio.data_sources.data_reader import DataReader
+from portofolio.utils import logger
 
 
 class FxRates:
@@ -16,7 +16,7 @@ class FxRates:
     def __repr__(self):
         return self.NAME
 
-    def set(self, pairs: List[str]):
+    def set_pairs(self, pairs: List[str]):
         self.pairs = pairs
         self._load()
 
@@ -27,7 +27,15 @@ class FxRates:
 
     def get(self, pair: str):
         if len(pair) != 6:
-            logger.logging.error(f'enter valid currency pair')
+            logger.logging.error(f'{pair} is not a valid pair, enter valid currency pair')
+
+        if pair not in self.pairs and not self.pairs:
+            self.set_pairs([pair])
+            logger.logging.debug(f'setting pairs')
+        elif pair not in self.pairs:
+            self.pairs.append(pair)
+            self._load()
+
         return self.rates.get(pair)
 
     def _load(self):

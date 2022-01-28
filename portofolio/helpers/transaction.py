@@ -1,8 +1,6 @@
 from datetime import datetime
-
 import pandas as pd
-
-from utils import logger
+from portofolio.utils import logger
 
 
 class Transaction(object):
@@ -29,6 +27,9 @@ class Transaction(object):
 
     def __repr__(self):
         return f"{self.NAME} - {self.date.date()} - {self.ticker}"
+
+    # def __str__(self):
+    #     return self.get()
 
     def get(self) -> pd.DataFrame:
         columns = ['Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']

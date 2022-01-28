@@ -1,6 +1,7 @@
 from typing import Union, List
-from transaction import Transaction
-from utils import logger, files_utils, df_utils
+
+from portofolio.helpers.transaction import Transaction
+from portofolio.utils import logger, df_utils, files_utils
 import pandas as pd
 
 
@@ -39,7 +40,7 @@ class TransactionManager(object):
             if not files_utils.check_dir(self.directory):
                 files_utils.make_dir(self.directory)
             # create empty transaction file in new directory
-            empty_transactions = pd.DataFrame(columns=Transaction.TRANSACTIONS_INFO).set_index('Date')
+            empty_transactions = self.empty_transactions()
             empty_transactions.to_csv(f"{self.directory}/{self.filename}")
             self.transactions = empty_transactions
             return empty_transactions
@@ -102,3 +103,15 @@ class TransactionManager(object):
 
     def get_transactions(self):
         return self.transactions
+
+    def from_csv(self, filename) -> List[Transaction]:
+        raise NotImplementedError()
+
+    def reset_transactions(self):
+        empty_transactions = self.empty_transactions()
+        empty_transactions.to_csv(f"{self.directory}/{self.filename}")
+        self.transactions = empty_transactions
+
+    @staticmethod
+    def empty_transactions():
+        return pd.DataFrame(columns=Transaction.TRANSACTIONS_INFO).set_index('Date')
