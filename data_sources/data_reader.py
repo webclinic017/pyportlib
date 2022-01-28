@@ -2,7 +2,7 @@ from config import config_utils
 from data_sources.alphavantage_connection import AlphaVantageConnection
 from data_sources.simfin_connection import SimFinConnection
 from data_sources.yfinance_connection import YFinanceConnection
-from transaction_manager import TransactionManager
+from helpers.transaction_manager import TransactionManager
 from utils import logger, files_utils
 import pandas as pd
 

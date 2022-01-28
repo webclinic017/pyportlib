@@ -1,5 +1,6 @@
 from typing import Union, List
-from transaction import Transaction
+
+from helpers.transaction import Transaction
 from utils import logger, files_utils, df_utils
 import pandas as pd
 

@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Union, List
-from cash_account import CashAccount
+from helpers.cash_account import CashAccount
 from data_sources.data_reader import DataReader
-from fx_rates import FxRates
+from helpers.fx_rates import FxRates
 from position import Position
-from transaction import Transaction
-from transaction_manager import TransactionManager
+from helpers.transaction import Transaction
+from helpers.transaction_manager import TransactionManager
 from utils import logger, dates_utils, df_utils
 import pandas as pd
 
@@ -158,14 +158,17 @@ class Portfolio(object):
 
         changes = self._cash_account.get_cash_change(date)
 
-        trx = self._transaction_manager.get_transactions()
+        trx = self.transactions
         trx = trx.loc[trx.index <= date]
         trx_value = trx.Quantity * trx.Price
         trx = pd.concat([trx, trx_value], axis=1)
 
         trx_currencies = set(trx.Currency)
         for curr in trx_currencies:
-            live_fx = self._fx.get(f'{curr}{self.currency}').loc[date]
+            try:
+                live_fx = self._fx.get(f'{curr}{self.currency}').loc[date]
+            except KeyError:
+                raise KeyError("fx data has not been updated")
             trx.loc[trx.Currency == curr, 0] *= live_fx
         values = trx[0].sum() * -1
 
