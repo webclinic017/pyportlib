@@ -7,6 +7,9 @@ from data_sources.data_reader import DataReader
 from utils import files_utils
 
 OUT_DIR = "client_data/outputs/"
+if not files_utils.check_dir(OUT_DIR):
+    files_utils.make_dir(OUT_DIR)
+
 
 def full_html(strategy_returns: pd.Series, benchmark: Union[pd.Series, str], name: str, rf=None) -> None:
     """
@@ -24,9 +27,6 @@ def full_html(strategy_returns: pd.Series, benchmark: Union[pd.Series, str], nam
         dr.update_prices(ticker=benchmark)
         benchmark = dr.read_prices(ticker=benchmark).pct_change()
         benchmark = benchmark.loc[benchmark.index.isin(strategy_returns.index)]
-
-    if not files_utils.check_dir(OUT_DIR):
-        files_utils.make_dir(OUT_DIR)
 
     title = f"{OUT_DIR}{name}.html"
     qs.reports.html(strategy_returns,
