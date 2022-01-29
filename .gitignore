@@ -7,3 +7,4 @@ config/config.json
 /client_data/data/fx/
 /portofolio/utils/PortoFolio.log
 /client_data/data/statements/
+/client_data/outputs/

@@ -41,7 +41,7 @@ class Portfolio(object):
         self._load_positions()
         self._load_position_quantities()
         self._load_market_value()
-        logger.logging.info(f'{self.account} data loaded')
+        logger.logging.debug(f'{self.account} data loaded')
 
     def update_data(self) -> None:
         """
@@ -52,7 +52,7 @@ class Portfolio(object):
         self._refresh_fx()
         self.load_data()
         self._transaction_manager.fetch()
-        logger.logging.info(f'{self.account} updated')
+        logger.logging.debug(f'{self.account} updated')
 
     def _refresh_fx(self) -> None:
         self._fx.refresh()
@@ -75,7 +75,7 @@ class Portfolio(object):
             self._market_value = market_value.dropna()
             logger.logging.debug(f'{self.account} market_value computed')
         else:
-            logger.logging.info(f"{self.account} no positions in portfolio")
+            logger.logging.debug(f"{self.account} no positions in portfolio")
 
     @property
     def market_values(self) -> pd.Series:
@@ -114,7 +114,7 @@ class Portfolio(object):
             logger.logging.debug(f'{self.account} quantities computed')
 
         else:
-            logger.logging.info(f'{self.account} no positions in portfolio')
+            logger.logging.debug(f'{self.account} no positions in portfolio')
 
     def add_transaction(self, transactions: List[Transaction]) -> None:
         """
@@ -144,7 +144,7 @@ class Portfolio(object):
 
     def add_cash_change(self, date: datetime, direction: str, amount: float) -> None:
         self._cash_account.add_cash_change(date=date, direction=direction, amount=amount)
-        logger.logging.info(f'transactions for {self.account} have been reset')
+        logger.logging.info(f'cash change for {self.account} have been added')
         self.load_data()
 
     def cash(self, date: datetime = None) -> float:
@@ -245,7 +245,12 @@ class Portfolio(object):
 
     def reset_transactions(self) -> None:
         self._transaction_manager.reset_transactions()
-        logger.logging.info(f'transactions for {self.account} have been reset')
+        logger.logging.debug(f'transactions for {self.account} have been reset')
+        self.load_data()
+
+    def reset_cash(self) -> None:
+        self._cash_account.reset_cash()
+        logger.logging.debug(f'cash for {self.account} have been reset')
         self.load_data()
 
     @staticmethod
