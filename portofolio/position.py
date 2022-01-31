@@ -70,7 +70,7 @@ class Position(object):
 
         if not transactions.empty:
             transactions.reset_index(inplace=True)
-            ptf_currency = list(fx.keys())[1][3:]
+            ptf_currency = list(fx.keys())[0][3:]
             for trx_idx in range(len(transactions)):
                 trx = transactions.iloc[trx_idx]
                 try:
