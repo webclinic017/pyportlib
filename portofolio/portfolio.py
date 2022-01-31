@@ -52,7 +52,7 @@ class Portfolio(object):
         self._refresh_prices()
         self._refresh_fx()
         self.load_data()
-        logger.logging.debug(f'{self.account} updated')
+        logger.logging.info(f'{self.account} updated')
 
     def _refresh_fx(self) -> None:
         self._fx.refresh()
