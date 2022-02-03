@@ -69,8 +69,8 @@ class Position(object):
         pnl = pnl.fillna(0)
 
         if not transactions.empty:
-            transactions.reset_index(inplace=True)
-            ptf_currency = list(fx.keys())[1][3:]
+            transactions = transactions[:end_date].reset_index()
+            ptf_currency = list(fx.keys())[0][3:]
             for trx_idx in range(len(transactions)):
                 trx = transactions.iloc[trx_idx]
                 try:
@@ -86,7 +86,7 @@ class Position(object):
                 if trx.Type == 'Buy':
                     new_qty = (trx.Quantity + start_qty)
                     daily_avg_cost = (trx.Quantity * (trx.Price * trx_fx) + start_qty * daily_avg_cost) / new_qty
-                    pnl.loc[trx.Date, 'unrealized'] = (daily_avg_cost - self._prices.loc[trx.Date]) * new_qty * trx_fx
+                    pnl.loc[trx.Date, 'unrealized'] = (self._prices.loc[trx.Date] - daily_avg_cost) * new_qty
                 elif trx.Type == 'Sell':
                     realized = (daily_avg_cost - (trx.Price * trx_fx)) * trx.Quantity
                     pnl.loc[trx.Date, 'realized'] += realized

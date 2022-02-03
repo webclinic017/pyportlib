@@ -25,7 +25,7 @@ class Portfolio(object):
         self._transaction_manager = TransactionManager(account=self.account)
         self._fx = FxRates(ptf_currency=currency, currencies=self._transaction_manager.get_currencies())
 
-        self.start_date = self._transaction_manager.first_trx_date()
+        self.start_date = None
         # load data        
         self.load_data()
 
@@ -38,6 +38,7 @@ class Portfolio(object):
         :return:
         """
         self._transaction_manager.fetch()
+        self.start_date = self._transaction_manager.first_trx_date()
         self._load_positions()
         self._load_position_quantities()
         self._load_market_value()
@@ -51,8 +52,7 @@ class Portfolio(object):
         self._refresh_prices()
         self._refresh_fx()
         self.load_data()
-        self._transaction_manager.fetch()
-        logger.logging.debug(f'{self.account} updated')
+        logger.logging.info(f'{self.account} updated')
 
     def _refresh_fx(self) -> None:
         self._fx.refresh()
