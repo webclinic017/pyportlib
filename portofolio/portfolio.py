@@ -87,8 +87,8 @@ class Portfolio(object):
             currency = self._transaction_manager.get_currency(ticker=ticker)
             pos = Position(ticker, currency=currency)
 
-            if self.currency != pos.currency:
-                prices = pos.get_prices().multiply(self._fx.get(f"{pos.currency}{self.currency}")).dropna()
+            if self.currency != pos.currency:  # FIXME sometimes FX is missing for today... yfinance no price for that day
+                prices = pos.get_prices().multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
                 pos.set_prices(prices=prices)
             self._positions[ticker] = pos
         logger.logging.debug(f'positions for {self.account} loaded')

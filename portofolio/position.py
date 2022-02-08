@@ -16,7 +16,7 @@ class Position(object):
         self._load_prices()
 
     def __repr__(self):
-        return f"{self.ticker}"
+        return f"{self.ticker} - {self.currency}"
 
     def _load_prices(self):
         self._prices = self.datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
