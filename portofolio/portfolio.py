@@ -61,19 +61,31 @@ class Portfolio(object):
         for ticker in self._positions.keys():
             self._datareader.update_prices(ticker=ticker)
 
-    def _load_market_value(self) -> None:
-        if len(self._positions):
+    def _load_market_value(self, **kwargs) -> None:
+        positions_to_compute = self.positions
+        return_flag = False
+        if kwargs.get('positions_to_exclude'):
+            positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
+            positions_to_compute = {k: positions_to_compute[k] for k in positions_}
+            return_flag = True
+
+        if len(positions_to_compute):
             last_date = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
             dates = dates_utils.get_market_days(start=self.start_date, end=last_date)
             market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
-            for position in self._positions.values():
+            for position in positions_to_compute.values():
                 pos_val = position.get_quantities().shift(1).fillna(method="backfill").multiply(position.get_prices().loc[self.start_date:])
                 pos_val = pos_val.fillna(method='ffill')
                 market_value = market_value.add(pos_val)
                 market_value = market_value.fillna(method='ffill')
-            self._market_value = market_value.dropna()
-            logger.logging.debug(f'{self.account} market_value computed')
+
+            if return_flag:
+                logger.logging.debug(f'{self.account} market_value computed')
+                return market_value.dropna()
+            elif not return_flag:
+                self._market_value = market_value.dropna()
+                logger.logging.debug(f'{self.account} market_value computed and set')
         else:
             logger.logging.debug(f"{self.account} no positions in portfolio")
 
@@ -135,6 +147,7 @@ class Portfolio(object):
     def transactions(self) -> pd.DataFrame:
         return self._transaction_manager.get_transactions()
 
+    # TODO verify if cash is affected by excluded positions for pnl
     @property
     def cash_history(self):
         dates = self.market_values.index
@@ -202,9 +215,9 @@ class Portfolio(object):
         else:
             return 0
 
-    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
+    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, **kwargs) -> pd.DataFrame:
         """
-        portfolio return in $ amount
+        portfolio return per position in $ amount
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
@@ -214,15 +227,22 @@ class Portfolio(object):
         if start_date is None:
             start_date = end_date
 
-        transactions = self._transaction_manager.get_transactions()
+        positions_to_compute = self.positions
+
+        if kwargs.get('positions_to_exclude'):
+            positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
+            positions_to_compute = {k: positions_to_compute[k] for k in positions_}
+
+        transactions = self._transaction_manager.get_transactions().loc[self._transaction_manager.get_transactions().Ticker.isin(positions_to_compute.keys())]
         try:
             transactions = transactions.loc[start_date:end_date]
         except KeyError:
             transactions = transactions.loc[start_date:]
-        pnl = df_utils.pnl_dict_map(d=self.positions, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
+
+        pnl = df_utils.pnl_dict_map(d=positions_to_compute, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
 
-    def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False) -> pd.DataFrame:
+    def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False, **kwargs) -> pd.DataFrame:
         """
         portfolio return in % of market value
         :param include_cash: if we include the cash amount at that time to calc the market value
@@ -240,7 +260,7 @@ class Portfolio(object):
         else:
             market_vals = self.market_values.loc[start_date:end_date]
 
-        pnl = self.daily_total_pnl(start_date, end_date).sum(axis=1).divide(market_vals)
+        pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals)
         return pnl
 
     def reset_transactions(self) -> None:
