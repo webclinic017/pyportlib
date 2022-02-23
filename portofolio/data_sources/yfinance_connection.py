@@ -25,7 +25,7 @@ class YFinanceConnection(object):
         directory = self.PRICES_DIRECTORY
         ticker = self._convert_ticker(ticker)
         data = pdr.get_data_yahoo(ticker, progress=False)
-        data.columns = ['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']
+        data.columns = [col.replace(' ', '') for col in data.columns]
 
         data.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{ticker} loaded from yfinance api")
@@ -38,7 +38,7 @@ class YFinanceConnection(object):
             data = self._make_ptf_currency_df()
         else:
             data = pdr.get_data_yahoo(f'{currency_pair}=X', progress=False)
-            data.columns = ['Open', 'High', 'Low', 'Close', 'AdjClose', 'Volume']
+            data.columns = [col.replace(' ', '') for col in data.columns]
 
         data.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{currency_pair} loaded from yfinance api")
