@@ -7,9 +7,9 @@ from portofolio.utils import logger
 
 class Position(object):
 
-    def __init__(self, ticker: str, currency: str):
+    def __init__(self, ticker: str, local_currency: str):
         self.ticker = ticker
-        self.currency = currency
+        self.currency = local_currency
         self._datareader = DataReader()
         self._prices = pd.Series()
         self._quantities = pd.Series()
