@@ -75,7 +75,7 @@ class Portfolio(object):
             market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
             for position in positions_to_compute.values():
-                pos_val = position.get_quantities().shift(1).fillna(method="backfill").multiply(position.get_prices().loc[self.start_date:])
+                pos_val = position.quantities.shift(1).fillna(method="backfill").multiply(position.prices.loc[self.start_date:])
                 pos_val = pos_val.fillna(method='ffill')
                 market_value = market_value.add(pos_val)
                 market_value = market_value.fillna(method='ffill')
@@ -100,8 +100,8 @@ class Portfolio(object):
             pos = Position(ticker, currency=currency)
 
             if self.currency != pos.currency:  # FIXME sometimes FX is missing for today... yfinance no price for that day
-                prices = pos.get_prices().multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
-                pos.set_prices(prices=prices)
+                prices = pos.prices.multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
+                pos.prices = prices
             self._positions[ticker] = pos
         logger.logging.debug(f'positions for {self.account} loaded')
 
@@ -122,7 +122,7 @@ class Portfolio(object):
                     & (self._transaction_manager.transactions.Type != 'Dividend')]
                 date_merge.loc[:, 'qty'] = trx['Quantity']
                 pos_qty = self._make_qty_series(date_merge.loc[:, 'qty'])
-                position.set_quantities(pos_qty)
+                position.quantities = pos_qty
             logger.logging.debug(f'{self.account} quantities computed')
 
         else:
@@ -203,7 +203,7 @@ class Portfolio(object):
                 end_date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
             if start_date is None:
                 start_date = self.start_date
-            transactions = self._transaction_manager.get_transactions().loc[start_date:]
+            transactions = self.transactions.loc[start_date:]
             transactions = transactions.loc[transactions.index <= end_date]
             dividends = transactions.loc[transactions.Type == 'Dividend', ['Price', 'Currency']]
 
@@ -233,7 +233,7 @@ class Portfolio(object):
             positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
             positions_to_compute = {k: positions_to_compute[k] for k in positions_}
 
-        transactions = self._transaction_manager.get_transactions().loc[self._transaction_manager.get_transactions().Ticker.isin(positions_to_compute.keys())]
+        transactions = self.transactions.loc[self.transactions.Ticker.isin(positions_to_compute.keys())]
         try:
             transactions = transactions.loc[start_date:end_date]
         except KeyError:
