@@ -6,3 +6,4 @@ pos.update_prices()
 
 
 print(pos.prices.iloc[-1])
+print(pos.quantities.iloc[-1])

@@ -103,7 +103,7 @@ class Position(object):
                 elif trx.Type == 'Dividend':
                     pnl.loc[trx.Date, 'dividend'] = trx.Price * trx_fx
                 pnl.loc[trx.Date, 'total'] -= trx.Fees
-        pnl.loc[:, 'total'] = pnl[['unrealized', 'realized', 'dividend']].sum(axis=1)
+        pnl.loc[:, 'total'] = pnl[['unrealized', 'realized', 'dividend', 'total']].sum(axis=1)
 
         return pnl.fillna(0)
 
