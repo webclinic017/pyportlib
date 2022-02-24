@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+setup.py
+portofolio/src/quicksample.egg-info/PKG-INFO
+portofolio/src/quicksample.egg-info/SOURCES.txt
+portofolio/src/quicksample.egg-info/dependency_links.txt
+portofolio/src/quicksample.egg-info/top_level.txt
