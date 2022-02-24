@@ -7,10 +7,10 @@ from portofolio.utils import logger
 
 class Position(object):
 
-    def __init__(self, ticker: str, currency: str):
+    def __init__(self, ticker: str, local_currency: str):
         self.ticker = ticker
-        self.currency = currency
-        self.datareader = DataReader()
+        self.currency = local_currency
+        self._datareader = DataReader()
         self._prices = pd.Series()
         self._quantities = pd.Series()
         self._load_prices()
@@ -18,22 +18,31 @@ class Position(object):
     def __repr__(self):
         return f"{self.ticker} - {self.currency}"
 
-    def _load_prices(self):
-        self._prices = self.datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
+    def update_prices(self):
+        self._datareader.update_prices(ticker=self.ticker)
+        self._load_prices()
+        logger.logging.info(f'{self} prices updated with local currency')
 
-    def get_prices(self):
+    def _load_prices(self):
+        self._prices = self._datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
+
+    @property
+    def prices(self):
         return self._prices
 
-    def set_prices(self, prices: pd.Series) -> None:
+    @prices.setter
+    def prices(self, prices: pd.Series) -> None:
         self._prices = prices
 
-    def get_quantities(self) -> pd.Series:
+    @property
+    def quantities(self) -> pd.Series:
         if not self._quantities.empty:
             return self._quantities
         else:
             return pd.Series(index=self._prices.index, data=[1 for _ in range(len(self._prices))])
 
-    def set_quantities(self, quantities: pd.Series) -> None:
+    @quantities.setter
+    def quantities(self, quantities: pd.Series) -> None:
         self._quantities = quantities
 
     def daily_pnl(self,
@@ -57,8 +66,8 @@ class Position(object):
 
         search_date = start_date - BDay(4)
         try:
-            prices = self.get_prices().loc[search_date:end_date]
-            quantities = self.get_quantities()
+            prices = self.prices.loc[search_date:end_date]
+            quantities = self.quantities
             diff = prices.loc[prices.index.isin(quantities.index)].diff().dropna()
         except KeyError:
             raise KeyError("pnl error")
@@ -94,7 +103,7 @@ class Position(object):
                 elif trx.Type == 'Dividend':
                     pnl.loc[trx.Date, 'dividend'] = trx.Price * trx_fx
                 pnl.loc[trx.Date, 'total'] -= trx.Fees
-        pnl.loc[:, 'total'] = pnl[['unrealized', 'realized', 'dividend']].sum(axis=1)
+        pnl.loc[:, 'total'] = pnl[['unrealized', 'realized', 'dividend', 'total']].sum(axis=1)
 
         return pnl.fillna(0)
 
