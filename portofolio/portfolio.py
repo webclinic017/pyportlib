@@ -128,12 +128,15 @@ class Portfolio(object):
         else:
             logger.logging.debug(f'{self.account} no positions in portfolio')
 
-    def add_transaction(self, transactions: List[Transaction]) -> None:
+    def add_transaction(self, transactions: Union[Transaction, List[Transaction]]) -> None:
         """
         add transactions to portfolio
         :param transactions: portofolio transaction object list
         :return: None
         """
+        if not hasattr(transactions, '__iter__'):
+            transactions = [transactions]
+
         for trx in transactions:
             ok, new_cash = self._check_trx(transaction=trx)
 
