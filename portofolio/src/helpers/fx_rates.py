@@ -1,6 +1,6 @@
 from typing import List
-from data_sources.data_reader import DataReader
-from utils import logger
+from ..data_sources.data_reader import DataReader
+from ..utils import logger
 
 
 class FxRates:

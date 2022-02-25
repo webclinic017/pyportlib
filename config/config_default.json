@@ -1,0 +1,15 @@
+{
+ "api": {
+  "max_requests_per_minute": {
+   "AlphaVantage": 5
+  },
+  "api_keys": {
+   "SimFin": "ENTER_KEY",
+   "AlphaVantage": "ENTER_KEY"
+  }
+ },
+ "datasource": {
+  "statements": "YFinance",
+  "market_data": "YFinance"
+ }
+}

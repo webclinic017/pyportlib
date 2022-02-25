@@ -1,8 +1,8 @@
 from datetime import datetime
 from pandas._libs.tslibs.offsets import BDay
-from data_sources.data_reader import DataReader
+from .data_sources.data_reader import DataReader
 import pandas as pd
-from utils import logger
+from .utils import logger
 
 
 class Position(object):

@@ -2,9 +2,9 @@ from datetime import datetime
 
 import pandas as pd
 import requests
-from data_sources.alpha_vantage_request_manager import request_limit_manager
-from utils import dates_utils, logger, files_utils
-from utils.config_utils import fetch_key
+from ..data_sources.alpha_vantage_request_manager import request_limit_manager
+from ..utils import dates_utils, logger, files_utils
+from ..utils.config_utils import fetch_key
 
 
 class AlphaVantageConnection(object):

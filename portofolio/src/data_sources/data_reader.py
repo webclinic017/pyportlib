@@ -1,8 +1,8 @@
-from utils import logger, files_utils, config_utils
-from data_sources.alphavantage_connection import AlphaVantageConnection
-from data_sources.simfin_connection import SimFinConnection
-from data_sources.yfinance_connection import YFinanceConnection
-from helpers.transaction_manager import TransactionManager
+from ..utils import logger, files_utils, config_utils
+from ..data_sources.alphavantage_connection import AlphaVantageConnection
+from ..data_sources.simfin_connection import SimFinConnection
+from ..data_sources.yfinance_connection import YFinanceConnection
+from ..helpers.transaction_manager import TransactionManager
 import pandas as pd
 
 

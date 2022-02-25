@@ -3,17 +3,17 @@ from typing import Union
 import pandas as pd
 import quantstats as qs
 
-import portfolio
-from data_sources.data_reader import DataReader
-from utils import files_utils
+from ..portfolio import Portfolio
+from ..data_sources.data_reader import DataReader
+from ..utils import files_utils
 
 OUT_DIR = "client_data/outputs/"
 if not files_utils.check_dir(OUT_DIR):
     files_utils.make_dir(OUT_DIR)
 
 
-def full_html(ptf: Union[portfolio.Portfolio, pd.Series, pd.DataFrame],
-              benchmark: Union[pd.Series, pd.DataFrame, str, portfolio.Portfolio],
+def full_html(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
+              benchmark: Union[pd.Series, pd.DataFrame, str, Portfolio],
               name: str,
               rf=None) -> None:
     """
@@ -24,7 +24,7 @@ def full_html(ptf: Union[portfolio.Portfolio, pd.Series, pd.DataFrame],
     :param name: name of saved file
     :return: None
     """
-    if isinstance(ptf, portfolio.Portfolio):
+    if isinstance(ptf, Portfolio):
         ptf.update_data()
         strategy_returns = ptf.pct_daily_total_pnl(start_date=ptf.start_date)
     else:
@@ -38,7 +38,7 @@ def full_html(ptf: Union[portfolio.Portfolio, pd.Series, pd.DataFrame],
         dr.update_prices(ticker=benchmark)
         benchmark_returns = dr.read_prices(ticker=benchmark).pct_change()
         benchmark_returns = benchmark_returns.loc[benchmark_returns.index.isin(strategy_returns.index)]
-    elif isinstance(benchmark, portfolio.Portfolio):
+    elif isinstance(benchmark, Portfolio):
         benchmark.update_data()
         benchmark_returns = benchmark.pct_daily_total_pnl(start_date=benchmark.start_date)
     elif isinstance(benchmark, pd.Series) or isinstance(benchmark, pd.DataFrame):
