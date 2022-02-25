@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pandas as pd
 
-from utils import df_utils, files_utils
-from utils import logger
+from ..utils import df_utils, files_utils
+from ..utils import logger
 
 
 class CashAccount:
