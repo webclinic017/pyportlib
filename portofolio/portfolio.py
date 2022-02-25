@@ -32,6 +32,10 @@ class Portfolio(object):
     def __repr__(self):
         return self.account
 
+    def __str__(self):
+        self.load_data()
+        return str(self.positions)
+
     def load_data(self) -> None:
         """
 
@@ -94,6 +98,7 @@ class Portfolio(object):
         return self._market_value
 
     def _load_positions(self, ) -> None:
+        self._positions = {}
         tickers = self._transaction_manager.all_positions()
         for ticker in tickers:
             currency = self._transaction_manager.get_currency(ticker=ticker)
