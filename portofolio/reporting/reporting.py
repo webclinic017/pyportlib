@@ -1,15 +1,10 @@
 from typing import Union
-
 import pandas as pd
 import quantstats as qs
-
 from ..portfolio import Portfolio
 from ..data_sources.data_reader import DataReader
-from ..utils import files_utils
 
 OUT_DIR = "client_data/outputs/"
-if not files_utils.check_dir(OUT_DIR):
-    files_utils.make_dir(OUT_DIR)
 
 
 def full_html(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
@@ -20,7 +15,7 @@ def full_html(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
     produces quantstats html report
     :param rf: riskfree rate
     :param ptf: portfolio object or strategy returns
-    :param benchmark: benchmark returns in % or ticker of benchmark
+    :param benchmark: benchmark returns in % or ticker of benchmark, portfolio object or series
     :param name: name of saved file
     :return: None
     """
