@@ -1,7 +1,8 @@
 Metadata-Version: 2.1
 Name: portofolio
-Version: 0.0.1
+Version: 0.0.2
 Summary: Portfolio building for statistics and performance analytics
+Home-page: UNKNOWN
 Author: Philippe Lacroix-Ouellette
 License: UNKNOWN
 Platform: UNKNOWN
@@ -10,6 +11,7 @@ Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
+License-File: LICENSE
 
 # portofolio
 
