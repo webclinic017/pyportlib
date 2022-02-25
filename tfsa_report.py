@@ -1,5 +1,5 @@
 from datetime import datetime
-import portofolio.src as porto
+import portofolio as porto
 
 ptf = porto.Portfolio(account='tfsa', currency="CAD")
 ptf.update_data()
