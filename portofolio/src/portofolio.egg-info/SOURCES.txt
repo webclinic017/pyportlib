@@ -1,8 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-setup.py
-portofolio/src/portofolio.egg-info/PKG-INFO
-portofolio/src/portofolio.egg-info/SOURCES.txt
-portofolio/src/portofolio.egg-info/dependency_links.txt
-portofolio/src/portofolio.egg-info/top_level.txt

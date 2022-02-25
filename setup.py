@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="portofolio",                     # This is the name of the package
-    version="0.0.2",                        # The initial release version
+    version="0.0.1",                        # The initial release version
     author="Philippe Lacroix-Ouellette",                     # Full name of the author
     description="Portfolio building for statistics and performance analytics",
     long_description=long_description,      # Long description read from the the readme file

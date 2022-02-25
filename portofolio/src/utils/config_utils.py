@@ -1,5 +1,6 @@
 import json
-import files_utils
+
+from utils import files_utils
 
 
 def make_config_dir():

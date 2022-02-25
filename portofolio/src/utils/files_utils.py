@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import logger
 
 
 def check_file(directory: str, file: str) -> bool:
@@ -15,13 +14,10 @@ def check_file(directory: str, file: str) -> bool:
     else:
         my_file = Path(f"{file}")
 
-    try:
-        if my_file.is_file():
-            return True
-        else:
-            return False
-    except Exception as e:
-        logger.logging.error(e)
+    if my_file.is_file():
+        return True
+    else:
+        return False
 
 
 def check_dir(directory) -> bool:
