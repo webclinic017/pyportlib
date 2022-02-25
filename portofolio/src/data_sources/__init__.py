@@ -1,5 +1,5 @@
-from portofolio.utils import files_utils
-from portofolio.utils.config_utils import make_config_dir, create_default_config
+from utils import files_utils
+from utils.config_utils import make_config_dir, create_default_config
 
 make_config_dir()
 create_default_config()

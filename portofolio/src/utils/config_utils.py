@@ -1,5 +1,5 @@
 import json
-from portofolio.utils import files_utils
+import files_utils
 
 
 def make_config_dir():

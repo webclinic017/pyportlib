@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import List
 import pandas as pd
 import requests
-from portofolio.utils.config_utils import fetch_key
-from portofolio.utils.files_utils import check_file
+from utils.config_utils import fetch_key
+from utils.files_utils import check_file
 
 
 class SimFinConnection(object):

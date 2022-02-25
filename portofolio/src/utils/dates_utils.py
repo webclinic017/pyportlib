@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 import pandas_market_calendars as mcal
-import pandas as pd
 
 
 def get_market_days(start: datetime, end: datetime = None, market: str = None) -> List[datetime]:

@@ -1,6 +1,6 @@
 from datetime import datetime
 import pandas as pd
-from portofolio.utils import logger
+from utils import logger
 from pandas_datareader import data as pdr
 import yfinance as yfin
 

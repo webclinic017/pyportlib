@@ -4,8 +4,8 @@ import pandas as pd
 import quantstats as qs
 
 import portofolio
-from portofolio.data_sources.data_reader import DataReader
-from portofolio.utils import files_utils
+from data_sources.data_reader import DataReader
+from utils import files_utils
 
 OUT_DIR = "client_data/outputs/"
 if not files_utils.check_dir(OUT_DIR):
