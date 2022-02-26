@@ -150,7 +150,7 @@ class Portfolio(object):
             ok, new_cash = self._check_trx(transaction=trx)
 
             if not ok:
-                logger.logging.error(f'{self.account}: Not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
+                logger.logging.error(f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
             else:
                 self._transaction_manager.add(transaction=trx)
         self.load_data()
