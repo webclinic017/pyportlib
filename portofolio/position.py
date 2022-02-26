@@ -14,6 +14,9 @@ class Position(object):
         self._prices = pd.Series()
         self._quantities = pd.Series()
         self._load_prices()
+        self._fundamentals = {'balance_sheet': None,
+                              'cash_flow': None,
+                              'income_statement': None}
 
     def __repr__(self):
         return f"{self.ticker} - {self.currency}"
@@ -25,6 +28,14 @@ class Position(object):
 
     def _load_prices(self):
         self._prices = self._datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
+
+    def get_fundamentals(self, statement_type: str):
+        if self._fundamentals.get(statement_type):
+            return self._fundamentals.get(statement_type)
+        else:
+            self._fundamentals[statement_type] = self._datareader.read_fundamentals(ticker=self.ticker,
+                                                                                    statement_type=statement_type)
+            return self._fundamentals.get(statement_type)
 
     @property
     def prices(self):

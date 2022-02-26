@@ -73,11 +73,41 @@ class DataReader(object):
             self.update_fx(currency_pair=currency_pair)
             return self.read_fx(currency_pair)
 
+    def read_fundamentals(self, ticker: str, statement_type: str):
+        implemented = {'balance_sheet', 'cash_flow', 'income_statement'}
+        if statement_type not in implemented:
+            raise ValueError(f'enter valid statement type: {implemented}')
+        directory = self._market_data_source.STATEMENT_DIRECTORY
+        filename = f"{self._market_data_source.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_{statement_type}.csv"
+
+        if files_utils.check_file(directory=directory, file=filename):
+            if statement_type in {"balance_sheet", "cash_flow", "income_statement"}:
+                index = "Breakdown"
+            else:
+                index = 'no index'
+            df = pd.read_csv(f"{directory}/{filename}").set_index(index)
+            return df
+
+        else:
+            logger.logging.info(f'no {statement_type} data to read for {ticker}, now fetching new data from api')
+            self.update_statement(ticker=ticker, statement_type=statement_type)
+            return self.read_fundamentals(ticker=ticker, statement_type=statement_type)
+
     def update_prices(self, ticker: str):
         self._market_data_source.get_prices(ticker=ticker)
 
     def update_fx(self, currency_pair: str):
         self._market_data_source.get_fx(currency_pair=currency_pair)
+
+    def update_statement(self, ticker: str, statement_type: str):
+        if statement_type == 'balance_sheet':
+            self._statements_data_source.get_balance_sheet(ticker)
+        elif statement_type == 'cash_flow':
+            self._statements_data_source.get_cash_flow(ticker)
+        elif statement_type == 'income_statement':
+            self._statements_data_source.get_income_statement(ticker)
+        else:
+            raise NotImplementedError()
 
     def last_data_point(self, account: str, ptf_currency: str = 'CAD'):
         last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]

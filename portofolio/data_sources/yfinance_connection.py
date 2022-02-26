@@ -3,6 +3,7 @@ import pandas as pd
 from ..utils import logger
 from pandas_datareader import data as pdr
 import yfinance as yfin
+import yahoo_fin.stock_info as yf
 
 
 class YFinanceConnection(object):
@@ -42,6 +43,34 @@ class YFinanceConnection(object):
 
         data.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{currency_pair} loaded from yfinance api")
+
+    def get_balance_sheet(self, ticker: str):
+        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_balance_sheet.csv"
+        directory = self.STATEMENT_DIRECTORY
+        ticker = self._convert_ticker(ticker)
+
+        bs = yf.get_balance_sheet(ticker)
+        bs.to_csv(f"{directory}/{filename}")
+        logger.logging.debug(f"{ticker} balance_sheet loaded from yfinance api")
+
+    def get_cash_flow(self, ticker: str):
+        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_cash_flow.csv"
+        directory = self.STATEMENT_DIRECTORY
+        ticker = self._convert_ticker(ticker)
+
+        bs = yf.get_cash_flow(ticker)
+        bs.to_csv(f"{directory}/{filename}")
+        logger.logging.debug(f"{ticker} cash flow loaded from yfinance api")
+
+    def get_income_statement(self, ticker: str):
+        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_income_statement.csv"
+        directory = self.STATEMENT_DIRECTORY
+        ticker = self._convert_ticker(ticker)
+
+        bs = yf.get_cash_flow(ticker)
+        bs.to_csv(f"{directory}/{filename}")
+        logger.logging.debug(f"{ticker} income statement loaded from yfinance api")
+
 
     @staticmethod
     def _make_ptf_currency_df():
