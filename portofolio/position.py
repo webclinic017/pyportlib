@@ -8,8 +8,8 @@ from .utils import logger
 class Position(object):
 
     def __init__(self, ticker: str, local_currency: str):
-        self.ticker = ticker
-        self.currency = local_currency
+        self.ticker = ticker.upper()
+        self.currency = local_currency.upper()
         self._datareader = DataReader()
         self._prices = pd.Series()
         self._quantities = pd.Series()

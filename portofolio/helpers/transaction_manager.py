@@ -106,7 +106,7 @@ class TransactionManager(object):
     def from_csv(self, filename) -> List[Transaction]:
         raise NotImplementedError()
 
-    def reset_transactions(self):
+    def reset(self):
         empty_transactions = self.empty_transactions()
         empty_transactions.to_csv(f"{self.directory}/{self.filename}")
         self.transactions = empty_transactions

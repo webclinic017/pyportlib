@@ -40,7 +40,7 @@ class CashAccount:
             if not files_utils.check_dir(self.directory):
                 files_utils.make_dir(self.directory)
             # create empty transaction file in new directory
-            empty_cash = self.empty_cash()
+            empty_cash = self._empty_cash()
             empty_cash.to_csv(f"{self.directory}/{self.filename}")
             return empty_cash
 
@@ -61,10 +61,10 @@ class CashAccount:
         self.cash_changes.to_csv(f"{self.directory}/{self.filename}")
         self._load_cash()
 
-    def reset_cash(self):
-        empty_cash = self.empty_cash()
+    def reset(self):
+        empty_cash = self._empty_cash()
         empty_cash.to_csv(f"{self.directory}/{self.filename}")
         self.cash_changes = empty_cash
 
-    def empty_cash(self):
+    def _empty_cash(self):
         return pd.DataFrame(columns=self.CASH_INFO).set_index('Date')

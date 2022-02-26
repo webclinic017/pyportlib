@@ -16,7 +16,7 @@ class Portfolio(object):
         # attributes
         self.account = account
         self._positions = {}
-        self.currency = currency
+        self.currency = currency.upper()
         self._market_value = pd.Series()
 
         # helpers
@@ -41,11 +41,14 @@ class Portfolio(object):
 
         :return:
         """
-        self._transaction_manager.fetch()
         self.start_date = self._transaction_manager.first_trx_date()
+        self._fx.set_pairs(pairs=[f"{curr}{self.currency}" for curr in self._transaction_manager.get_currencies()])
+
+        self._transaction_manager.fetch()
         self._load_positions()
         self._load_position_quantities()
         self._load_market_value()
+
         logger.logging.debug(f'{self.account} data loaded')
 
     def update_data(self) -> None:
@@ -66,6 +69,7 @@ class Portfolio(object):
             self._datareader.update_prices(ticker=ticker)
 
     def _load_market_value(self, **kwargs) -> None:
+        self._market_value = pd.Series()
         positions_to_compute = self.positions
         return_flag = False
         if kwargs.get('positions_to_exclude'):
@@ -271,14 +275,10 @@ class Portfolio(object):
         pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals)
         return pnl
 
-    def reset_transactions(self) -> None:
-        self._transaction_manager.reset_transactions()
-        logger.logging.debug(f'transactions for {self.account} have been reset')
-        self.load_data()
-
-    def reset_cash(self) -> None:
-        self._cash_account.reset_cash()
-        logger.logging.debug(f'cash for {self.account} have been reset')
+    def reset(self):
+        self._transaction_manager.reset()
+        self._cash_account.reset()
+        self._fx.reset()
         self.load_data()
 
     @staticmethod

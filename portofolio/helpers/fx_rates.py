@@ -18,6 +18,11 @@ class FxRates:
 
     def set_pairs(self, pairs: List[str]):
         self.pairs = pairs
+        self.refresh()
+
+    def reset(self):
+        self.pairs = []
+        self.rates = {}
         self._load()
 
     def refresh(self):
