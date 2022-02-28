@@ -1,7 +1,7 @@
 from ..utils import logger, files_utils, config_utils
 from ..data_sources.alphavantage_connection import AlphaVantageConnection
 from ..data_sources.simfin_connection import SimFinConnection
-from ..data_sources.yfinance_connection import YFinanceConnection
+from ..data_sources.yahoo_connection import YahooConnection
 from ..helpers.transaction_manager import TransactionManager
 import pandas as pd
 
@@ -25,8 +25,8 @@ class DataReader(object):
             market_data = AlphaVantageConnection()
         elif prices_data_source == 'SimFin':
             market_data = SimFinConnection()
-        elif prices_data_source == 'YFinance':
-            market_data = YFinanceConnection()
+        elif prices_data_source == 'Yahoo':
+            market_data = YahooConnection()
         else:
             logger.logging.error(f'prices datasource: {prices_data_source} not valid')
             return None
@@ -35,8 +35,8 @@ class DataReader(object):
             statements = AlphaVantageConnection()
         elif statements_data_source == 'SimFin':
             statements = SimFinConnection()
-        elif prices_data_source == 'YFinance':
-            statements = YFinanceConnection()
+        elif prices_data_source == 'Yahoo':
+            statements = YahooConnection()
         else:
             logger.logging.error(f'statements datasource: {statements_data_source} not valid')
             return None
@@ -93,6 +93,20 @@ class DataReader(object):
             self.update_statement(ticker=ticker, statement_type=statement_type)
             return self.read_fundamentals(ticker=ticker, statement_type=statement_type)
 
+    def read_dividends(self, ticker: str):
+        directory = self._market_data_source.STATEMENT_DIRECTORY
+        filename = f"{self._market_data_source.FILE_PREFIX}_{ticker}_dividends.csv"
+
+        if files_utils.check_file(directory=directory, file=filename):
+            df = pd.read_csv(f"{directory}/{filename}")
+            df = df.set_index('date')
+            df.index = pd.to_datetime(df.index)
+            return df['dividend']
+        else:
+            logger.logging.info(f'no dividend data to read for {ticker}, now fetching new data from api')
+            self.update_dividends(ticker=ticker)
+            return self.read_dividends(ticker)
+
     def update_prices(self, ticker: str):
         self._market_data_source.get_prices(ticker=ticker)
 
@@ -105,11 +119,19 @@ class DataReader(object):
         elif statement_type == 'cash_flow':
             self._statements_data_source.get_cash_flow(ticker)
         elif statement_type == 'income_statement':
+            self._statements_data_source.get_cash_flow(ticker)
+
+        elif statement_type == 'all':
+            self._statements_data_source.get_balance_sheet(ticker)
+            self._statements_data_source.get_cash_flow(ticker)
             self._statements_data_source.get_income_statement(ticker)
         else:
-            raise NotImplementedError()
+            raise NotImplementedError({statement_type})
+
+    def update_dividends(self, ticker: str):
+        self._market_data_source.get_dividends(ticker=ticker)
 
     def last_data_point(self, account: str, ptf_currency: str = 'CAD'):
         last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]
-        last_trade = TransactionManager(account=account).transactions.index.max()
+        last_trade = TransactionManager(account=account).get_transactions().index.max()
         return max(last_data, last_trade)

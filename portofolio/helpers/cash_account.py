@@ -52,7 +52,7 @@ class CashAccount:
         return c_ch.loc[self.get_cash_changes().index <= date, 'Amount'].sum()
 
     def add_cash_change(self, date: datetime, direction: str, amount: float):
-        if direction not in ['Deposit', 'Withdrawal']:
+        if direction not in ['deposit', 'withdrawal']:
             raise Exception(f'cash direction type not supported {direction}')
 
         self.cash_changes.loc[date, "Type"] = direction

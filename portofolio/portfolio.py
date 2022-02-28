@@ -6,7 +6,7 @@ from .data_sources.data_reader import DataReader
 from .helpers.fx_rates import FxRates
 from .helpers.transaction import Transaction
 from .helpers.transaction_manager import TransactionManager
-from .utils import dates_utils, logger, df_utils
+from .utils import dates_utils, logger
 import pandas as pd
 
 
@@ -32,14 +32,14 @@ class Portfolio(object):
     def __repr__(self):
         return self.account
 
-    def __str__(self):
-        self.load_data()
-        return str(self.positions)
+    # def __str__(self):
+    #     return str(self.positions)
 
     def load_data(self) -> None:
         """
-
-        :return:
+        loads portfolio object with current available data, mostly used to update some attributes
+        dependent on other objects or computations
+        :return: None
         """
         self.start_date = self._transaction_manager.first_trx_date()
         self._fx.set_pairs(pairs=[f"{curr}{self.currency}" for curr in self._transaction_manager.get_currencies()])
@@ -51,27 +51,29 @@ class Portfolio(object):
 
         logger.logging.debug(f'{self.account} data loaded')
 
-    def update_data(self) -> None:
+    def update_data(self, fundamentals_and_dividends: bool = True) -> None:
         """
-
+        updates all of the market data of the portfolio (prices, fx)
         :return:
         """
-        self._refresh_prices()
-        self._refresh_fx()
+        self._update_positions(fundamentals_and_dividends=fundamentals_and_dividends)
+        self._update_fx()
         self.load_data()
         logger.logging.info(f'{self.account} updated')
 
-    def _refresh_fx(self) -> None:
+    def _update_fx(self) -> None:
         self._fx.refresh()
 
-    def _refresh_prices(self) -> None:
-        for ticker in self._positions.keys():
-            self._datareader.update_prices(ticker=ticker)
+    def _update_positions(self, fundamentals_and_dividends: bool = True) -> None:
+        for position in self._positions.values():
+            position.update_data(fundamentals_and_dividends=fundamentals_and_dividends)
 
     def _load_market_value(self, **kwargs) -> None:
         self._market_value = pd.Series()
         positions_to_compute = self.positions
         return_flag = False
+
+        # used for pnl what if scenarios where position are easily ommited from calculations
         if kwargs.get('positions_to_exclude'):
             positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
             positions_to_compute = {k: positions_to_compute[k] for k in positions_}
@@ -88,6 +90,7 @@ class Portfolio(object):
                 market_value = market_value.add(pos_val)
                 market_value = market_value.fillna(method='ffill')
 
+            # used by pnl to return the value instead of setting it
             if return_flag:
                 logger.logging.debug(f'{self.account} market_value computed')
                 return market_value.dropna()
@@ -102,13 +105,17 @@ class Portfolio(object):
         return self._market_value
 
     def _load_positions(self, ) -> None:
+        """
+        based on transaction data, loads all of the active and closed positions
+        :return: None
+        """
         self._positions = {}
         tickers = self._transaction_manager.all_positions()
         for ticker in tickers:
             currency = self._transaction_manager.get_currency(ticker=ticker)
             pos = Position(ticker, local_currency=currency)
 
-            if self.currency != pos.currency:  # FIXME sometimes FX is missing for today... yfinance no price for that day
+            if self.currency != pos.currency:  # FIXME sometimes FX is missing for today... yahoo no price for that day
                 prices = pos.prices.multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
                 pos.prices = prices
             self._positions[ticker] = pos
@@ -119,6 +126,10 @@ class Portfolio(object):
         return self._positions
 
     def _load_position_quantities(self) -> None:
+        """
+        based on transaction data, loads all of the active and closed positions
+        :return: None
+        """
         if len(self._positions):
 
             last_date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
@@ -140,7 +151,7 @@ class Portfolio(object):
     def add_transaction(self, transactions: Union[Transaction, List[Transaction]]) -> None:
         """
         add transactions to portfolio
-        :param transactions: portofolio transaction object list
+        :param transactions: portofolio transaction object, single or list
         :return: None
         """
         if not hasattr(transactions, '__iter__'):
@@ -159,15 +170,25 @@ class Portfolio(object):
     def transactions(self) -> pd.DataFrame:
         return self._transaction_manager.get_transactions()
 
-    # TODO verify if cash is affected by excluded positions for pnl
     @property
     def cash_history(self):
+        """
+        computes cash account for every date
+        :return:
+        """
         dates = self.market_values.index
         cash = [self.cash(date) for date in dates]
         cash_c = pd.Series(data=cash, index=dates)
         return cash_c
 
     def add_cash_change(self, date: datetime, direction: str, amount: float) -> None:
+        """
+        add a cash deposit or withdrawal from the account
+        :param date: datetime of the cash change
+        :param direction: withdrawal or deposit
+        :param amount: in portfolio currency
+        :return: None
+        """
         self._cash_account.add_cash_change(date=date, direction=direction, amount=amount)
         logger.logging.info(f'cash change for {self.account} have been added')
         self.load_data()
@@ -175,7 +196,7 @@ class Portfolio(object):
     def cash(self, date: datetime = None) -> float:
         """
         cash available on given date
-        :param date: datetime object
+        :param date: datetime
         :return: float
         """
         if date is None:
@@ -185,8 +206,8 @@ class Portfolio(object):
 
         trx = self.transactions
         trx = trx.loc[trx.index <= date]
-        trx_value = trx.Quantity * trx.Price
-        trx = pd.concat([trx, trx_value], axis=1)
+        trx_values = trx.Quantity * trx.Price
+        trx = pd.concat([trx, trx_values], axis=1)
 
         trx_currencies = set(trx.Currency)
         for curr in trx_currencies:
@@ -205,7 +226,7 @@ class Portfolio(object):
 
     def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
         """
-        accumulated dividend over date range
+        accumulated dividend over date range for the entire portfolio
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
@@ -221,7 +242,11 @@ class Portfolio(object):
 
             trx_currencies = set(transactions.Currency)
             for curr in trx_currencies:
-                live_fx = self._fx.get(f'{curr}{self.currency}').loc[end_date]
+                try:
+                    live_fx = self._fx.get(f'{curr}{self.currency}').loc[end_date]
+                except KeyError:
+                    logger.logging.debug('live fx request on holiday, key error')
+                    live_fx = self._fx.get(f'{curr}{self.currency}').iloc[-1]
                 dividends.loc[dividends.Currency == curr, 'Price'] *= live_fx
             return round(dividends['Price'].sum(), 2)
         else:
@@ -229,7 +254,7 @@ class Portfolio(object):
 
     def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, **kwargs) -> pd.DataFrame:
         """
-        portfolio return per position in $ amount
+        portfolio return per position in $ amount for specified date range
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
@@ -251,8 +276,8 @@ class Portfolio(object):
         except KeyError:
             transactions = transactions.loc[start_date:]
 
-        pnl = df_utils.pnl_dict_map(d=positions_to_compute, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
-        return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)
+        pnl = self.pnl_dict_map(d=positions_to_compute, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
+        return pnl
 
     def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False, **kwargs) -> pd.DataFrame:
         """
@@ -275,7 +300,12 @@ class Portfolio(object):
         pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals)
         return pnl
 
-    def reset(self):
+    def reset(self) -> None:
+        """
+        Resets transactions and cash flows from the portfolio object and erases the saved csv files associated to
+        the portfolio
+        :return: None
+        """
         self._transaction_manager.reset()
         self._cash_account.reset()
         self._fx.reset()
@@ -295,3 +325,18 @@ class Portfolio(object):
         new_cash = live_cash - value
 
         return value < live_cash, new_cash
+
+    @staticmethod
+    def pnl_dict_map(d, start_date, end_date, transactions, fx: dict) -> pd.DataFrame:
+        """
+        Apply function to values of position dictionary and convert back to df
+        :param d: positions dict
+        :param start_date:
+        :param end_date:
+        :param transactions: transaction to take into account on the pnl
+        :param fx: fx df
+        :return:
+        """
+
+        pnl = {k: v.daily_pnl(start_date, end_date, transactions.loc[transactions.Ticker == k], fx)['total'] for k, v in d.items()}
+        return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)

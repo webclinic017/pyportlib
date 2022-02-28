@@ -14,28 +14,37 @@ class Position(object):
         self._prices = pd.Series()
         self._quantities = pd.Series()
         self._load_prices()
-        self._fundamentals = {'balance_sheet': pd.DataFrame(),
-                              'cash_flow': pd.DataFrame(),
-                              'income_statement': pd.DataFrame()}
 
     def __repr__(self):
         return f"{self.ticker} - {self.currency}"
 
-    def update_prices(self):
+    def update_data(self, fundamentals_and_dividends: bool = True):
+        if fundamentals_and_dividends:
+            self._update_fundamentals()
+            self._update_dividends()
+        self._update_prices()
+
+    def _update_prices(self):
         self._datareader.update_prices(ticker=self.ticker)
         self._load_prices()
         logger.logging.info(f'{self} prices updated with local currency')
 
+    def get_fundamentals(self, statement_type: str):
+        return self._datareader.read_fundamentals(ticker=self.ticker, statement_type=statement_type)
+
+    def _update_dividends(self):
+        self._datareader.update_dividends(ticker=self.ticker)
+        logger.logging.info(f'{self} dividends updated with local currency')
+
+    def _update_fundamentals(self):
+        self._datareader.update_statement(ticker=self.ticker, statement_type='all')
+        logger.logging.info(f'{self} statements updated with local currency')
+
+    def dividends(self):
+        return self._datareader.read_dividends(ticker=self.ticker)
+
     def _load_prices(self):
         self._prices = self._datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
-
-    def get_fundamentals(self, statement_type: str):
-        if not self._fundamentals.get(statement_type).empty:
-            return self._fundamentals.get(statement_type)
-        else:
-            self._fundamentals[statement_type] = self._datareader.read_fundamentals(ticker=self.ticker,
-                                                                                    statement_type=statement_type)
-            return self._fundamentals.get(statement_type)
 
     @property
     def prices(self):
@@ -50,7 +59,7 @@ class Position(object):
         if not self._quantities.empty:
             return self._quantities
         else:
-            return pd.Series(index=self._prices.index, data=[1 for _ in range(len(self._prices))])
+            return pd.Series(index=self.prices.index, data=[1 for _ in range(len(self.prices))])
 
     @quantities.setter
     def quantities(self, quantities: pd.Series) -> None:
