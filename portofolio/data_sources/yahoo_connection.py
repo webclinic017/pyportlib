@@ -1,15 +1,16 @@
 from datetime import datetime
 import pandas as pd
-from ..utils import logger
+from ..utils import logger, files_utils
 from pandas_datareader import data as pdr
 import yfinance as yfin
 import yahoo_fin.stock_info as yf
 
 
 class YahooConnection(object):
-    STATEMENT_DIRECTORY = 'client_data/data/statements'
-    PRICES_DIRECTORY = 'client_data/data/prices'
-    FX_DIRECTORY = 'client_data/data/fx'
+    DATA_DIRECTORY = files_utils.get_data_dir()
+    STATEMENT_DIRECTORY = files_utils.get_statements_data_dir()
+    PRICES_DIRECTORY = files_utils.get_price_data_dir()
+    FX_DIRECTORY = files_utils.get_fx_data_dir()
     FILE_PREFIX = 'yfin'
     NAME = 'Yahoo'
     URL = ''
@@ -102,4 +103,6 @@ class YahooConnection(object):
     def _convert_ticker(ticker):
         ticker = ticker.replace('.TRT', '.TO')
         ticker = ticker.replace(' ', '')
+        ticker = ticker.replace('.UN', '-UN')
+        ticker = ticker.replace('.VN', '.V')
         return ticker

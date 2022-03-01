@@ -1,28 +1,26 @@
 from datetime import datetime
-
 import pandas as pd
-
 from ..utils import df_utils, files_utils
 from ..utils import logger
 
 
 class CashAccount:
     NAME = "Cash Account"
-    ACCOUNTS_DIRECTORY = "client_data/accounts/"
+    ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
     CASH_INFO = ['Date', 'Type', 'Amount']
+    CASH_FILENAME = "cash.csv"
 
     def __init__(self, account):
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
-        self.filename = f"{self.account}_cash.csv"
         self.cash_changes = self._load_cash()
 
     def __repr__(self):
         return self.NAME
 
     def _load_cash(self):
-        if files_utils.check_file(self.directory, self.filename):
-            cash = pd.read_csv(f"{self.directory}/{self.filename}")
+        if files_utils.check_file(self.directory, self.CASH_FILENAME):
+            cash = pd.read_csv(f"{self.directory}/{self.CASH_FILENAME}")
             try:
                 cash.drop(columns='Unnamed: 0', inplace=True)
             except KeyError:
@@ -41,7 +39,7 @@ class CashAccount:
                 files_utils.make_dir(self.directory)
             # create empty transaction file in new directory
             empty_cash = self._empty_cash()
-            empty_cash.to_csv(f"{self.directory}/{self.filename}")
+            empty_cash.to_csv(f"{self.directory}/{self.CASH_FILENAME}")
             return empty_cash
 
     def get_cash_changes(self):
@@ -58,12 +56,12 @@ class CashAccount:
         self.cash_changes.loc[date, "Type"] = direction
         self.cash_changes.loc[date, "Amount"] = amount
 
-        self.cash_changes.to_csv(f"{self.directory}/{self.filename}")
+        self.cash_changes.to_csv(f"{self.directory}/{self.CASH_FILENAME}")
         self._load_cash()
 
     def reset(self):
         empty_cash = self._empty_cash()
-        empty_cash.to_csv(f"{self.directory}/{self.filename}")
+        empty_cash.to_csv(f"{self.directory}/{self.CASH_FILENAME}")
         self.cash_changes = empty_cash
 
     def _empty_cash(self):

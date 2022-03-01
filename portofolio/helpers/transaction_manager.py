@@ -6,12 +6,12 @@ import pandas as pd
 
 class TransactionManager(object):
     NAME = "Transactions Manager"
-    ACCOUNTS_DIRECTORY = "client_data/accounts/"
+    ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
+    TRANSACTION_FILENAME = "transactions.csv"
 
     def __init__(self, account):
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
-        self.filename = f"{self.account}_transactions.csv"
         self.transactions = pd.DataFrame()
         self.fetch()
 
@@ -19,8 +19,8 @@ class TransactionManager(object):
         return self.NAME
 
     def fetch(self) -> pd.DataFrame:
-        if files_utils.check_file(self.directory, self.filename):
-            trx = pd.read_csv(f"{self.directory}/{self.filename}")
+        if files_utils.check_file(self.directory, self.TRANSACTION_FILENAME):
+            trx = pd.read_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
             try:
                 trx.drop(columns='Unnamed: 0', inplace=True)
             except KeyError:
@@ -35,12 +35,13 @@ class TransactionManager(object):
                 else:
                     logger.logging.error(f'transactions do not match requirements for account: {self.account}')
         else:
+            # FIXME relative path doesnt work for new ptf...
             # if new ptf, create required files to use it
             if not files_utils.check_dir(self.directory):
                 files_utils.make_dir(self.directory)
             # create empty transaction file in new directory
             empty_transactions = self.empty_transactions()
-            empty_transactions.to_csv(f"{self.directory}/{self.filename}")
+            empty_transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
             self.transactions = empty_transactions
             return empty_transactions
 
@@ -48,13 +49,14 @@ class TransactionManager(object):
         new = transaction.get()
         self.transactions = pd.concat([self.transactions, new])
 
-        self.transactions.to_csv(f"{self.directory}/{self.filename}")
+        self.transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
         logger.logging.debug('transactions file updated')
 
     def _check_trx(self, transaction: Transaction) -> bool:
         new_qty = self.transactions.Quantity.loc[self.transactions.Ticker == transaction.ticker].sum() + transaction.quantity
 
         if new_qty < 0:
+            print(transaction.get())
             logger.logging.error(f'no short positions allowed, you sold {-1 * (transaction.quantity - (transaction.quantity - new_qty))} units too many')
             return False
         else:
@@ -85,11 +87,19 @@ class TransactionManager(object):
     def total_fees(self) -> float:
         return self.transactions.Fees.sum()
     
-    def first_trx_date(self, ticker: str = None):
+    def first_trx(self, ticker: str = None):
         if len(self.get_transactions()):
             if ticker:
                 return self.transactions.loc[self.transactions.Ticker == ticker].index.min()
             return self.get_transactions().index.min()
+        else:
+            return None
+
+    def last_trx(self, ticker: str = None):
+        if len(self.get_transactions()):
+            if ticker:
+                return self.transactions.loc[self.transactions.Ticker == ticker].index.max()
+            return self.get_transactions().index.max()
         else:
             return None
 
@@ -108,7 +118,7 @@ class TransactionManager(object):
 
     def reset(self):
         empty_transactions = self.empty_transactions()
-        empty_transactions.to_csv(f"{self.directory}/{self.filename}")
+        empty_transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
         self.transactions = empty_transactions
 
     @staticmethod

@@ -1,6 +1,6 @@
 from ..utils import logger, files_utils, config_utils
-from ..data_sources.alphavantage_connection import AlphaVantageConnection
-from ..data_sources.simfin_connection import SimFinConnection
+# from old.alphavantage_connection import AlphaVantageConnection
+# from old.simfin_connection import SimFinConnection
 from ..data_sources.yahoo_connection import YahooConnection
 from ..helpers.transaction_manager import TransactionManager
 import pandas as pd
@@ -21,21 +21,21 @@ class DataReader(object):
         prices_data_source = config_utils.fetch_data_sources('market_data')
         statements_data_source = config_utils.fetch_data_sources('statements')
         # data_source for prices and fx
-        if prices_data_source == 'AlphaVantage':
-            market_data = AlphaVantageConnection()
-        elif prices_data_source == 'SimFin':
-            market_data = SimFinConnection()
-        elif prices_data_source == 'Yahoo':
+        # if prices_data_source == 'AlphaVantage':
+        #     market_data = AlphaVantageConnection()
+        # elif prices_data_source == 'SimFin':
+        #     market_data = SimFinConnection()
+        if prices_data_source == 'Yahoo':
             market_data = YahooConnection()
         else:
             logger.logging.error(f'prices datasource: {prices_data_source} not valid')
             return None
         # data source for statments
-        if statements_data_source == 'AlphaVantage':
-            statements = AlphaVantageConnection()
-        elif statements_data_source == 'SimFin':
-            statements = SimFinConnection()
-        elif prices_data_source == 'Yahoo':
+        # if statements_data_source == 'AlphaVantage':
+        #     statements = AlphaVantageConnection()
+        # elif statements_data_source == 'SimFin':
+        #     statements = SimFinConnection()
+        if prices_data_source == 'Yahoo':
             statements = YahooConnection()
         else:
             logger.logging.error(f'statements datasource: {statements_data_source} not valid')

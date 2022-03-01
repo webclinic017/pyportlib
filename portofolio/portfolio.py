@@ -41,9 +41,10 @@ class Portfolio(object):
         dependent on other objects or computations
         :return: None
         """
-        self.start_date = self._transaction_manager.first_trx_date()
+        self.start_date = self._transaction_manager.first_trx()
         self._fx.set_pairs(pairs=[f"{curr}{self.currency}" for curr in self._transaction_manager.get_currencies()])
 
+        self._cash_account._load_cash()
         self._transaction_manager.fetch()
         self._load_positions()
         self._load_position_quantities()
