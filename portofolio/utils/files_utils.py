@@ -50,6 +50,7 @@ _price_data_dir = None
 _fx_data_dir = None
 _statements_data_dir = None
 _config_dir = None
+_outputs_dir = None
 
 
 def _check_client_dir():
@@ -72,7 +73,8 @@ def set_client_dir(data_dir=""):
     :return: `None`
     """
     data_dir = f'~{data_dir}/portofolio_client_data'
-    global _client_dir, _data_dir, _accounts_dir, _price_data_dir, _fx_data_dir, _statements_data_dir, _config_dir
+    global _client_dir, _data_dir, _accounts_dir, _price_data_dir, \
+        _fx_data_dir, _statements_data_dir, _config_dir, _outputs_dir
 
     # Expand directory if it begins with ~
     _client_dir = os.path.expanduser(data_dir)
@@ -84,6 +86,7 @@ def set_client_dir(data_dir=""):
     _statements_data_dir = os.path.join(_data_dir, 'statements/')
 
     _config_dir = os.path.join(_client_dir, 'config/')
+    _outputs_dir = os.path.join(_client_dir, 'outputs/')
 
     if not os.path.exists(_client_dir):
         os.makedirs(_client_dir)
@@ -98,6 +101,9 @@ def set_client_dir(data_dir=""):
 
     if not os.path.exists(_accounts_dir):
         os.makedirs(_accounts_dir)
+    if not os.path.exists(_outputs_dir):
+        os.makedirs(_outputs_dir)
+
     if not os.path.exists(_config_dir):
         os.makedirs(_config_dir)
     if not os.path.exists(f"{_config_dir}config.json"):
@@ -186,3 +192,15 @@ def get_statements_data_dir():
     # Ensure the data-directory has been set by the user.
     _check_client_dir()
     return _statements_data_dir
+
+
+def get_outputs_dir():
+    """
+    Get the full path for the statements directory where
+    the files with datasets are temporarily stored.
+
+    :return: String with the path for the statements directory.
+    """
+    # Ensure the data-directory has been set by the user.
+    _check_client_dir()
+    return _outputs_dir

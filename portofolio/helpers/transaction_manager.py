@@ -35,7 +35,6 @@ class TransactionManager(object):
                 else:
                     logger.logging.error(f'transactions do not match requirements for account: {self.account}')
         else:
-            # FIXME relative path doesnt work for new ptf...
             # if new ptf, create required files to use it
             if not files_utils.check_dir(self.directory):
                 files_utils.make_dir(self.directory)

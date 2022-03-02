@@ -3,8 +3,9 @@ import pandas as pd
 import quantstats as qs
 from ..portfolio import Portfolio
 from ..data_sources.data_reader import DataReader
+from ..utils import files_utils
 
-OUT_DIR = "client_data/outputs/"
+OUT_DIR = files_utils.get_outputs_dir()
 
 
 def full_html(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
