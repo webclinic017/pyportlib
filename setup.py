@@ -1,23 +1,80 @@
-import setuptools
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+"""Portofolio: Portfolio analytics and stock data daba management
+https://github.com/phil-lo/PortoFolio
+Portofolio manages your stock data, transactions and allows for easy portfolio creation
+and analytics.
+"""
 
-setuptools.setup(
-    name="portofolio",                     # This is the name of the package
-    version="0.0.1",                        # The initial release version
-    author="Philippe Lacroix-Ouellette",                     # Full name of the author
-    description="Portfolio building for statistics and performance analytics",
-    long_description=long_description,      # Long description read from the the readme file
-    long_description_content_type="text/markdown",
-    packages=setuptools.find_packages(),    # List of all python modules to be installed
+from setuptools import setup, find_packages
+# from codecs import open
+import io
+from os import path
+
+# --- get version ---
+with open("portofolio/version.py") as f:
+    line = f.read().strip()
+    version = line.replace("version = ", "").replace('"', '')
+# --- /get version ---
+
+here = path.abspath(path.dirname(__file__))
+
+# Get the long description from the README file
+with io.open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
+with io.open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+    requirements = [line.rstrip() for line in f]
+
+setup(
+    name='Portofolio',
+    version=version,
+    description='Streamlines backtesting and portfolio performance tracking with one tool',
+    long_description=long_description,
+    url='https://github.com/phil-lo/PortoFolio',
+    author='Philippe Lacroix-Ouellette',
+    author_email='philippe.lacroix.ouellette@gmail.com.com',
+    license='MIT License',
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],                                      # Information to filter the project on PyPi website
-    python_requires='>=3.8',                # Minimum version requirement of the package
-    py_modules=["portofolio"],             # Name of the python package
-    package_dir={'':'portofolio/src'},     # Directory of the source code of the package
-    install_requires=[]                     # Install other dependencies if any
+        'License :: OSI Approved :: Apache Software License',
+        # 'Development Status :: 1 - Planning',
+        # 'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
+        # 'Development Status :: 4 - Beta',
+        # 'Development Status :: 5 - Production/Stable',
+
+        'Operating System :: OS Independent',
+
+        'Intended Audience :: Developers',
+        'Intended Audience :: Financial and Insurance Industry',
+        'Intended Audience :: Science/Research',
+
+        'Topic :: Office/Business :: Financial',
+        'Topic :: Office/Business :: Financial :: Investment',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Scientific/Engineering :: Mathematics',
+
+        # 'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+    ],
+
+    platforms=['any'],
+    keywords="""quant algotrading algorithmic-trading quantitative-trading
+                quantitative-analysis algo-trading visualization plotting""",
+    packages=find_packages(exclude=['docs', 'examples']),
+    install_requires=requirements,
+    entry_points={
+        'console_scripts': [
+            'sample=sample:main',
+        ],
+    },
+
+    include_package_data=True,
 )

@@ -18,7 +18,7 @@ class Position(object):
     def __repr__(self):
         return f"{self.ticker} - {self.currency}"
 
-    def update_data(self, fundamentals_and_dividends: bool = True) -> None:
+    def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
         updates all of the position's market data
         :param fundamentals_and_dividends: True if you want to update
@@ -38,7 +38,7 @@ class Position(object):
     def get_fundamentals(self, statement_type: str) -> pd.DataFrame:
         """
         retreives the position's fundamentals by statement type
-        :param statement_type: ('balance_sheet', 'cashflow', 'income_statement')
+        :param statement_type: choose from ('balance_sheet', 'cashflow', 'income_statement')
         :return: df with statement data
         """
         return self._datareader.read_fundamentals(ticker=self.ticker, statement_type=statement_type)

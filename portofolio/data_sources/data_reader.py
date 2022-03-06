@@ -1,6 +1,5 @@
+from datetime import datetime
 from ..utils import logger, files_utils, config_utils
-# from old.alphavantage_connection import AlphaVantageConnection
-# from old.simfin_connection import SimFinConnection
 from ..data_sources.yahoo_connection import YahooConnection
 from ..helpers.transaction_manager import TransactionManager
 import pandas as pd
@@ -20,21 +19,12 @@ class DataReader(object):
     def _set_sources(self) -> None:
         prices_data_source = config_utils.fetch_data_sources('market_data')
         statements_data_source = config_utils.fetch_data_sources('statements')
-        # data_source for prices and fx
-        # if prices_data_source == 'AlphaVantage':
-        #     market_data = AlphaVantageConnection()
-        # elif prices_data_source == 'SimFin':
-        #     market_data = SimFinConnection()
         if prices_data_source == 'Yahoo':
             market_data = YahooConnection()
         else:
             logger.logging.error(f'prices datasource: {prices_data_source} not valid')
             return None
-        # data source for statments
-        # if statements_data_source == 'AlphaVantage':
-        #     statements = AlphaVantageConnection()
-        # elif statements_data_source == 'SimFin':
-        #     statements = SimFinConnection()
+
         if prices_data_source == 'Yahoo':
             statements = YahooConnection()
         else:
@@ -43,7 +33,13 @@ class DataReader(object):
         self._market_data_source = market_data
         self._statements_data_source = statements
 
-    def read_prices(self, ticker):
+    def read_prices(self, ticker: str) -> pd.Series:
+        """
+        Read prices saved locally in client data folder.
+        If no .csv found, prices will be fetched
+        :param ticker: stock ticker
+        :return:
+        """
         directory = self._market_data_source.PRICES_DIRECTORY
         filename = f"{self._market_data_source.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_prices.csv"
 
@@ -58,7 +54,13 @@ class DataReader(object):
             self.update_prices(ticker=ticker)
             return self.read_prices(ticker)
 
-    def read_fx(self, currency_pair: str):
+    def read_fx(self, currency_pair: str) -> pd.Series:
+        """
+        Read fx rates saved locally in client data folder.
+        If no .csv found, rates will be fetched
+        :param currency_pair: fx pair ex. USDCAD or CADUSD
+        :return:
+        """
         directory = self._market_data_source.FX_DIRECTORY
         filename = f"{self._market_data_source.FILE_PREFIX}_{currency_pair}_fx.csv"
 
@@ -73,7 +75,14 @@ class DataReader(object):
             self.update_fx(currency_pair=currency_pair)
             return self.read_fx(currency_pair)
 
-    def read_fundamentals(self, ticker: str, statement_type: str):
+    def read_fundamentals(self, ticker: str, statement_type: str) -> pd.DataFrame:
+        """
+        Read statements saved locally in client data folder.
+        If no .csv found, statements will be fetched
+        :param ticker: stocke ticker to read fundamentals data from
+        :param statement_type: choose from ('balance_sheet', 'cashflow', 'income_statement')
+        :return: dataframe with statement data
+        """
         implemented = {'balance_sheet', 'cash_flow', 'income_statement'}
         if statement_type not in implemented:
             raise ValueError(f'enter valid statement type: {implemented}')
@@ -81,19 +90,20 @@ class DataReader(object):
         filename = f"{self._market_data_source.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_{statement_type}.csv"
 
         if files_utils.check_file(directory=directory, file=filename):
-            if statement_type in {"balance_sheet", "cash_flow", "income_statement"}:
-                index = "Breakdown"
-            else:
-                index = 'no index'
-            df = pd.read_csv(f"{directory}/{filename}").set_index(index)
+            df = pd.read_csv(f"{directory}/{filename}").set_index("Breakdown")
             return df
-
         else:
             logger.logging.info(f'no {statement_type} data to read for {ticker}, now fetching new data from api')
             self.update_statement(ticker=ticker, statement_type=statement_type)
             return self.read_fundamentals(ticker=ticker, statement_type=statement_type)
 
     def read_dividends(self, ticker: str):
+        """
+        Read dividends data saved locally in client data folder.
+        If no .csv found, dividends data will be fetched
+        :param ticker:
+        :return:
+        """
         directory = self._market_data_source.STATEMENT_DIRECTORY
         filename = f"{self._market_data_source.FILE_PREFIX}_{ticker}_dividends.csv"
 
@@ -132,9 +142,21 @@ class DataReader(object):
         self._market_data_source.get_dividends(ticker=ticker)
 
     def get_splits(self, ticker: str):
+        """
+        Read stock splits data saved locally in client data folder.
+        If no .csv found, splits data will be fetched
+        :param ticker:
+        :return:
+        """
         return self._market_data_source.get_splits(ticker=ticker)
 
-    def last_data_point(self, account: str, ptf_currency: str = 'CAD'):
+    def last_data_point(self, account: str, ptf_currency: str = 'CAD') -> datetime:
+        """
+        Find last data point fetched in locally saved files.
+        :param account: Portofolio account name
+        :param ptf_currency: portfolio currency
+        :return:
+        """
         last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]
         last_trade = TransactionManager(account=account).get_transactions().index.max()
         return max(last_data, last_trade)
