@@ -287,7 +287,8 @@ class Portfolio(object):
         except KeyError:
             transactions = transactions.loc[start_date:]
 
-        pnl = self.pnl_dict_map(d=positions_to_compute, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
+        pnl = self._pnl_dict_map(d=positions_to_compute, start_date=start_date, end_date=end_date,
+                                 transactions=transactions, fx=self._fx.rates)
         return pnl
 
     def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False, **kwargs) -> pd.DataFrame:
@@ -338,7 +339,7 @@ class Portfolio(object):
         return value < live_cash, new_cash
 
     @staticmethod
-    def pnl_dict_map(d, start_date, end_date, transactions, fx: dict) -> pd.DataFrame:
+    def _pnl_dict_map(d, start_date, end_date, transactions, fx: dict) -> pd.DataFrame:
         """
         Apply function to values of position dictionary and convert back to df
         :param d: positions dict

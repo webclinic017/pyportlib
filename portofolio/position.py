@@ -18,7 +18,13 @@ class Position(object):
     def __repr__(self):
         return f"{self.ticker} - {self.currency}"
 
-    def update_data(self, fundamentals_and_dividends: bool = True):
+    def update_data(self, fundamentals_and_dividends: bool = True) -> None:
+        """
+        updates all of the position's market data
+        :param fundamentals_and_dividends: True if you want to update
+        fundamentals and dividends data
+        :return: None
+        """
         if fundamentals_and_dividends:
             self._update_fundamentals()
             self._update_dividends()
@@ -29,10 +35,19 @@ class Position(object):
         self._load_prices()
         logger.logging.info(f'{self} prices updated with local currency')
 
-    def get_fundamentals(self, statement_type: str):
+    def get_fundamentals(self, statement_type: str) -> pd.DataFrame:
+        """
+        retreives the position's fundamentals by statement type
+        :param statement_type: ('balance_sheet', 'cashflow', 'income_statement')
+        :return: df with statement data
+        """
         return self._datareader.read_fundamentals(ticker=self.ticker, statement_type=statement_type)
 
-    def get_splits(self):
+    def get_splits(self) -> pd.DataFrame:
+        """
+        retreives the position's stock splits
+        :return:
+        """
         return self._datareader.get_splits(ticker=self.ticker)
 
     def _update_dividends(self):
@@ -43,7 +58,11 @@ class Position(object):
         self._datareader.update_statement(ticker=self.ticker, statement_type='all')
         logger.logging.info(f'{self} statements updated with local currency')
 
-    def dividends(self):
+    def dividends(self) -> pd.DataFrame:
+        """
+        retreives dividends of the position's stock
+        :return:
+        """
         return self._datareader.read_dividends(ticker=self.ticker)
 
     def _load_prices(self):
@@ -74,14 +93,14 @@ class Position(object):
                   transactions: pd.DataFrame = pd.DataFrame(),
                   fx: dict = None) -> pd.DataFrame:
         """
-        gives all pnl of position in $ amount
+        gives the pnl of position in $ amount by type of pnl
         :param fx: dict of fx pairs for conversion if there are transactions
         :param transactions: transactions from a portfolio, if none transactions are not considered
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return: series of position pnl in $ amount
         """
-        # print(self.ticker)
+
         if end_date is None:
             end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         if start_date is None:
@@ -108,8 +127,7 @@ class Position(object):
                 try:
                     start_qty = self._quantities.shift(1).fillna(0).loc[trx.Date]
                 except KeyError:
-                    logger.logging.info(
-                        f'{self.ticker}: error in trx date ({trx.Date}), NYSE market not open. open qty set to 0')
+                    logger.logging.error(f'{self.ticker}: ({trx.Date}), NYSE market not open. open qty set to 0')
                     start_qty = 0
 
                 trx_fx = fx.get(f"{trx.Currency}{ptf_currency}").loc[trx.Date]
