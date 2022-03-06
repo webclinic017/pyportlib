@@ -26,7 +26,7 @@ class Transaction(object):
         self.check()
 
     def __repr__(self):
-        return f"{self.NAME} - {self.date.date()} - {self.ticker}"
+        return f"{self.NAME} - {self.date.date()} - {self.type} - {self.ticker}"
 
     # def __str__(self):
     #     return self.get()

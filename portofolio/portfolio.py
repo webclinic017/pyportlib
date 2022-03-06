@@ -88,8 +88,12 @@ class Portfolio(object):
             for position in positions_to_compute.values():
                 pos_val = position.quantities.shift(1).fillna(method="backfill").multiply(position.prices.loc[self.start_date:])
                 pos_val = pos_val.fillna(method='ffill')
-                market_value = market_value.add(pos_val)
-                market_value = market_value.fillna(method='ffill')
+                pos_val = pos_val.fillna(0)
+                if pos_val.sum() != 0:
+                    market_value = market_value.add(pos_val)
+                    market_value = market_value.fillna(method='ffill')
+                else:
+                    logger.logging.error(f'no market value computed for {position.ticker}')
 
             # used by pnl to return the value instead of setting it
             if return_flag:
@@ -141,7 +145,12 @@ class Portfolio(object):
                 trx = self._transaction_manager.transactions.loc[
                     (self._transaction_manager.transactions.Ticker == position.ticker)
                     & (self._transaction_manager.transactions.Type != 'Dividend')]
-                date_merge.loc[:, 'qty'] = trx['Quantity']
+
+                date_merge.loc[:, 'qty'] = trx[['Quantity']].reset_index().groupby('Date').sum()
+                #     date_merge.loc[:, 'qty'] += trx['Quantity']
+                # except ValueError:
+                #     date_merge.loc[:, 'qty'] =
+
                 pos_qty = self._make_qty_series(date_merge.loc[:, 'qty'])
                 position.quantities = pos_qty
             logger.logging.debug(f'{self.account} quantities computed')
@@ -155,17 +164,18 @@ class Portfolio(object):
         :param transactions: portofolio transaction object, single or list
         :return: None
         """
-        if not hasattr(transactions, '__iter__'):
-            transactions = [transactions]
+        if transactions:
+            if not hasattr(transactions, '__iter__'):
+                transactions = [transactions]
 
-        for trx in transactions:
-            ok, new_cash = self._check_trx(transaction=trx)
+            for trx in transactions:
+                ok, new_cash = self._check_trx(transaction=trx)
 
-            if not ok:
-                logger.logging.error(f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
-            else:
-                self._transaction_manager.add(transaction=trx)
-        self.load_data()
+                if not ok:
+                    logger.logging.error(f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
+                else:
+                    self._transaction_manager.add(transaction=trx)
+            self.load_data()
 
     @property
     def transactions(self) -> pd.DataFrame:

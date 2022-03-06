@@ -32,6 +32,9 @@ class Position(object):
     def get_fundamentals(self, statement_type: str):
         return self._datareader.read_fundamentals(ticker=self.ticker, statement_type=statement_type)
 
+    def get_splits(self):
+        return self._datareader.get_splits(ticker=self.ticker)
+
     def _update_dividends(self):
         self._datareader.update_dividends(ticker=self.ticker)
         logger.logging.info(f'{self} dividends updated with local currency')
@@ -78,7 +81,7 @@ class Position(object):
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return: series of position pnl in $ amount
         """
-
+        # print(self.ticker)
         if end_date is None:
             end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         if start_date is None:
@@ -110,7 +113,11 @@ class Position(object):
                     start_qty = 0
 
                 trx_fx = fx.get(f"{trx.Currency}{ptf_currency}").loc[trx.Date]
-                daily_avg_cost = self._prices.shift(1).loc[trx.Date]
+                try:
+                    daily_avg_cost = self._prices.shift(1).loc[trx.Date]
+                except KeyError:
+                    logger.logging.error(f'no data for {self.ticker}, pnl not computed')
+                    break
 
                 if trx.Type == 'Buy':
                     new_qty = (trx.Quantity + start_qty)

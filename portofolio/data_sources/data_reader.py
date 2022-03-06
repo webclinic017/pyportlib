@@ -131,6 +131,9 @@ class DataReader(object):
     def update_dividends(self, ticker: str):
         self._market_data_source.get_dividends(ticker=ticker)
 
+    def get_splits(self, ticker: str):
+        return self._market_data_source.get_splits(ticker=ticker)
+
     def last_data_point(self, account: str, ptf_currency: str = 'CAD'):
         last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]
         last_trade = TransactionManager(account=account).get_transactions().index.max()

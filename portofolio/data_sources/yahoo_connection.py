@@ -93,6 +93,11 @@ class YahooConnection(object):
             divs.to_csv(f"{directory}/{filename}")
             logger.logging.debug(f"{ticker} dividends loaded from yfinance api")
 
+    def get_splits(self, ticker: str):
+        ticker = self._convert_ticker(ticker)
+        splits = yfin.Ticker(ticker=ticker).get_splits()
+        return splits
+
     @staticmethod
     def _make_ptf_currency_df():
         dates = pd.date_range(start=datetime(2000, 1, 1), end=datetime.today())
@@ -105,4 +110,5 @@ class YahooConnection(object):
         ticker = ticker.replace(' ', '')
         ticker = ticker.replace('.UN', '-UN')
         ticker = ticker.replace('.VN', '.V')
+        ticker = ticker.replace('.B', '-B')
         return ticker
