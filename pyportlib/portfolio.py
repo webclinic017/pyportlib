@@ -161,7 +161,7 @@ class Portfolio(object):
     def add_transaction(self, transactions: Union[Transaction, List[Transaction]]) -> None:
         """
         add transactions to portfolio
-        :param transactions: portofolio transaction object, single or list
+        :param transactions: pyportlib transaction object, single or list
         :return: None
         """
         if transactions:

@@ -13,7 +13,7 @@ import io
 from os import path
 
 # --- get version ---
-with open("portofolio/version.py") as f:
+with open("pyportlib/version.py") as f:
     line = f.read().strip()
     version = line.replace("version = ", "").replace('"', '')
 # --- /get version ---

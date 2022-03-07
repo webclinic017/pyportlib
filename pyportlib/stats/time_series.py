@@ -1,8 +1,8 @@
 from datetime import datetime
 import pandas as pd
-from portofolio import Position
+from pyportlib import Position
 import quantstats as qs
-from portofolio.utils import dates_utils
+from pyportlib.utils import dates_utils
 
 
 def skew(pos: Position, lookback: str, date: datetime = None) -> float:

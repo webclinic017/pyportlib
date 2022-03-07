@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from portofolio.utils.config_utils import create_default_config
+from pyportlib.utils.config_utils import create_default_config
 
 
 def check_file(directory: str, file: str) -> bool:
@@ -59,8 +59,8 @@ def _check_client_dir():
     This is used instead of a really strange Python error-message.
     """
     if _data_dir is None:
-        msg = 'The portofolio data directory has not been set by the user. ' \
-              'Please call the function portofolio.set_data_dir() first.'
+        msg = 'The pyportlib data directory has not been set by the user. ' \
+              'Please call the function pyportlib.set_data_dir() first.'
         raise Exception(msg)
 
 

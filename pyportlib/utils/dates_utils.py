@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 import pandas_market_calendars as mcal
 
-from portofolio.utils import logger
+from pyportlib.utils import logger
 
 
 def get_market_days(start: datetime, end: datetime = None, market: str = None) -> List[datetime]:

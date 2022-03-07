@@ -1,6 +1,6 @@
 import logging
 
-# logger = logging.getLogger('portofolio')
+# logger = logging.getLogger('pyportlib')
 # logging.basicConfig(level=logging.ERROR,
 #                     format='%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s',
 #                     )
