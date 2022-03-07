@@ -6,11 +6,12 @@ from .data_sources.data_reader import DataReader
 from .helpers.fx_rates import FxRates
 from .helpers.transaction import Transaction
 from .helpers.transaction_manager import TransactionManager
+from .stats import stats
 from .utils import dates_utils, logger
 import pandas as pd
 
 
-class Portfolio(object):
+class Portfolio:
 
     def __init__(self, account: str, currency: str):
         # attributes
@@ -52,7 +53,7 @@ class Portfolio(object):
 
         logger.logging.debug(f'{self.account} data loaded')
 
-    def update_data(self, fundamentals_and_dividends: bool = True) -> None:
+    def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
         updates all of the market data of the portfolio (prices, fx)
         :return:
@@ -86,7 +87,8 @@ class Portfolio(object):
             market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
             for position in positions_to_compute.values():
-                pos_val = position.quantities.shift(1).fillna(method="backfill").multiply(position.prices.loc[self.start_date:])
+                pos_val = position.quantities.shift(1).fillna(method="backfill").multiply(
+                    position.prices.loc[self.start_date:])
                 pos_val = pos_val.fillna(method='ffill')
                 pos_val = pos_val.fillna(0)
                 if pos_val.sum() != 0:
@@ -172,7 +174,8 @@ class Portfolio(object):
                 ok, new_cash = self._check_trx(transaction=trx)
 
                 if not ok:
-                    logger.logging.error(f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
+                    logger.logging.error(
+                        f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
                 else:
                     self._transaction_manager.add(transaction=trx)
             self.load_data()
@@ -285,13 +288,14 @@ class Portfolio(object):
         try:
             transactions = transactions.loc[start_date:end_date]
         except KeyError:
-            transactions = transactions.loc[start_date:]
+            transactions = transactions.loc[transactions.index >= start_date]
 
         pnl = self._pnl_dict_map(d=positions_to_compute, start_date=start_date, end_date=end_date,
                                  transactions=transactions, fx=self._fx.rates)
         return pnl
 
-    def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False, **kwargs) -> pd.DataFrame:
+    def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False,
+                            **kwargs) -> pd.Series:
         """
         portfolio return in % of market value
         :param include_cash: if we include the cash amount at that time to calc the market value
@@ -323,6 +327,56 @@ class Portfolio(object):
         self._fx.reset()
         self.load_data()
 
+    def beta(self, benchmark, lookback: str = "1y", date: datetime = None, include_cash: bool = False):
+        start_date = dates_utils.date_window(lookback=lookback, date=date)
+        rets = self.pct_daily_total_pnl(start_date=start_date,
+                                        include_cash=include_cash)
+
+        bench_rets = benchmark.pct_daily_total_pnl(start_date=start_date,
+                                                   include_cash=False)
+
+        return stats.beta(pos=rets, benchmark=bench_rets, lookback=lookback, date=date)
+
+    def corr(self, lookback: str = None, date: datetime = None):
+        return self.open_positions_returns(lookback=lookback, date=date).corr()
+
+    def bivariate_co_kurtosis(self, lookback: str = None, date: datetime = None, bias=False, fisher=True,
+                              variant='middle'):
+        df = self.open_positions_returns(lookback=lookback, date=date)
+        return stats.co_kurtosis(df, bias=bias, fisher=fisher, variant=variant)
+
+    def co_kurtosis(self, lookback: str = None, date: datetime = None, bias=False, fisher=True, variant='middle'):
+        raise NotImplementedError()
+
+    def co_skewness(self):
+        raise NotImplementedError()
+
+    def bivariate_co_skewness(self):
+        raise NotImplementedError()
+
+    def weights(self, date: datetime = None):
+        if date is None:
+            date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
+
+        port_mv = self.market_values.loc[date]
+        weights_dict = {k: round(v.market_value(date) / port_mv, 5) for k, v in self.positions.items() if
+                        v.market_value(date) != 0}
+        if not 0.9999 < sum(weights_dict.values()) < 1.001:
+            raise ValueError(f'weights ({sum(weights_dict.values())}) do not add to 1')
+        return weights_dict
+
+    def open_positions(self, date: datetime):
+        return {k: v for k, v in self.positions.items() if v.quantities.loc[date] != 0}
+
+    def open_positions_returns(self, lookback: str = None, date: datetime = None):
+        if date is None:
+            date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
+        if lookback is None:
+            lookback = "1y"
+        open_positions = self.open_positions(date)
+        prices = {k: stats.prep_returns(v, date=date, lookback=lookback) for k, v in open_positions.items()}
+        return pd.DataFrame(prices).fillna(0)
+
     @staticmethod
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
         return quantities.fillna(0).cumsum()
@@ -350,5 +404,6 @@ class Portfolio(object):
         :return:
         """
 
-        pnl = {k: v.daily_pnl(start_date, end_date, transactions.loc[transactions.Ticker == k], fx)['total'] for k, v in d.items()}
+        pnl = {k: v.daily_pnl(start_date, end_date, transactions.loc[transactions.Ticker == k], fx)['total'] for k, v in
+               d.items()}
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)

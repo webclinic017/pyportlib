@@ -68,6 +68,9 @@ class Position(object):
     def _load_prices(self):
         self._prices = self._datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
 
+    def market_value(self, date: datetime) -> float:
+        return self.prices.loc[date] * self.quantities.loc[date]
+
     @property
     def prices(self):
         return self._prices

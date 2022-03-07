@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 import pandas_market_calendars as mcal
+from dateutil.relativedelta import relativedelta
 
 from pyportlib.utils import logger
 
@@ -25,15 +26,15 @@ def get_market_days(start: datetime, end: datetime = None, market: str = None) -
 
 
 def date_window(lookback: str = "1y", date: datetime = None):
-    amount = int(lookback[0])
-    scale = lookback[1]
+    amount = int(lookback[:-1])
+    scale = lookback[-1]
     if date is None:
         date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
 
     if scale == "y":
-        date = date.replace(year=date.year - amount)
+        date = date + relativedelta(years=- amount)
     elif scale == "m":
-        date = date.replace(month=date.month - amount)
+        date = date + relativedelta(months=- amount)
     else:
         logger.logging.error(f"lookback scale {scale} not supported. choose (y or m)")
 
