@@ -74,7 +74,7 @@ class TransactionManager(object):
             logger.logging.error(f'no tickers found for account: {self.account}')
             return []
 
-    def live_positions(self) -> list:
+    def open_positions(self) -> list:
         live_tickers = self.transactions.groupby('Ticker').sum()
         try:
             live_tickers = live_tickers.loc[live_tickers.Quantity > 0]
