@@ -10,6 +10,11 @@ def skew(pos: Position, lookback: str, date: datetime = None) -> float:
     return qs.stats.skew(returns=returns, prepare_returns=False)
 
 
+def kurtosis(pos: Position, lookback: str, date: datetime = None) -> float:
+    returns = _prep_returns(pos=pos, lookback=lookback, date=date)
+    return qs.stats.kurtosis(returns=returns, prepare_returns=False)
+
+
 def _prep_returns(pos: Position, lookback: str, date: datetime = None) -> pd.Series:
     if date:
         start_date = dates_utils.date_window(date=date, lookback=lookback)
