@@ -72,7 +72,7 @@ def set_client_dir(data_dir=""):
     :param data_dir: String with the directory-name.
     :return: `None`
     """
-    data_dir = f'~{data_dir}/portofolio_client_data'
+    data_dir = f'~{data_dir}/pyportlib_client_data'
     global _client_dir, _data_dir, _accounts_dir, _price_data_dir, \
         _fx_data_dir, _statements_data_dir, _config_dir, _outputs_dir
 
