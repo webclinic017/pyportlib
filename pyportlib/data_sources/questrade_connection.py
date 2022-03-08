@@ -2,9 +2,12 @@ from datetime import datetime
 from typing import Union, List
 import pandas as pd
 from pandas._libs.tslibs.offsets import BDay
-import pyportlib
-from questrade_api.questrade import Questrade
+from .questrade_api.questrade import Questrade
 import dateutil.parser
+from ..helpers.transaction import Transaction
+from ..portfolio import Portfolio
+from ..position import Position
+from ..utils import dates_utils
 
 
 class QuestradeConnection(Questrade):
@@ -29,7 +32,7 @@ class QuestradeConnection(Questrade):
             end_date = datetime.now().replace(hour=0, minute=0, second=0,
                                               microsecond=0).astimezone().isoformat('T')
 
-        date_rng = pyportlib.dates_utils.get_market_days(start=start_date, end=end_date)
+        date_rng = dates_utils.get_market_days(start=start_date, end=end_date)
         list_of_trx = []
         for date in date_rng:
             date = date.isoformat('T') + '-05:00'
@@ -41,7 +44,7 @@ class QuestradeConnection(Questrade):
 
         return list_of_trx
 
-    def get_transactions_list(self, start_date: datetime = None, end_date: datetime = None):
+    def get_transactions_list(self, start_date: datetime = None, end_date: datetime = None) -> List[Transaction]:
         transactions = self.get_transactions(start_date, end_date)
 
         list_of_transactions = []
@@ -50,10 +53,11 @@ class QuestradeConnection(Questrade):
             list_of_transactions.append(trx)
 
         to_remove = ['ARRY', "IPL.TO"]
-        list_of_transactions = self._remove_transactions([pos for pos in list_of_transactions if not isinstance(pos, str)], to_remove)
+        list_of_transactions = self._remove_transactions(
+            [pos for pos in list_of_transactions if not isinstance(pos, str)], to_remove)
         return list_of_transactions
 
-    def update_transactions(self, portfolio: pyportlib.Portfolio):
+    def update_transactions(self, portfolio: Portfolio) -> None:
         last_trade = portfolio.transactions.index.max()
         list_of_transactions = self.get_transactions_list(start_date=last_trade)
 
@@ -61,9 +65,9 @@ class QuestradeConnection(Questrade):
                                                           ptf_transactions=portfolio.transactions,
                                                           last_trade_date=last_trade)
         portfolio.add_transaction(transactions)
-        return portfolio
 
-    def remove_duplicated_transaction(self, new_transactions: List[pyportlib.Transaction], ptf_transactions: pd.DataFrame, last_trade_date: datetime):
+    def remove_duplicated_transaction(self, new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
+                                      last_trade_date: datetime):
         duped = self.duplicated_transaction(new_transactions=new_transactions,
                                             ptf_transactions=ptf_transactions,
                                             last_trade_date=last_trade_date)
@@ -78,17 +82,19 @@ class QuestradeConnection(Questrade):
         return transactions
 
     @staticmethod
-    def duplicated_transaction(new_transactions: List[pyportlib.Transaction], ptf_transactions: pd.DataFrame, last_trade_date: datetime):
+    def duplicated_transaction(new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
+                               last_trade_date: datetime):
         transactions = pd.concat([trx.get() for trx in new_transactions])
         transactions = pd.concat([transactions, ptf_transactions], axis=0).sort_index().loc[last_trade_date:]
         duped = transactions.duplicated()
         return transactions.loc[duped]
 
-    def _make_transaction(self, transaction) -> Union[pyportlib.Transaction, None]:
+    def _make_transaction(self, transaction) -> Union[Transaction, None]:
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
             return transaction.get('type')
 
-        date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+        date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
+                                                                              tzinfo=None)
         ticker = transaction.get('symbol')
         currency = transaction.get('currency')
         trx_type = transaction.get('type')
@@ -96,7 +102,7 @@ class QuestradeConnection(Questrade):
         fees = abs(transaction.get('commission'))
 
         if not isinstance(ticker, float):
-            pos = pyportlib.Position(ticker=ticker, local_currency=currency)
+            pos = Position(ticker=ticker, local_currency=currency)
         else:
             return trx_type
 
@@ -119,13 +125,13 @@ class QuestradeConnection(Questrade):
         else:
             raise ValueError(f"error in transaction {date} {ticker}")
 
-        trx = pyportlib.Transaction(date=date,
-                                    ticker=ticker,
-                                    type=trx_type,
-                                    quantity=qty * split_factor,
-                                    price=price,
-                                    fees=fees,
-                                    currency=currency)
+        trx = Transaction(date=date,
+                          ticker=ticker,
+                          type=trx_type,
+                          quantity=qty * split_factor,
+                          price=price,
+                          fees=fees,
+                          currency=currency)
 
         return trx
 
@@ -146,7 +152,7 @@ class QuestradeConnection(Questrade):
         return split_factor
 
     @staticmethod
-    def _transfer_cost(position: pyportlib.Position, date: datetime) -> float:
+    def _transfer_cost(position: Position, date: datetime) -> float:
         try:
             price = position.prices.loc[date]
         except KeyError:

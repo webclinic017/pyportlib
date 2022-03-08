@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 import configparser
 import urllib
-from questrade_api.auth import Auth
+from .auth import Auth
 
 CONFIG_PATH = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), 'questrade.cfg')
