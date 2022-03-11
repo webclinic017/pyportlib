@@ -45,7 +45,7 @@ class TransactionManager(object):
             return empty_transactions
 
     def _write_trx(self, transaction: Transaction) -> None:
-        new = transaction.get()
+        new = transaction.df
         self.transactions = pd.concat([self.transactions, new])
 
         self.transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
@@ -55,7 +55,7 @@ class TransactionManager(object):
         new_qty = self.transactions.Quantity.loc[self.transactions.Ticker == transaction.ticker].sum() + transaction.quantity
 
         if new_qty < 0:
-            print(transaction.get())
+            print(transaction.df)
             logger.logging.error(f'no short positions allowed, you sold {-1 * (transaction.quantity - (transaction.quantity - new_qty))} units too many')
             return False
         else:

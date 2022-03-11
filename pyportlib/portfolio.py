@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union, List
+from typing import Union, List, Dict
 from .position import Position
 from .helpers.cash_account import CashAccount
 from .data_sources.data_reader import DataReader
@@ -129,7 +129,7 @@ class Portfolio:
         logger.logging.debug(f'positions for {self.account} loaded')
 
     @property
-    def positions(self) -> dict:
+    def positions(self) -> Dict[str, Position]:
         return self._positions
 
     def _load_position_quantities(self) -> None:
@@ -314,6 +314,7 @@ class Portfolio:
             market_vals = self.market_values.loc[start_date:end_date]
 
         pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals)
+        pnl.name = self.account
         return pnl
 
     def reset(self) -> None:
@@ -330,28 +331,20 @@ class Portfolio:
     def beta(self, benchmark, lookback: str = "1y", date: datetime = None, include_cash: bool = False):
         start_date = dates_utils.date_window(lookback=lookback, date=date)
         rets = self.pct_daily_total_pnl(start_date=start_date,
-                                        include_cash=include_cash)
+                                        include_cash=include_cash).fillna(0)
 
         bench_rets = benchmark.pct_daily_total_pnl(start_date=start_date,
-                                                   include_cash=False)
+                                                   include_cash=False).fillna(0)
 
         return stats.beta(pos=rets, benchmark=bench_rets, lookback=lookback, date=date)
 
     def corr(self, lookback: str = None, date: datetime = None):
         return self.open_positions_returns(lookback=lookback, date=date).corr()
 
-    def bivariate_co_kurtosis(self, lookback: str = None, date: datetime = None, bias=False, fisher=True,
-                              variant='middle'):
-        df = self.open_positions_returns(lookback=lookback, date=date)
-        return stats.co_kurtosis(df, bias=bias, fisher=fisher, variant=variant)
-
     def co_kurtosis(self, lookback: str = None, date: datetime = None, bias=False, fisher=True, variant='middle'):
         raise NotImplementedError()
 
     def co_skewness(self):
-        raise NotImplementedError()
-
-    def bivariate_co_skewness(self):
         raise NotImplementedError()
 
     def weights(self, date: datetime = None):
@@ -365,7 +358,7 @@ class Portfolio:
             raise ValueError(f'weights ({sum(weights_dict.values())}) do not add to 1')
         return weights_dict
 
-    def open_positions(self, date: datetime):
+    def open_positions(self, date: datetime) -> Dict[str, Position]:
         return {k: v for k, v in self.positions.items() if v.quantities.loc[date] != 0}
 
     def open_positions_returns(self, lookback: str = None, date: datetime = None):

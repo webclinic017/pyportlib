@@ -73,7 +73,7 @@ class QuestradeConnection(Questrade):
                                             last_trade_date=last_trade_date)
         transactions = []
         for trx in new_transactions:
-            merge = trx.get().merge(duped, indicator=True)
+            merge = trx.df.merge(duped, indicator=True)
             if merge.empty:
                 transactions.append(trx)
             else:
@@ -84,7 +84,7 @@ class QuestradeConnection(Questrade):
     @staticmethod
     def duplicated_transaction(new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
                                last_trade_date: datetime):
-        transactions = pd.concat([trx.get() for trx in new_transactions])
+        transactions = pd.concat([trx.df for trx in new_transactions])
         transactions = pd.concat([transactions, ptf_transactions], axis=0).sort_index().loc[last_trade_date:]
         duped = transactions.duplicated()
         return transactions.loc[duped]
@@ -94,7 +94,7 @@ class QuestradeConnection(Questrade):
             return transaction.get('type')
 
         date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
-                                                                              tzinfo=None)
+                                                                             tzinfo=None)
         ticker = transaction.get('symbol')
         currency = transaction.get('currency')
         trx_type = transaction.get('type')

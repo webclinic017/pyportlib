@@ -12,11 +12,11 @@ from setuptools import setup, find_packages
 import io
 from os import path
 
-# --- get version ---
+# --- df version ---
 with open("pyportlib/version.py") as f:
     line = f.read().strip()
     version = line.replace("version = ", "").replace('"', '')
-# --- /get version ---
+# --- /df version ---
 
 here = path.abspath(path.dirname(__file__))
 
