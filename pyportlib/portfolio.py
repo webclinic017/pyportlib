@@ -341,12 +341,6 @@ class Portfolio:
     def corr(self, lookback: str = None, date: datetime = None):
         return self.open_positions_returns(lookback=lookback, date=date).corr()
 
-    def co_kurtosis(self, lookback: str = None, date: datetime = None, bias=False, fisher=True, variant='middle'):
-        raise NotImplementedError()
-
-    def co_skewness(self):
-        raise NotImplementedError()
-
     def weights(self, date: datetime = None):
         if date is None:
             date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)

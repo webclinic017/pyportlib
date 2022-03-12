@@ -7,13 +7,17 @@ from .utils import logger
 
 class Position(object):
 
-    def __init__(self, ticker: str, local_currency: str):
+    def __init__(self, ticker: str, local_currency: str = None):
         self.ticker = ticker.upper()
-        self.currency = local_currency.upper()
         self._datareader = DataReader()
         self._prices = pd.Series()
         self._quantities = pd.Series()
         self._load_prices()
+
+        if local_currency is None:
+            self.currency = 'CAD' if ticker[-2:] == 'TO' else 'USD'
+        else:
+            self.currency = local_currency
 
     def __repr__(self):
         return f"{self.ticker} - {self.currency}"

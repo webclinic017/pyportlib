@@ -4,6 +4,7 @@ import scipy.cluster.hierarchy as sch
 import numpy as np
 import pandas as pd
 from ..position import Position
+from .. import portfolio
 import quantstats as qs
 from pyportlib.utils import dates_utils
 
@@ -13,7 +14,8 @@ def skew(pos: Union[Position, pd.Series], lookback: str, date: datetime = None) 
     return returns.skew()
 
 
-def rolling_skew(pos: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252) -> pd.Series:
+def rolling_skew(pos: Union[Position, pd.Series], lookback: str, date: datetime = None,
+                 rolling_period: int = 252) -> pd.Series:
     returns = prep_returns(pos=pos, lookback=lookback, date=date)
     return returns.rolling(int(rolling_period)).skew()
 
@@ -23,19 +25,22 @@ def kurtosis(pos: Union[Position, pd.Series], lookback: str, date: datetime = No
     return returns.kurtosis()
 
 
-def rolling_kurtosis(pos: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252) -> pd.Series:
+def rolling_kurtosis(pos: Union[Position, pd.Series], lookback: str, date: datetime = None,
+                     rolling_period: int = 252) -> pd.Series:
     returns = prep_returns(pos=pos, lookback=lookback, date=date)
     return returns.rolling(int(rolling_period)).kurt()
 
 
-def beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None) -> float:
+def beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str,
+         date: datetime = None) -> float:
     returns = prep_returns(pos=pos, lookback=lookback, date=date)
     benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
     return matrix[0, 1] / matrix[1, 1]
 
 
-def rolling_beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252) -> pd.Series:
+def rolling_beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str,
+                 date: datetime = None, rolling_period: int = 252) -> pd.Series:
     returns = prep_returns(pos=pos, lookback=lookback, date=date)
     benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
     df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
@@ -51,12 +56,13 @@ def annualized_volatility(pos: Union[Position, pd.Series], lookback: str, date: 
     return qs.stats.volatility(returns=returns, prepare_returns=False, annualize=True)
 
 
-def rolling_volatility(pos: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252) -> pd.Series:
+def rolling_volatility(pos: Union[Position, pd.Series], lookback: str, date: datetime = None,
+                       rolling_period: int = 252) -> pd.Series:
     returns = prep_returns(pos=pos, lookback=lookback, date=date)
     return returns.rolling(rolling_period).std() * np.sqrt(252)
 
 
-def prep_returns(pos: Union[Position, pd.Series], lookback: str, date: datetime = None) -> pd.Series:
+def prep_returns(pos, lookback: str, date: datetime = None, **kwargs) -> pd.Series:
     if date:
         start_date = dates_utils.date_window(date=date, lookback=lookback)
     else:
@@ -69,6 +75,8 @@ def prep_returns(pos: Union[Position, pd.Series], lookback: str, date: datetime 
         return prices.loc[start_date:date].pct_change().dropna()
     if isinstance(pos, pd.Series):
         return pos.loc[start_date:date].dropna()
+    if isinstance(pos, portfolio.Portfolio):
+        return pos.pct_daily_total_pnl(start_date=start_date, end_date=date, include_cash=False, **kwargs)
 
 
 def cluster_corr(corr_array, inplace=False):
@@ -105,4 +113,3 @@ def cluster_corr(corr_array, inplace=False):
 
 if __name__ == "__main__":
     pass
-
