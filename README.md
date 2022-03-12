@@ -12,4 +12,6 @@ On the other hand, you can leverage the *Position* object to retreive and manipu
         -Backtests
         -Build benchmarks etc.
 
+Most of the stats and plots modules wrap around quantstats modules.
+
 See examples/examples.ipynb
