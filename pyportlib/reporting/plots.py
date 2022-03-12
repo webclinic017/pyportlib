@@ -4,6 +4,7 @@ from typing import Union
 import quantstats as qs
 from ..position import Position
 from ..portfolio import Portfolio
+from ..stats import stats
 from ..stats.stats import prep_returns
 
 

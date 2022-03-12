@@ -39,8 +39,7 @@ def beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series],
     return matrix[0, 1] / matrix[1, 1]
 
 
-def rolling_beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str,
-                 date: datetime = None, rolling_period: int = 252) -> pd.Series:
+def rolling_beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252) -> pd.Series:
     returns = prep_returns(pos=pos, lookback=lookback, date=date)
     benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
     df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
@@ -49,6 +48,28 @@ def rolling_beta(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.
     std = df.rolling(int(rolling_period)).std()
     rolling_b = corr * std['returns'] / std['benchmark']
     return rolling_b
+
+
+def alpha(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None) -> float:
+    returns = prep_returns(pos=pos, lookback=lookback, date=date)
+    benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
+    matrix = np.cov(returns, benchmark)
+    bet = matrix[0, 1] / matrix[1, 1]
+    alph = returns.mean() - (bet * benchmark.mean())
+    return alph*len(returns)
+
+
+def rolling_alpha(pos: Union[Position, pd.Series], benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252) -> pd.Series:
+    returns = prep_returns(pos=pos, lookback=lookback, date=date)
+    benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
+    df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
+
+    corr = df.rolling(int(rolling_period)).corr().unstack()['returns']['benchmark']
+    std = df.rolling(int(rolling_period)).std()
+    rolling_b = corr * std['returns'] / std['benchmark']
+
+    rolling_alph = returns.rolling(int(rolling_period)).mean() - (rolling_b * benchmark.rolling(int(rolling_period)).mean())
+    return rolling_alph*rolling_period
 
 
 def annualized_volatility(pos: Union[Position, pd.Series], lookback: str, date: datetime = None) -> float:
@@ -72,11 +93,11 @@ def prep_returns(pos, lookback: str, date: datetime = None, **kwargs) -> pd.Seri
     if isinstance(pos, Position):
         prices = pos.prices
         prices.name = pos.ticker
-        return prices.loc[start_date:date].pct_change().dropna()
+        return prices.loc[start_date:date].pct_change().fillna(0)
     if isinstance(pos, pd.Series):
-        return pos.loc[start_date:date].dropna()
+        return pos.loc[start_date:date].fillna(0)
     if isinstance(pos, portfolio.Portfolio):
-        return pos.pct_daily_total_pnl(start_date=start_date, end_date=date, include_cash=False, **kwargs)
+        return pos.pct_daily_total_pnl(start_date=start_date, end_date=date, include_cash=False, **kwargs).fillna(0)
 
 
 def cluster_corr(corr_array, inplace=False):
