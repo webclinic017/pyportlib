@@ -5,9 +5,9 @@ import pandas as pd
 
 
 class TransactionManager(object):
-    NAME = "_Transactions Manager"
+    NAME = "Transactions Manager"
     ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
-    TRANSACTION_FILENAME = "_transactions.csv"
+    TRANSACTION_FILENAME = "transactions.csv"
 
     def __init__(self, account):
         self.account = account
@@ -37,7 +37,7 @@ class TransactionManager(object):
                     self._transactions = trx
 
                 else:
-                    logger.logging.error(f'_transactions do not match requirements for account: {self.account}')
+                    logger.logging.error(f'transactions do not match requirements for account: {self.account}')
         else:
             # if new ptf, create required files to use it
             if not files_utils.check_dir(self.directory):
@@ -52,7 +52,7 @@ class TransactionManager(object):
         self._transactions = pd.concat([self._transactions, new])
 
         self._transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
-        logger.logging.debug('_transactions file updated')
+        logger.logging.debug('transactions file updated')
 
     def _check_trx(self, transaction: Transaction) -> bool:
         new_qty = self._transactions.Quantity.loc[self._transactions.Ticker == transaction.ticker].sum() + transaction.quantity

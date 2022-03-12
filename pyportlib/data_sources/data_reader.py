@@ -158,5 +158,5 @@ class DataReader(object):
         :return:
         """
         last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]
-        last_trade = TransactionManager(account=account).get_transactions().index.max()
+        last_trade = TransactionManager(account=account).transactions.index.max()
         return max(last_data, last_trade)
