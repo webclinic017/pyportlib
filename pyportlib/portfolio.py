@@ -33,20 +33,17 @@ class Portfolio:
     def __repr__(self):
         return self.account
 
-    # def __str__(self):
-    #     return str(self.positions)
-
     def load_data(self) -> None:
         """
-        loads portfolio object with current available data, mostly used to update some attributes
+        loads Portfolio object with current available data, mostly used to update some attributes
         dependent on other objects or computations
         :return: None
         """
         self.start_date = self._transaction_manager.first_trx()
         self._fx.set_pairs(pairs=[f"{curr}{self.currency}" for curr in self._transaction_manager.get_currencies()])
 
-        self._cash_account._load_cash()
-        self._transaction_manager.fetch()
+        self._cash_account.load()
+        self._transaction_manager.load()
         self._load_positions()
         self._load_position_quantities()
         self._load_market_value()
@@ -122,7 +119,7 @@ class Portfolio:
             currency = self._transaction_manager.get_currency(ticker=ticker)
             pos = Position(ticker, local_currency=currency)
 
-            if self.currency != pos.currency:  # FIXME sometimes FX is missing for today... yahoo no price for that day
+            if self.currency != pos.currency:
                 prices = pos.prices.multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
                 pos.prices = prices
             self._positions[ticker] = pos
@@ -182,7 +179,7 @@ class Portfolio:
 
     @property
     def transactions(self) -> pd.DataFrame:
-        return self._transaction_manager.get_transactions()
+        return self._transaction_manager.transactions
 
     @property
     def cash_history(self):

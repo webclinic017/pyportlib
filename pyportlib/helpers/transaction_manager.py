@@ -5,20 +5,24 @@ import pandas as pd
 
 
 class TransactionManager(object):
-    NAME = "Transactions Manager"
+    NAME = "_Transactions Manager"
     ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
-    TRANSACTION_FILENAME = "transactions.csv"
+    TRANSACTION_FILENAME = "_transactions.csv"
 
     def __init__(self, account):
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
-        self.transactions = pd.DataFrame()
-        self.fetch()
+        self._transactions = pd.DataFrame()
+        self.load()
 
     def __repr__(self):
         return self.NAME
 
-    def fetch(self) -> pd.DataFrame:
+    @property
+    def transactions(self):
+        return self._transactions
+
+    def load(self) -> None:
         if files_utils.check_file(self.directory, self.TRANSACTION_FILENAME):
             trx = pd.read_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
             try:
@@ -30,10 +34,10 @@ class TransactionManager(object):
                     trx.set_index('Date', inplace=True)
                     trx.index.name = 'Date'
                     trx.index = pd.to_datetime(trx.index)
-                    self.transactions = trx
-                    return trx
+                    self._transactions = trx
+
                 else:
-                    logger.logging.error(f'transactions do not match requirements for account: {self.account}')
+                    logger.logging.error(f'_transactions do not match requirements for account: {self.account}')
         else:
             # if new ptf, create required files to use it
             if not files_utils.check_dir(self.directory):
@@ -41,18 +45,17 @@ class TransactionManager(object):
             # create empty transaction file in new directory
             empty_transactions = self.empty_transactions()
             empty_transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
-            self.transactions = empty_transactions
-            return empty_transactions
+            self._transactions = empty_transactions
 
     def _write_trx(self, transaction: Transaction) -> None:
         new = transaction.df
-        self.transactions = pd.concat([self.transactions, new])
+        self._transactions = pd.concat([self._transactions, new])
 
-        self.transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
-        logger.logging.debug('transactions file updated')
+        self._transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
+        logger.logging.debug('_transactions file updated')
 
     def _check_trx(self, transaction: Transaction) -> bool:
-        new_qty = self.transactions.Quantity.loc[self.transactions.Ticker == transaction.ticker].sum() + transaction.quantity
+        new_qty = self._transactions.Quantity.loc[self._transactions.Ticker == transaction.ticker].sum() + transaction.quantity
 
         if new_qty < 0:
             print(transaction.df)
@@ -68,14 +71,14 @@ class TransactionManager(object):
 
     def all_positions(self) -> list:
         try:
-            tickers = list(set(self.transactions.Ticker))
+            tickers = list(set(self._transactions.Ticker))
             return tickers
         except AttributeError:
             logger.logging.error(f'no tickers found for account: {self.account}')
             return []
 
     def open_positions(self) -> list:
-        live_tickers = self.transactions.groupby('Ticker').sum()
+        live_tickers = self._transactions.groupby('Ticker').sum()
         try:
             live_tickers = live_tickers.loc[live_tickers.Quantity > 0]
             return list(live_tickers.index)
@@ -84,33 +87,30 @@ class TransactionManager(object):
             return []
 
     def total_fees(self) -> float:
-        return self.transactions.Fees.sum()
+        return self._transactions.Fees.sum()
     
     def first_trx(self, ticker: str = None):
-        if len(self.get_transactions()):
+        if len(self._transactions):
             if ticker:
-                return self.transactions.loc[self.transactions.Ticker == ticker].index.min()
-            return self.get_transactions().index.min()
+                return self._transactions.loc[self._transactions.Ticker == ticker].index.min()
+            return self._transactions.index.min()
         else:
             return None
 
     def last_trx(self, ticker: str = None):
-        if len(self.get_transactions()):
+        if len(self._transactions):
             if ticker:
-                return self.transactions.loc[self.transactions.Ticker == ticker].index.max()
-            return self.get_transactions().index.max()
+                return self._transactions.loc[self._transactions.Ticker == ticker].index.max()
+            return self._transactions.index.max()
         else:
             return None
 
     def get_currencies(self):
-        currencies = set(self.transactions.Currency)
+        currencies = set(self._transactions.Currency)
         return currencies
 
     def get_currency(self, ticker: str):
-        return self.get_transactions().loc[self.get_transactions()['Ticker'] == ticker, 'Currency'].iloc[0]
-
-    def get_transactions(self):
-        return self.transactions
+        return self._transactions.loc[self._transactions['Ticker'] == ticker, 'Currency'].iloc[0]
 
     def from_csv(self, filename) -> List[Transaction]:
         raise NotImplementedError()
@@ -118,7 +118,7 @@ class TransactionManager(object):
     def reset(self):
         empty_transactions = self.empty_transactions()
         empty_transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
-        self.transactions = empty_transactions
+        self._transactions = empty_transactions
 
     @staticmethod
     def empty_transactions():

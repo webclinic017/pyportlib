@@ -13,12 +13,12 @@ class CashAccount:
     def __init__(self, account):
         self.account = account
         self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
-        self.cash_changes = self._load_cash()
+        self.cash_changes = self.load()
 
     def __repr__(self):
         return self.NAME
 
-    def _load_cash(self):
+    def load(self):
         if files_utils.check_file(self.directory, self.CASH_FILENAME):
             cash = pd.read_csv(f"{self.directory}/{self.CASH_FILENAME}")
             try:
@@ -57,7 +57,7 @@ class CashAccount:
         self.cash_changes.loc[date, "Amount"] = amount
 
         self.cash_changes.to_csv(f"{self.directory}/{self.CASH_FILENAME}")
-        self._load_cash()
+        self.load()
 
     def reset(self):
         empty_cash = self._empty_cash()
