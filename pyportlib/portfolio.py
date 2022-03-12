@@ -359,7 +359,7 @@ class Portfolio:
         return weights_dict
 
     def open_positions(self, date: datetime) -> Dict[str, Position]:
-        return {k: v for k, v in self.positions.items() if v.quantities.loc[date] != 0}
+        return {k: v for k, v in self.positions.items() if round(v.quantities.loc[date]) != 0.}
 
     def open_positions_returns(self, lookback: str = None, date: datetime = None):
         if date is None:
