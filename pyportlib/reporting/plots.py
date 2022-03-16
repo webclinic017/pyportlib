@@ -4,7 +4,6 @@ from typing import Union
 import quantstats as qs
 from ..position import Position
 from ..portfolio import Portfolio
-from ..stats import stats
 from ..stats.stats import prep_returns
 
 
@@ -18,10 +17,12 @@ def snapshot(pos: Union[Position, Portfolio], date: datetime = None, lookback: s
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback)
+    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
         kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
     qs.plots.snapshot(rets, **kwargs)
 
 
@@ -36,10 +37,12 @@ def returns(pos: Union[Position, Portfolio], date: datetime = None, lookback: st
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback)
+    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
         kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
     if not log:
         qs.plots.returns(rets, prepare_returns=False, **kwargs)
     elif log:
@@ -56,10 +59,12 @@ def distribution(pos: Union[Position, Portfolio], date: datetime = None, lookbac
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback)
+    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
         kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
     qs.plots.histogram(rets, prepare_returns=False, **kwargs)
 
 
@@ -74,7 +79,7 @@ def rolling_beta(pos: Union[Position, Portfolio], benchmark: Union[Position, Por
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback)
+    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
     bench_rets = prep_returns(benchmark, date=date, lookback=lookback)
 
     qs.plots.rolling_beta(rets, benchmark=bench_rets, prepare_returns=False, **kwargs)
@@ -90,10 +95,12 @@ def rolling_vol(pos: Union[Position, Portfolio], date: datetime = None, lookback
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback)
+    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
         kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
     qs.plots.rolling_volatility(rets, **kwargs)
 
 
@@ -107,8 +114,10 @@ def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookb
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback)
+    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
         kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
     qs.plots.rolling_sharpe(rets, **kwargs)

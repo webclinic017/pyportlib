@@ -1,5 +1,8 @@
 from datetime import datetime
 from typing import Union, List, Dict
+
+from pandas._libs.tslibs.offsets import BDay
+
 from .position import Position
 from .helpers.cash_account import CashAccount
 from .data_sources.data_reader import DataReader
@@ -225,7 +228,9 @@ class Portfolio:
             try:
                 live_fx = self._fx.get(f'{curr}{self.currency}').loc[date]
             except KeyError:
-                raise KeyError("fx data has not been updated")
+                live_fx = self._fx.get(f'{curr}{self.currency}').loc[date - BDay(1)]
+            except Exception:
+                raise KeyError("fx data unavailable on trx date")
             trx.loc[trx.Currency == curr, 0] *= live_fx
         values = trx[0].sum() * -1
 

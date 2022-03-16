@@ -13,11 +13,11 @@ from ..utils import dates_utils
 class QuestradeConnection(Questrade):
     def __init__(self, account_name, **kwargs):
         super().__init__(**kwargs)
-        self.account_name = account_name
+        self.account_name = account_name.upper()
 
     def _get_account_id(self):
         accounts = self.accounts.get('accounts')
-        tfsa_id = [acc for acc in accounts if acc.get('type') == self.account_name.upper() and acc.get('status') == 'Active'][0].get('number')
+        tfsa_id = [acc for acc in accounts if acc.get('type') == self.account_name and acc.get('status') == 'Active'][0].get('number')
         return tfsa_id
 
     def get_positions(self):
