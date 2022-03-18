@@ -1,10 +1,14 @@
 from datetime import datetime
 from typing import Union
 
+import pandas as pd
 import quantstats as qs
+from scipy.stats import norm
+
 from ..position import Position
 from ..portfolio import Portfolio
 from ..stats.stats import prep_returns
+
 
 
 def snapshot(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
@@ -121,3 +125,18 @@ def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookb
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
     qs.plots.rolling_sharpe(rets, **kwargs)
+
+
+def rolling_var(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', rolling_period: int = 252, quantile=0.95, **kwargs):
+    rets = prep_returns(pos=pos, lookback=lookback, date=date)
+    mean = rets.rolling(rolling_period).mean()
+    var = rets.rolling(rolling_period).std()
+    stat = norm.ppf(1 - quantile, mean, var)
+    roll_var = pd.Series(stat, index=rets.index).dropna() * -1
+
+    if kwargs.get('benchmark'):
+        kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
+
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
+    qs.plots.returns(roll_var, compound=False, prepare_returns=False, **kwargs)
