@@ -52,9 +52,13 @@ class Transaction(object):
 
         if not condition1:
             logger.logging.error(f'transaction type {self.type} is invalid, must be in {types}')
+            print(self.df)
         if not condition2:
             logger.logging.error(f'transaction currency {self.type} is invalid, must be in {currencies}')
+            print(self.df)
         if not condition3:
             logger.logging.error(f'transaction date {self.date} is invalid, must be in YYYY-mm-dd format')
+            print(self.df)
         if not condition4:
             logger.logging.error(f'transaction type {self.type} and quantity {self.quantity} are invalid')
+            print(self.df)

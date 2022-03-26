@@ -26,7 +26,15 @@ class YahooConnection(object):
         filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_prices.csv"
         directory = self.PRICES_DIRECTORY
         ticker = self._convert_ticker(ticker)
-        data = pdr.get_data_yahoo(ticker, progress=False)
+        try:
+            data = pdr.get_data_yahoo(ticker, progress=False)
+        except ValueError:
+            logger.logging.error(f"yahoo api error for {ticker}, trying again")
+            try:
+                data = pdr.get_data_yahoo(ticker, progress=False)
+            except ValueError:
+                logger.logging.error(f"yahoo api error, no data")
+                return
         data.columns = [col.replace(' ', '') for col in data.columns]
 
         data.to_csv(f"{directory}/{filename}")

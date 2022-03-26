@@ -195,15 +195,15 @@ class Portfolio:
         cash_c = pd.Series(data=cash, index=dates)
         return cash_c
 
-    def add_cash_change(self, date: datetime, direction: str, amount: float) -> None:
+    def add_cash_change(self, cash_changes: Union[List[dict], dict]) -> None:
         """
         add a cash deposit or withdrawal from the account
-        :param date: datetime of the cash change
-        :param direction: withdrawal or deposit
-        :param amount: in portfolio currency
+        dict need to include {date: datetime,
+                              direction: str = "withdrawal", "deposit",
+                              amount: float}
         :return: None
         """
-        self._cash_account.add_cash_change(date=date, direction=direction, amount=amount)
+        self._cash_account.add(cash_changes)
         logger.logging.info(f'cash change for {self.account} have been added')
         self.load_data()
 
@@ -276,7 +276,9 @@ class Portfolio:
         :return:
         """
         if end_date is None:
-            end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+            last = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
+            end_date = last
+            # end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         if start_date is None:
             start_date = end_date
 
@@ -315,7 +317,7 @@ class Portfolio:
         else:
             market_vals = self.market_values.loc[start_date:end_date]
 
-        pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals)
+        pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals).dropna()
         pnl.name = self.account
         return pnl
 
