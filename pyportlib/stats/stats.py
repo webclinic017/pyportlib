@@ -16,21 +16,9 @@ def skew(pos, lookback: str, date: datetime = None, **kwargs) -> float:
     return returns.skew()
 
 
-def rolling_skew(pos, lookback: str, date: datetime = None,
-                 rolling_period: int = 252, **kwargs) -> pd.Series:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    return returns.rolling(int(rolling_period)).skew()
-
-
 def kurtosis(pos, lookback: str, date: datetime = None, **kwargs) -> float:
     returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     return returns.kurtosis()
-
-
-def rolling_kurtosis(pos, lookback: str, date: datetime = None,
-                     rolling_period: int = 252, **kwargs) -> pd.Series:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    return returns.rolling(int(rolling_period)).kurt()
 
 
 def beta(pos, benchmark: Union[Position, pd.Series], lookback: str,
@@ -39,17 +27,6 @@ def beta(pos, benchmark: Union[Position, pd.Series], lookback: str,
     benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
     return matrix[0, 1] / matrix[1, 1]
-
-
-def rolling_beta(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
-    df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
-
-    corr = df.rolling(int(rolling_period)).corr().unstack()['returns']['benchmark']
-    std = df.rolling(int(rolling_period)).std()
-    rolling_b = corr * std['returns'] / std['benchmark']
-    return rolling_b
 
 
 def alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, **kwargs) -> float:
@@ -79,16 +56,10 @@ def annualized_volatility(pos, lookback: str, date: datetime = None, **kwargs) -
     return qs.stats.volatility(returns=returns, prepare_returns=False, annualize=True)
 
 
-def rolling_volatility(pos, lookback: str, date: datetime = None,
-                       rolling_period: int = 252, **kwargs) -> pd.Series:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    return returns.rolling(rolling_period).std() * np.sqrt(252)
-
-
 def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, **kwargs) -> float:
     returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    var = np.percentile(returns, 1-quantile)
-    return var * -1
+    var = qs.stats.value_at_risk(returns=returns, confidence=quantile, prepare_returns=False)
+    return abs(var)
 
 
 def rolling_var(pos, lookback: str, date: datetime = None, rolling_period: int = 252, quantile=0.95, **kwargs):
@@ -116,6 +87,7 @@ def prep_returns(pos, lookback: str, date: datetime = None, **kwargs) -> pd.Seri
         return pos.pct_daily_total_pnl(start_date=start_date, end_date=date, include_cash=False, **kwargs).fillna(0)
     else:
         logger.logging.error(f"passed type ({pos.__class__}) unsupport")
+
 
 def cluster_corr(corr_array, inplace=False):
     """

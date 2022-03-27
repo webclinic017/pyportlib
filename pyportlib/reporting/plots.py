@@ -69,7 +69,8 @@ def distribution(pos: Union[Position, Portfolio], date: datetime = None, lookbac
     qs.plots.histogram(rets, prepare_returns=False, **kwargs)
 
 
-def rolling_beta(pos: Union[Position, Portfolio], benchmark: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
+def rolling_beta(pos: Union[Position, Portfolio], benchmark: Union[Position, Portfolio], date: datetime = None,
+                 lookback: str = '1y', **kwargs):
     """
 
     :param benchmark:
@@ -105,6 +106,26 @@ def rolling_vol(pos: Union[Position, Portfolio], date: datetime = None, lookback
     qs.plots.rolling_volatility(rets, **kwargs)
 
 
+def rolling_skew(pos, lookback: str, date: datetime = None,
+                 rolling_period: int = 252, **kwargs):
+    rets = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    roll = rets.rolling(int(rolling_period)).skew()
+
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
+    qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
+
+
+def rolling_kurtosis(pos, lookback: str, date: datetime = None,
+                     rolling_period: int = 252, **kwargs):
+    rets = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    roll = rets.rolling(int(rolling_period)).kurt()
+
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
+    qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False,**kwargs)
+
+
 def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
     """
 
@@ -124,7 +145,8 @@ def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookb
     qs.plots.rolling_sharpe(rets, **kwargs)
 
 
-def rolling_var(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', rolling_period: int = 252, quantile=0.95, **kwargs):
+def rolling_var(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', rolling_period: int = 252,
+                quantile=0.95, **kwargs):
     rets = prep_returns(pos=pos, lookback=lookback, date=date)
     mean = rets.rolling(rolling_period).mean()
     var = rets.rolling(rolling_period).std()
