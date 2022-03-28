@@ -1,10 +1,8 @@
 from datetime import datetime
-from typing import Union
 import scipy.cluster.hierarchy as sch
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from ..position import Position
 import quantstats as qs
 from ..utils import ts
 

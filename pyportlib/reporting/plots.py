@@ -1,10 +1,7 @@
 from datetime import datetime
-from typing import Union
 import pandas as pd
 import quantstats as qs
 from scipy.stats import norm
-from ..position import Position
-from ..portfolio import Portfolio
 from ..utils import ts
 
 
