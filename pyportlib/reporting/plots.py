@@ -16,7 +16,7 @@ def snapshot(pos, date: datetime = None, lookback: str = '1y', **kwargs):
     :return:
     """
     rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
-    if kwargs.get('benchmark'):
+    if kwargs.get('benchmark') is not None:
         kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
@@ -38,7 +38,7 @@ def returns(pos, date: datetime = None, lookback: str = '1y', log: bool = False,
     :return:
     """
     rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
-    if kwargs.get('benchmark'):
+    if kwargs.get('benchmark') is not None:
         kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
@@ -62,7 +62,7 @@ def distribution(pos, date: datetime = None, lookback: str = '1y', **kwargs):
     :return:
     """
     rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
-    if kwargs.get('benchmark'):
+    if kwargs.get('benchmark') is not None:
         kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
@@ -104,7 +104,7 @@ def rolling_vol(pos, date: datetime = None, lookback: str = '1y', **kwargs):
     :return:
     """
     rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
-    if kwargs.get('benchmark'):
+    if kwargs.get('benchmark') is not None:
         kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
@@ -167,7 +167,7 @@ def rolling_var(pos, date: datetime = None, lookback: str = '1y', rolling_period
     stat = norm.ppf(1 - quantile, mean, var)
     roll_var = pd.Series(stat, index=rets.index).dropna() * -1
 
-    if kwargs.get('benchmark'):
+    if kwargs.get('benchmark') is not None:
         kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):

@@ -184,7 +184,6 @@ class Portfolio:
     def transactions(self) -> pd.DataFrame:
         return self._transaction_manager.transactions
 
-    @property
     def cash_history(self):
         """
         computes cash account for every date
@@ -313,7 +312,7 @@ class Portfolio:
             start_date = end_date
 
         if include_cash:
-            market_vals = self.market_values.loc[start_date:end_date] + self.cash_history
+            market_vals = self.market_values.loc[start_date:end_date] + self.cash_history()
         else:
             market_vals = self.market_values.loc[start_date:end_date]
 

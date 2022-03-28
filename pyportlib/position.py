@@ -7,8 +7,9 @@ from .utils import logger
 
 class Position(object):
 
-    def __init__(self, ticker: str, local_currency: str = None):
+    def __init__(self, ticker: str, local_currency: str = None, strategy: str = None):
         self.ticker = ticker.upper()
+        self._strategy = strategy
         self._datareader = DataReader()
         self._prices = pd.Series()
         self._quantities = pd.Series()
@@ -23,8 +24,16 @@ class Position(object):
     def name(self):
         return "position"
 
+    @property
+    def strategy(self):
+        return self._strategy
+
+    @strategy.setter
+    def strategy(self, value: str):
+        self._strategy = value
+
     def __repr__(self):
-        return f"{self.ticker} - {self.currency}"
+        return f"{self.ticker} - {self.currency} - {self.strategy}"
 
     def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
@@ -79,8 +88,11 @@ class Position(object):
     def market_value(self, date: datetime) -> float:
         return self.prices.loc[date] * self.quantities.loc[date]
 
+    def npv(self) -> pd.Series:
+        return self.prices.multiply(self.quantities).dropna()
+
     @property
-    def prices(self):
+    def prices(self) -> pd.Series:
         return self._prices
 
     @prices.setter
