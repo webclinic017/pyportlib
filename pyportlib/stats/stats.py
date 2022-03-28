@@ -19,7 +19,7 @@ def kurtosis(pos, lookback: str, date: datetime = None, **kwargs) -> float:
     return returns.kurtosis()
 
 
-def beta(pos, benchmark: Union[Position, pd.Series], lookback: str,
+def beta(pos, benchmark, lookback: str,
          date: datetime = None, **kwargs) -> float:
     returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     benchmark = ts.prep_returns(pos=benchmark, lookback=lookback, date=date)
@@ -27,7 +27,7 @@ def beta(pos, benchmark: Union[Position, pd.Series], lookback: str,
     return matrix[0, 1] / matrix[1, 1]
 
 
-def alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, **kwargs) -> float:
+def alpha(pos, benchmark, lookback: str, date: datetime = None, **kwargs) -> float:
     returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     benchmark = ts.prep_returns(pos=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
@@ -36,7 +36,7 @@ def alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datet
     return alph*len(returns)
 
 
-def rolling_alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
+def rolling_alpha(pos, benchmark, lookback: str, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
     returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     benchmark = ts.prep_returns(pos=benchmark, lookback=lookback, date=date)
     df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})

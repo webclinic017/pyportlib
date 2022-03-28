@@ -8,7 +8,7 @@ from ..portfolio import Portfolio
 from ..utils import ts
 
 
-def snapshot(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
+def snapshot(pos, date: datetime = None, lookback: str = '1y', **kwargs):
     """
 
     :param pos: Position or Portfolio object to plot returns
@@ -29,7 +29,7 @@ def snapshot(pos: Union[Position, Portfolio], date: datetime = None, lookback: s
     qs.plots.snapshot(rets, **kwargs)
 
 
-def returns(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', log: bool = False, **kwargs):
+def returns(pos, date: datetime = None, lookback: str = '1y', log: bool = False, **kwargs):
     """
 
     :param pos: Position object to plot returns
@@ -54,7 +54,7 @@ def returns(pos: Union[Position, Portfolio], date: datetime = None, lookback: st
         qs.plots.log_returns(rets, prepare_returns=False, **kwargs)
 
 
-def distribution(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
+def distribution(pos, date: datetime = None, lookback: str = '1y', **kwargs):
     """
 
     :param pos: Position object to plot returns
@@ -75,7 +75,7 @@ def distribution(pos: Union[Position, Portfolio], date: datetime = None, lookbac
     qs.plots.histogram(rets, prepare_returns=False, **kwargs)
 
 
-def rolling_beta(pos: Union[Position, Portfolio], benchmark: Union[Position, Portfolio], date: datetime = None,
+def rolling_beta(pos, benchmark, date: datetime = None,
                  lookback: str = '1y', **kwargs):
     """
 
@@ -96,7 +96,7 @@ def rolling_beta(pos: Union[Position, Portfolio], benchmark: Union[Position, Por
     qs.plots.rolling_beta(rets, benchmark=bench_rets, prepare_returns=False, **kwargs)
 
 
-def rolling_vol(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
+def rolling_vol(pos, date: datetime = None, lookback: str = '1y', **kwargs):
     """
 
     :param pos: Position object to plot returns
@@ -141,7 +141,7 @@ def rolling_kurtosis(pos, lookback: str, date: datetime = None,
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
-def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
+def rolling_sharpe(pos, date: datetime = None, lookback: str = '1y', **kwargs):
     """
 
     :param pos: Position object to plot returns
@@ -162,7 +162,7 @@ def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookb
     qs.plots.rolling_sharpe(rets, **kwargs)
 
 
-def rolling_var(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', rolling_period: int = 252,
+def rolling_var(pos, date: datetime = None, lookback: str = '1y', rolling_period: int = 252,
                 quantile=0.95, **kwargs):
     rets = ts.prep_returns(pos=pos, lookback=lookback, date=date)
     mean = rets.rolling(rolling_period).mean()
