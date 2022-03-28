@@ -24,6 +24,8 @@ def snapshot(pos: Union[Position, Portfolio], date: datetime = None, lookback: s
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.snapshot(rets, **kwargs)
 
 
@@ -44,6 +46,8 @@ def returns(pos: Union[Position, Portfolio], date: datetime = None, lookback: st
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     if not log:
         qs.plots.returns(rets, prepare_returns=False, **kwargs)
     elif log:
@@ -66,6 +70,8 @@ def distribution(pos: Union[Position, Portfolio], date: datetime = None, lookbac
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.histogram(rets, prepare_returns=False, **kwargs)
 
 
@@ -83,7 +89,10 @@ def rolling_beta(pos: Union[Position, Portfolio], benchmark: Union[Position, Por
     """
     rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
     bench_rets = prep_returns(benchmark, date=date, lookback=lookback)
-
+    if kwargs.get('positions_to_exclude'):
+        del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.rolling_beta(rets, benchmark=bench_rets, prepare_returns=False, **kwargs)
 
 
@@ -103,6 +112,8 @@ def rolling_vol(pos: Union[Position, Portfolio], date: datetime = None, lookback
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.rolling_volatility(rets, **kwargs)
 
 
@@ -113,6 +124,8 @@ def rolling_skew(pos, lookback: str, date: datetime = None,
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
@@ -123,6 +136,8 @@ def rolling_kurtosis(pos, lookback: str, date: datetime = None,
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False,**kwargs)
 
 
@@ -142,6 +157,8 @@ def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookb
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.rolling_sharpe(rets, **kwargs)
 
 
@@ -158,4 +175,6 @@ def rolling_var(pos: Union[Position, Portfolio], date: datetime = None, lookback
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
+    if kwargs.get("include_cash"):
+        del kwargs['include_cash']
     qs.plots.returns(roll_var, compound=False, prepare_returns=False, **kwargs)
