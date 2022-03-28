@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Union, List
 import pandas as pd
 from pandas._libs.tslibs.offsets import BDay
-
 from ..utils import logger
 from .questrade_api.questrade import Questrade
 import dateutil.parser
@@ -19,7 +18,8 @@ class QuestradeConnection(Questrade):
 
     def _get_account_id(self):
         accounts = self.accounts.get('accounts')
-        tfsa_id = [acc for acc in accounts if acc.get('type') == self.account_name and acc.get('status') == 'Active'][0].get('number')
+        tfsa_id = [acc for acc in accounts if acc.get('type') == self.account_name and acc.get('status') == 'Active'][
+            0].get('number')
         return tfsa_id
 
     def get_positions(self):
@@ -64,7 +64,8 @@ class QuestradeConnection(Questrade):
         return list_of_transactions
 
     def update_transactions(self, portfolio: Portfolio, start_date: datetime = None) -> None:
-        last_trade = portfolio.transactions.index.max() if not isinstance(portfolio.transactions.index.max(), pd._libs.tslibs.nattype.NaTType) else None
+        last_trade = portfolio.transactions.index.max() if not isinstance(portfolio.transactions.index.max(),
+                                                                          pd._libs.tslibs.nattype.NaTType) else None
         if not last_trade:
             if start_date:
                 last_trade = start_date
@@ -76,15 +77,15 @@ class QuestradeConnection(Questrade):
         list_of_transactions = self.get_transactions_list(transactions)
 
         list_of_transactions = self.remove_duplicated_transaction(new_transactions=list_of_transactions,
-                                                          ptf_transactions=portfolio.transactions,
-                                                          last_trade_date=last_trade)
+                                                                  ptf_transactions=portfolio.transactions,
+                                                                  last_trade_date=last_trade)
         # FIXME make remove duplicated cash changes
         # transactions = pd.read_csv("cash changes.csv")
         # list_of_cash_changes = []
         # for row in transactions.iterrows():
         #     list_of_cash_changes.append(row[1].to_dict())
-        portfolio.add_transaction(list_of_transactions)
         portfolio.add_cash_change(list_of_cash_changes)
+        portfolio.add_transaction(list_of_transactions)
 
     def remove_duplicated_transaction(self, new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
                                       last_trade_date: datetime):
@@ -117,7 +118,8 @@ class QuestradeConnection(Questrade):
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
             return transaction.get('type')
 
-        date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+        date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
+                                                                              tzinfo=None)
         ticker = transaction.get('symbol')
         currency = transaction.get('currency')
         trx_type = transaction.get('type')
