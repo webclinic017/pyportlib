@@ -19,6 +19,10 @@ class Position(object):
         else:
             self.currency = local_currency
 
+    @property
+    def name(self):
+        return "position"
+
     def __repr__(self):
         return f"{self.ticker} - {self.currency}"
 

@@ -5,7 +5,7 @@ import quantstats as qs
 from scipy.stats import norm
 from ..position import Position
 from ..portfolio import Portfolio
-from ..stats.stats import prep_returns
+from ..utils import ts
 
 
 def snapshot(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
@@ -18,9 +18,9 @@ def snapshot(pos: Union[Position, Portfolio], date: datetime = None, lookback: s
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
+    rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
-        kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
+        kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
@@ -40,9 +40,9 @@ def returns(pos: Union[Position, Portfolio], date: datetime = None, lookback: st
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
+    rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
-        kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
+        kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
@@ -64,9 +64,9 @@ def distribution(pos: Union[Position, Portfolio], date: datetime = None, lookbac
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
+    rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
-        kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
+        kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
@@ -87,8 +87,8 @@ def rolling_beta(pos: Union[Position, Portfolio], benchmark: Union[Position, Por
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
-    bench_rets = prep_returns(benchmark, date=date, lookback=lookback)
+    rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
+    bench_rets = ts.prep_returns(benchmark, date=date, lookback=lookback)
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
     if kwargs.get("include_cash"):
@@ -106,9 +106,9 @@ def rolling_vol(pos: Union[Position, Portfolio], date: datetime = None, lookback
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
+    rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
-        kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
+        kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
@@ -119,7 +119,7 @@ def rolling_vol(pos: Union[Position, Portfolio], date: datetime = None, lookback
 
 def rolling_skew(pos, lookback: str, date: datetime = None,
                  rolling_period: int = 252, **kwargs):
-    rets = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    rets = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     roll = rets.rolling(int(rolling_period)).skew()
 
     if kwargs.get('positions_to_exclude'):
@@ -131,14 +131,14 @@ def rolling_skew(pos, lookback: str, date: datetime = None,
 
 def rolling_kurtosis(pos, lookback: str, date: datetime = None,
                      rolling_period: int = 252, **kwargs):
-    rets = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    rets = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     roll = rets.rolling(int(rolling_period)).kurt()
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
     if kwargs.get("include_cash"):
         del kwargs['include_cash']
-    qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False,**kwargs)
+    qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
 def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', **kwargs):
@@ -151,9 +151,9 @@ def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookb
                     benchark returns pandas Series can be passed or a Position object
     :return:
     """
-    rets = prep_returns(pos, date=date, lookback=lookback, **kwargs)
+    rets = ts.prep_returns(pos, date=date, lookback=lookback, **kwargs)
     if kwargs.get('benchmark'):
-        kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
+        kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']
@@ -164,14 +164,14 @@ def rolling_sharpe(pos: Union[Position, Portfolio], date: datetime = None, lookb
 
 def rolling_var(pos: Union[Position, Portfolio], date: datetime = None, lookback: str = '1y', rolling_period: int = 252,
                 quantile=0.95, **kwargs):
-    rets = prep_returns(pos=pos, lookback=lookback, date=date)
+    rets = ts.prep_returns(pos=pos, lookback=lookback, date=date)
     mean = rets.rolling(rolling_period).mean()
     var = rets.rolling(rolling_period).std()
     stat = norm.ppf(1 - quantile, mean, var)
     roll_var = pd.Series(stat, index=rets.index).dropna() * -1
 
     if kwargs.get('benchmark'):
-        kwargs['benchmark'] = prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
+        kwargs['benchmark'] = ts.prep_returns(kwargs.get('benchmark'), date=date, lookback=lookback)
 
     if kwargs.get('positions_to_exclude'):
         del kwargs['positions_to_exclude']

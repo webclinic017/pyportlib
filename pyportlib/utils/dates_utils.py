@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import List
 import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
-
+from pandas._libs.tslibs.offsets import BDay
 from pyportlib.utils import logger
 
 
@@ -40,7 +40,12 @@ def date_window(lookback: str = "1y", date: datetime = None):
 
     return date
 
+
 def last_bday():
     last = datetime.today()
     shift = timedelta(max(1, (last.weekday() + 6) % 7 - 3))
     return (last - shift).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def bday(n):
+    return BDay(n)

@@ -4,34 +4,32 @@ import scipy.cluster.hierarchy as sch
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from pyportlib.utils.logger import logger
 from ..position import Position
-from .. import portfolio
 import quantstats as qs
-from pyportlib.utils import dates_utils
+from ..utils import ts
 
 
 def skew(pos, lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     return returns.skew()
 
 
 def kurtosis(pos, lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     return returns.kurtosis()
 
 
 def beta(pos, benchmark: Union[Position, pd.Series], lookback: str,
          date: datetime = None, **kwargs) -> float:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    benchmark = ts.prep_returns(pos=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
     return matrix[0, 1] / matrix[1, 1]
 
 
 def alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    benchmark = ts.prep_returns(pos=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
     bet = matrix[0, 1] / matrix[1, 1]
     alph = returns.mean() - (bet * benchmark.mean())
@@ -39,8 +37,8 @@ def alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datet
 
 
 def rolling_alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = prep_returns(pos=benchmark, lookback=lookback, date=date)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    benchmark = ts.prep_returns(pos=benchmark, lookback=lookback, date=date)
     df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
 
     corr = df.rolling(int(rolling_period)).corr().unstack()['returns']['benchmark']
@@ -52,44 +50,22 @@ def rolling_alpha(pos, benchmark: Union[Position, pd.Series], lookback: str, dat
 
 
 def annualized_volatility(pos, lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     return qs.stats.volatility(returns=returns, prepare_returns=False, annualize=True)
 
 
 def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, **kwargs) -> float:
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     var = qs.stats.value_at_risk(returns=returns, confidence=quantile, prepare_returns=False)
     return abs(var)
 
 
 def rolling_var(pos, lookback: str, date: datetime = None, rolling_period: int = 252, quantile=0.95, **kwargs):
-    returns = prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
+    returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     mean = returns.rolling(rolling_period).mean()
     var = returns.rolling(rolling_period).std()
     stat = norm.ppf(1-quantile, mean, var)
     return pd.Series(stat, index=returns.index).dropna() * -1
-
-
-def prep_returns(pos, lookback: str, date: datetime = None, **kwargs) -> pd.Series:
-    if date:
-        start_date = dates_utils.date_window(date=date, lookback=lookback)
-    else:
-        start_date = dates_utils.date_window(lookback=lookback)
-        date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-
-    if isinstance(pos, Position):
-        prices = pos.prices
-        prices.name = pos.ticker
-        return prices.loc[start_date:date].pct_change().fillna(0)
-    if isinstance(pos, pd.Series):
-        return pos.loc[start_date:date].fillna(0)
-    if isinstance(pos, portfolio.Portfolio):
-        ic = kwargs.get("include_cash") if kwargs.get("include_cash") else False
-        if kwargs.get("include_cash"):
-            del kwargs['include_cash']
-        return pos.pct_daily_total_pnl(start_date=start_date, end_date=date, include_cash=ic, **kwargs).fillna(0)
-    else:
-        logger.logging.error(f"passed type ({pos.__class__}) unsupport")
 
 
 def cluster_corr(corr_array, inplace=False):

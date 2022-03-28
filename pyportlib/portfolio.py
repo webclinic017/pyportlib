@@ -1,16 +1,12 @@
 from datetime import datetime
 from typing import Union, List, Dict
-
-from pandas._libs.tslibs.offsets import BDay
-
 from .position import Position
 from .helpers.cash_account import CashAccount
 from .data_sources.data_reader import DataReader
 from .helpers.fx_rates import FxRates
 from .helpers.transaction import Transaction
 from .helpers.transaction_manager import TransactionManager
-from .stats import stats
-from .utils import dates_utils, logger
+from .utils import dates_utils, logger, ts
 import pandas as pd
 
 
@@ -32,6 +28,10 @@ class Portfolio:
         self.start_date = None
         # load data        
         self.load_data()
+
+    @property
+    def name(self):
+        return "portfolio"
 
     def __repr__(self):
         return self.account
@@ -228,7 +228,7 @@ class Portfolio:
             try:
                 live_fx = self._fx.get(f'{curr}{self.currency}').loc[date]
             except KeyError:
-                live_fx = self._fx.get(f'{curr}{self.currency}').loc[date - BDay(1)]
+                live_fx = self._fx.get(f'{curr}{self.currency}').loc[date - dates_utils.bday(1)]
             except Exception:
                 raise KeyError("fx data unavailable on trx date")
             trx.loc[trx.Currency == curr, 0] *= live_fx
@@ -332,16 +332,6 @@ class Portfolio:
         self._fx.reset()
         self.load_data()
 
-    def beta(self, benchmark, lookback: str = "1y", date: datetime = None, include_cash: bool = False):
-        start_date = dates_utils.date_window(lookback=lookback, date=date)
-        rets = self.pct_daily_total_pnl(start_date=start_date,
-                                        include_cash=include_cash).fillna(0)
-
-        bench_rets = benchmark.pct_daily_total_pnl(start_date=start_date,
-                                                   include_cash=False).fillna(0)
-
-        return stats.beta(pos=rets, benchmark=bench_rets, lookback=lookback, date=date)
-
     def corr(self, lookback: str = None, date: datetime = None):
         return self.open_positions_returns(lookback=lookback, date=date).corr()
 
@@ -365,7 +355,7 @@ class Portfolio:
         if lookback is None:
             lookback = "1y"
         open_positions = self.open_positions(date)
-        prices = {k: stats.prep_returns(v, date=date, lookback=lookback) for k, v in open_positions.items()}
+        prices = {k: ts.prep_returns(v, date=date, lookback=lookback) for k, v in open_positions.items()}
         return pd.DataFrame(prices).fillna(0)
 
     @staticmethod
