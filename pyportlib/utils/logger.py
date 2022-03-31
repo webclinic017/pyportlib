@@ -1,7 +1,7 @@
 import logging
 
 logger = logging.getLogger('pyportlib')
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s',
                     )
 

@@ -202,9 +202,10 @@ class Portfolio:
                               amount: float}
         :return: None
         """
-        self._cash_account.add(cash_changes)
-        logger.logging.info(f'cash change for {self.account} have been added')
-        self.load_data()
+        if cash_changes:
+            self._cash_account.add(cash_changes)
+            logger.logging.info(f'cash change for {self.account} have been added')
+            self.load_data()
 
     def cash(self, date: datetime = None) -> float:
         """

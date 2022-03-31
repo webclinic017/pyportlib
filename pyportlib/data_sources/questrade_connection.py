@@ -80,12 +80,7 @@ class QuestradeConnection(Questrade):
                                                                   ptf_transactions=portfolio.transactions,
                                                                   last_trade_date=last_trade)
         # FIXME make remove duplicated cash changes
-        # transactions = pd.read_csv("cash changes.csv")
-        # list_of_cash_changes = []
-        # for row in transactions.iterrows():
-        #     list_of_cash_changes.append(row[1].to_dict())
         portfolio.add_cash_change(list_of_cash_changes)
-
         portfolio.add_transaction(list_of_transactions)
 
     def remove_duplicated_transaction(self, new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,

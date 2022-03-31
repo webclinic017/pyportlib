@@ -22,7 +22,7 @@ def beta(pos, benchmark, lookback: str,
     returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
     benchmark = ts.prep_returns(pos=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
-    return matrix[0, 1] / matrix[1, 1]
+    return round(matrix[0, 1] / matrix[1, 1], 2)
 
 
 def alpha(pos, benchmark, lookback: str, date: datetime = None, **kwargs) -> float:
@@ -52,10 +52,15 @@ def annualized_volatility(pos, lookback: str, date: datetime = None, **kwargs) -
     return qs.stats.volatility(returns=returns, prepare_returns=False, annualize=True)
 
 
-def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, **kwargs) -> float:
+def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, method: str = "gaussian", **kwargs) -> float:
     returns = ts.prep_returns(pos=pos, lookback=lookback, date=date, **kwargs)
-    var = qs.stats.value_at_risk(returns=returns, confidence=quantile, prepare_returns=False)
-    return abs(var)
+    if method == "gaussian":
+        var = qs.stats.value_at_risk(returns=returns, confidence=quantile, prepare_returns=False)
+        return abs(var)
+
+    if method == "historical":
+        var = returns.quantile(q=1 - quantile)
+        return abs(var)
 
 
 def rolling_var(pos, lookback: str, date: datetime = None, rolling_period: int = 252, quantile=0.95, **kwargs):
