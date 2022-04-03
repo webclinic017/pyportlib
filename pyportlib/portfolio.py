@@ -361,8 +361,8 @@ class Portfolio:
             date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
 
         port_mv = self.market_values.loc[date]
-        weights_dict = {k: round(v.market_value(date) / port_mv, 5) for k, v in self.positions.items() if
-                        v.market_value(date) != 0}
+        weights_dict = {k: round(v.npv().loc[date] / port_mv, 5) for k, v in self.positions.items() if
+                        v.npv().loc[date] != 0}
         if not 0.9999 < sum(weights_dict.values()) < 1.001:
             raise ValueError(f'weights ({sum(weights_dict.values())}) do not add to 1')
         return weights_dict

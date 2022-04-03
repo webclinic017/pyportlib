@@ -1,8 +1,7 @@
 from datetime import datetime
-from pandas._libs.tslibs.offsets import BDay
 from .data_sources.data_reader import DataReader
 import pandas as pd
-from .utils import logger
+from .utils import logger, dates_utils
 
 
 class Position(object):
@@ -37,9 +36,8 @@ class Position(object):
 
     def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
-        updates all of the position's market data
-        :param fundamentals_and_dividends: True if you want to update
-        fundamentals and dividends data
+        Updates all of the position's market data
+        :param fundamentals_and_dividends: set True if you want to update undamentals and dividends data
         :return: None
         """
         if fundamentals_and_dividends:
@@ -62,7 +60,7 @@ class Position(object):
 
     def get_splits(self) -> pd.DataFrame:
         """
-        retreives the position's stock splits
+        Retreives the position's stock splits
         :return:
         """
         return self._datareader.get_splits(ticker=self.ticker)
@@ -84,9 +82,6 @@ class Position(object):
 
     def _load_prices(self):
         self._prices = self._datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
-
-    def market_value(self, date: datetime) -> float:
-        return self.prices.loc[date] * self.quantities.loc[date]
 
     def npv(self) -> pd.Series:
         return self.prices.multiply(self.quantities).dropna()
@@ -116,7 +111,7 @@ class Position(object):
                   transactions: pd.DataFrame = pd.DataFrame(),
                   fx: dict = None) -> pd.DataFrame:
         """
-        gives the pnl of position in $ amount by type of pnl
+        Computes pnl of the position in $ amount by type of pnl
         :param fx: dict of fx pairs for conversion if there are transactions
         :param transactions: transactions from a portfolio, if none transactions are not considered
         :param start_date: start date of series (if only param, end_date is last date)
@@ -129,7 +124,7 @@ class Position(object):
         if start_date is None:
             start_date = end_date
 
-        search_date = start_date - BDay(4)
+        search_date = start_date - dates_utils.bday(4)
         try:
             prices = self.prices.loc[search_date:end_date]
             quantities = self.quantities
@@ -181,7 +176,7 @@ class Position(object):
                         transactions: pd.DataFrame = pd.DataFrame(),
                         fx: dict = None) -> pd.DataFrame:
         """
-        gives total pnl of position in $ amount
+        Computes total pnl of position in $ amount
         :param fx: dict of fx pairs for conversion if there are transactions
         :param transactions: transactions from a portfolio, if none transactions are not considered
         :param start_date: start date of series (if only param, end_date is last date)
