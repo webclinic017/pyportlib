@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Union, List
 import pandas as pd
 from pandas._libs.tslibs.offsets import BDay
-
 from pyportlib.helpers.cash_change import CashChange
 from ..utils import logger, config_utils
 from .questrade_api.questrade import Questrade

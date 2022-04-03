@@ -34,6 +34,8 @@ def create_default_config(directory):
             "datasource": {
                 "statements": "Yahoo",
                 "market_data": "Yahoo"
+            },
+            "ticker_ignore": {
             }
         }
         with open(f'{directory}/{name}', 'w', encoding='utf-8') as f:

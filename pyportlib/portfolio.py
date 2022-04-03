@@ -20,6 +20,7 @@ class Portfolio:
         self._positions = {}
         self.currency = currency.upper()
         self._market_value = pd.Series()
+        self._cash_history = pd.Series()
 
         # helpers
         self._cash_account = CashAccount(account=self.account)
@@ -30,6 +31,7 @@ class Portfolio:
         self.start_date = None
         # load data        
         self.load_data()
+        self._load_cash_history()
 
     @property
     def name(self):
@@ -187,15 +189,19 @@ class Portfolio:
     def cash_changes(self) -> pd.DataFrame:
         return self._cash_account.cash_changes
 
+    @property
     def cash_history(self):
+        return self._cash_history
+
+    def _load_cash_history(self):
         """
-        computes cash account for every date
+        Computes cash account for every date
         :return:
         """
         dates = self.market_values.index
         cash = [self.cash(date) for date in dates]
         cash_c = pd.Series(data=cash, index=dates)
-        return cash_c
+        self._cash_history = cash_c
 
     def add_cash_change(self, cash_changes: Union[List[CashChange], CashChange]) -> None:
         """
@@ -209,10 +215,11 @@ class Portfolio:
             self._cash_account.add(cash_changes)
             logger.logging.info(f'cash change for {self.account} have been added')
             self.load_data()
+            self._load_cash_history()
 
     def cash(self, date: datetime = None) -> float:
         """
-        cash available on given date
+        Cash available on given date
         :param date: datetime
         :return: float
         """
@@ -245,7 +252,7 @@ class Portfolio:
 
     def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
         """
-        accumulated dividend over date range for the entire portfolio
+        Accumulated dividend over date range for the entire portfolio
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
@@ -273,7 +280,7 @@ class Portfolio:
 
     def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, **kwargs) -> pd.DataFrame:
         """
-        portfolio return per position in $ amount for specified date range
+        Portfolio return per position in $ amount for specified date range
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
@@ -304,10 +311,10 @@ class Portfolio:
     def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False,
                             **kwargs) -> pd.Series:
         """
-        portfolio return in % of market value
-        :param include_cash: if we include the cash amount at that time to calc the market value
+        Portfolio return in % of market value
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
+        :param include_cash: If we include the cash amount at that time to calc the market value
         :return:
         """
         if end_date is None:
@@ -316,7 +323,7 @@ class Portfolio:
             start_date = end_date
 
         if include_cash:
-            market_vals = self.market_values.loc[start_date:end_date] + self.cash_history()
+            market_vals = self.market_values.loc[start_date:end_date] + self._cash_history
         else:
             market_vals = self.market_values.loc[start_date:end_date]
 
@@ -336,9 +343,20 @@ class Portfolio:
         self.load_data()
 
     def corr(self, lookback: str = None, date: datetime = None):
+        """
+
+        :param lookback:
+        :param date:
+        :return:
+        """
         return self.open_positions_returns(lookback=lookback, date=date).corr()
 
     def weights(self, date: datetime = None):
+        """
+
+        :param date:
+        :return:
+        """
         if date is None:
             date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
 
@@ -350,9 +368,20 @@ class Portfolio:
         return weights_dict
 
     def open_positions(self, date: datetime) -> Dict[str, Position]:
+        """
+
+        :param date:
+        :return:
+        """
         return {k: v for k, v in self.positions.items() if round(v.quantities.loc[date]) != 0.}
 
     def open_positions_returns(self, lookback: str = None, date: datetime = None):
+        """
+
+        :param lookback:
+        :param date:
+        :return:
+        """
         if date is None:
             date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
         if lookback is None:
