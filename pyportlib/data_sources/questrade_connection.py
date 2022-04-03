@@ -87,7 +87,6 @@ class QuestradeConnection(Questrade):
         list_of_cash_changes = self._remove_duplicated_cash_change(new_cash_changes=list_of_cash_changes,
                                                                    ptf_cash_changes=portfolio.cash_changes,
                                                                    last_cash_change_date=last_trade)
-        # FIXME make remove duplicated cash changes
         portfolio.add_cash_change(list_of_cash_changes)
         portfolio.add_transaction(list_of_transactions)
 
