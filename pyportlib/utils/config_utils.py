@@ -1,10 +1,22 @@
 import json
+from typing import List
+
 from ..utils import files_utils
 
 
 def make_config_dir(directory):
     if not files_utils.check_dir(directory):
         files_utils.make_dir(directory)
+
+
+def fetch_tickers_to_ignore() -> List[str]:
+    with open(f'{files_utils.get_config_dir()}config.json') as myfile:
+        data = json.loads(myfile.read())
+    tickers = data.get('ticker_ignore', None)
+
+    if not tickers:
+        return []
+    return list(tickers.values())
 
 
 def fetch_data_sources(source_type: str):

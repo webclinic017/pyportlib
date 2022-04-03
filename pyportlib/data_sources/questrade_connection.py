@@ -4,7 +4,7 @@ import pandas as pd
 from pandas._libs.tslibs.offsets import BDay
 
 from pyportlib.helpers.cash_change import CashChange
-from ..utils import logger
+from ..utils import logger, config_utils
 from .questrade_api.questrade import Questrade
 import dateutil.parser
 from ..helpers.transaction import Transaction
@@ -25,13 +25,26 @@ class QuestradeConnection(Questrade):
         return tfsa_id
 
     def get_positions(self):
+        """
+        Get positions from the connected account
+        :return:
+        """
         return self.account_positions(self._get_account_id())
 
     def get_balances(self):
+        """
+        Get balances from the connected account
+        :return:
+        """
         return self.account_balances(self._get_account_id())
 
     def get_transactions(self, start_date: datetime = None, end_date: datetime = None) -> List[dict]:
-
+        """
+        Get transactions within a date range from the connected account
+        :param start_date: Date to start search
+        :param end_date: Date to stop search
+        :return: List of dict containing transaction information
+        """
         if not end_date:
             end_date = datetime.now().replace(hour=0, minute=0, second=0,
                                               microsecond=0).astimezone().isoformat('T')
@@ -48,7 +61,12 @@ class QuestradeConnection(Questrade):
 
         return list_of_trx
 
-    def to_cash_changes_list(self, transactions: List[dict]):
+    def to_cash_changes_list(self, transactions: List[dict]) -> List[CashChange]:
+        """
+        Converts list of dicts containing cash change info to a list of CashChange objects
+        :param transactions: List of dicts containing cash changes info
+        :return: List of CashChange objects
+        """
         list_cc = []
         cash_changes = self._filter_cash_changes(transactions)
         for cc in cash_changes:
@@ -58,18 +76,29 @@ class QuestradeConnection(Questrade):
         return list_cc
 
     def to_transactions_list(self, transactions: List[dict]) -> List[Transaction]:
+        """
+        Converts list of dicts containing transaction info to a list of Transaction objects
+        :param transactions: List of dicts containing transaction info
+        :return: List of Transaction objects
+        """
         list_of_transactions = []
         for i in range(len(transactions)):
             trx = self._make_transaction(transactions[i])
             list_of_transactions.append(trx)
 
-        to_remove = ['ARRY', "IPL.TO"]
+        to_remove = config_utils.fetch_tickers_to_ignore()
         list_of_transactions = self._remove_transactions(
-            [pos for pos in list_of_transactions if not isinstance(pos, str)], to_remove)
+            [pos for pos in list_of_transactions if not isinstance(pos, str) if pos is not None], to_remove)
 
         return list_of_transactions
 
     def update_transactions(self, portfolio: Portfolio, start_date: datetime = None) -> None:
+        """
+        Updates a pyportlib Portfolio transactions and cash changes and saves Portfolio
+        :param portfolio: Portfolio
+        :param start_date: Date to start transactions search in connected account
+        :return: None
+        """
         last_trade = portfolio.transactions.index.max() if not isinstance(portfolio.transactions.index.max(),
                                                                           pd._libs.tslibs.nattype.NaTType) else None
         if not last_trade:
@@ -92,8 +121,7 @@ class QuestradeConnection(Questrade):
         portfolio.add_cash_change(list_of_cash_changes)
         portfolio.add_transaction(list_of_transactions)
 
-    def _remove_duplicated_cash_change(self, new_cash_changes: List[CashChange], ptf_cash_changes: pd.DataFrame,
-                                       last_cash_change_date: datetime) -> List[CashChange]:
+    def _remove_duplicated_cash_change(self, new_cash_changes: List[CashChange], ptf_cash_changes: pd.DataFrame, last_cash_change_date: datetime) -> List[CashChange]:
 
         duped = self._duplicated_cash_change(new_cash_changes, ptf_cash_changes, last_cash_change_date)
 
@@ -109,8 +137,7 @@ class QuestradeConnection(Questrade):
         return cash_changes
 
     @staticmethod
-    def _duplicated_cash_change(new_cash_changes: List[CashChange], ptf_cash_changes: pd.DataFrame,
-                                last_trade_date: datetime):
+    def _duplicated_cash_change(new_cash_changes: List[CashChange], ptf_cash_changes: pd.DataFrame, last_trade_date: datetime) -> pd.DataFrame:
 
         cash_changes = [cc.info for cc in new_cash_changes]
         cash_changes = pd.DataFrame(cash_changes).set_index('Date')
@@ -119,8 +146,7 @@ class QuestradeConnection(Questrade):
         duped = cash_changes.duplicated()
         return cash_changes.loc[duped]
 
-    def _remove_duplicated_transaction(self, new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
-                                       last_trade_date: datetime):
+    def _remove_duplicated_transaction(self, new_transactions: List[Transaction], ptf_transactions: pd.DataFrame, last_trade_date: datetime) -> List[Transaction]:
         duped = self._duplicated_transaction(new_transactions=new_transactions, ptf_transactions=ptf_transactions,
                                              last_trade_date=last_trade_date)
         transactions = []
@@ -134,19 +160,18 @@ class QuestradeConnection(Questrade):
         return transactions
 
     @staticmethod
-    def _duplicated_transaction(new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
-                                last_trade_date: datetime):
+    def _duplicated_transaction(new_transactions: List[Transaction], ptf_transactions: pd.DataFrame, last_trade_date: datetime) -> pd.DataFrame:
         transactions = pd.concat([trx.df for trx in new_transactions])
         transactions = pd.concat([transactions, ptf_transactions], axis=0).sort_index().loc[last_trade_date:]
         duped = transactions.duplicated()
         return transactions.loc[duped]
 
     @staticmethod
-    def _filter_cash_changes(transactions: list):
+    def _filter_cash_changes(transactions: list) -> List[dict]:
         return [trx for trx in transactions if trx.get("type") in ["Deposits", "Withdrawals"]]
 
     @staticmethod
-    def _make_cash_change(cash_change: dict):
+    def _make_cash_change(cash_change: dict) -> CashChange:
         date = dateutil.parser.isoparse(cash_change.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
                                                                               tzinfo=None)
         return CashChange(date=date,
@@ -154,8 +179,19 @@ class QuestradeConnection(Questrade):
                           amount=float(cash_change["netAmount"]))
 
     def _make_transaction(self, transaction) -> Union[Transaction, None]:
+        """
+        Makes Transaction object from dict containing transaction info.
+        :param transaction:
+        :return: Transaction object
+        """
+        # if not isinstance(transaction, dict):
+        #     raise ValueError("transaction must be a dict")
+
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
-            return transaction.get('type')
+            if transaction.get('type') in ["Deposits", "Withdrawals"]:
+                return
+            logger.logging.error(f"{transaction.get('type')} not supported. might be dividend tax")
+            return
 
         date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
                                                                               tzinfo=None)
@@ -168,7 +204,8 @@ class QuestradeConnection(Questrade):
         if not isinstance(ticker, float) and ticker:
             pos = Position(ticker=ticker, local_currency=currency)
         else:
-            return trx_type
+            logger.logging.error(f"{ticker} not supported")
+            return
 
         splits = pos.get_splits()
         split_factor = self._calc_split(splits=splits, trade_date=date)
@@ -183,16 +220,17 @@ class QuestradeConnection(Questrade):
 
         elif trx_type == 'Transfers':
             if transaction.get('quantity') == 0:
-                return trx_type
+                return
             price = self._transfer_cost(position=pos, date=date)
             trx_type = "Buy"
 
         else:
-            raise ValueError(f"error in transaction {date} {ticker}")
+            logger.logging.error(f"error in transaction {date} {ticker}")
+            return
 
         trx = Transaction(date=date,
                           ticker=ticker,
-                          type=trx_type,
+                          transaction_type=trx_type,
                           quantity=qty * split_factor,
                           price=price,
                           fees=fees,

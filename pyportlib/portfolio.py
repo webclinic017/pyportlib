@@ -151,9 +151,6 @@ class Portfolio:
                     & (self._transaction_manager.transactions.Type != 'Dividend')]
 
                 date_merge.loc[:, 'qty'] = trx[['Quantity']].reset_index().groupby('Date').sum()
-                #     date_merge.loc[:, 'qty'] += trx['Quantity']
-                # except ValueError:
-                #     date_merge.loc[:, 'qty'] =
 
                 pos_qty = self._make_qty_series(date_merge.loc[:, 'qty'])
                 position.quantities = pos_qty
@@ -300,8 +297,8 @@ class Portfolio:
         except KeyError:
             transactions = transactions.loc[transactions.index >= start_date]
 
-        pnl = self._pnl_dict_map(d=positions_to_compute, start_date=start_date, end_date=end_date,
-                                 transactions=transactions, fx=self._fx.rates)
+        pnl = self._pnl_pos_apply(d=positions_to_compute, start_date=start_date, end_date=end_date,
+                                  transactions=transactions, fx=self._fx.rates)
         return pnl
 
     def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False,
@@ -380,15 +377,15 @@ class Portfolio:
         return value < live_cash, new_cash
 
     @staticmethod
-    def _pnl_dict_map(d, start_date, end_date, transactions, fx: dict) -> pd.DataFrame:
+    def _pnl_pos_apply(d, start_date: datetime, end_date: datetime, transactions: pd.DataFrame, fx: dict) -> pd.DataFrame:
         """
-        Apply function to values of position dictionary and convert back to df
+        Apply pnl function to values of position dict and return portfolio pnl df
         :param d: positions dict
         :param start_date:
         :param end_date:
         :param transactions: transaction to take into account on the pnl
         :param fx: fx df
-        :return:
+        :return: pnl df
         """
 
         pnl = {k: v.daily_pnl(start_date, end_date, transactions.loc[transactions.Ticker == k], fx)['total'] for k, v in
