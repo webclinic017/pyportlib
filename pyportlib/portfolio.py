@@ -184,6 +184,10 @@ class Portfolio:
     def transactions(self) -> pd.DataFrame:
         return self._transaction_manager.transactions
 
+    @property
+    def cash_changes(self) -> pd.DataFrame:
+        return self._cash_account.cash_changes
+
     def cash_history(self):
         """
         computes cash account for every date

@@ -28,7 +28,7 @@ class QuestradeConnection(Questrade):
     def get_balances(self):
         return self.account_balances(self._get_account_id())
 
-    def get_transactions(self, start_date: datetime = None, end_date: datetime = None):
+    def get_transactions(self, start_date: datetime = None, end_date: datetime = None) -> List[dict]:
 
         if not end_date:
             end_date = datetime.now().replace(hour=0, minute=0, second=0,
@@ -46,12 +46,16 @@ class QuestradeConnection(Questrade):
 
         return list_of_trx
 
-    def get_cash_changes(self, start_date: datetime = None, end_date: datetime = None):
-        transactions = self.get_transactions(start_date, end_date)
-        cash = self._filter_cash_changes(transactions)
-        return cash
+    def to_cash_changes_list(self, transactions: List[dict]):
+        list_cc = []
+        cash_changes = self._filter_cash_changes(transactions)
+        for cc in cash_changes:
+            cc = self._make_cash_change(cc)
+            list_cc.append(cc)
 
-    def get_transactions_list(self, transactions) -> List[Transaction]:
+        return list_cc
+
+    def to_transactions_list(self, transactions: List[dict]) -> List[Transaction]:
         list_of_transactions = []
         for i in range(len(transactions)):
             trx = self._make_transaction(transactions[i])
@@ -73,21 +77,50 @@ class QuestradeConnection(Questrade):
                 logger.logging.error(f'no trades, specify start_date for transaction search (questrade_api)')
 
         transactions = self.get_transactions(start_date=last_trade)
-        list_of_cash_changes = self._filter_cash_changes(transactions)
-        list_of_transactions = self.get_transactions_list(transactions)
+        list_of_cash_changes = self.to_cash_changes_list(transactions)
+        list_of_transactions = self.to_transactions_list(transactions)
 
-        list_of_transactions = self.remove_duplicated_transaction(new_transactions=list_of_transactions,
-                                                                  ptf_transactions=portfolio.transactions,
-                                                                  last_trade_date=last_trade)
+        list_of_transactions = self._remove_duplicated_transaction(new_transactions=list_of_transactions,
+                                                                   ptf_transactions=portfolio.transactions,
+                                                                   last_trade_date=last_trade)
+
+        list_of_cash_changes = self._remove_duplicated_cash_change(new_cash_changes=list_of_cash_changes,
+                                                                   ptf_cash_changes=portfolio.cash_changes,
+                                                                   last_cash_change_date=last_trade)
         # FIXME make remove duplicated cash changes
         portfolio.add_cash_change(list_of_cash_changes)
         portfolio.add_transaction(list_of_transactions)
 
-    def remove_duplicated_transaction(self, new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
-                                      last_trade_date: datetime):
-        duped = self.duplicated_transaction(new_transactions=new_transactions,
-                                            ptf_transactions=ptf_transactions,
-                                            last_trade_date=last_trade_date)
+    def _remove_duplicated_cash_change(self, new_cash_changes: List[dict], ptf_cash_changes: pd.DataFrame,
+                                       last_cash_change_date: datetime) -> List[dict]:
+
+        duped = self._duplicated_cash_change(new_cash_changes, ptf_cash_changes, last_cash_change_date)
+
+        cash_changes = []
+        for cc in new_cash_changes:
+            df = pd.DataFrame([cc]).set_index('Date')
+            merge = df.merge(duped, indicator=True)
+            if merge.empty:
+                cash_changes.append(cc)
+            else:
+                pass
+
+        return cash_changes
+
+    @staticmethod
+    def _duplicated_cash_change(new_cash_changes: List[dict], ptf_cash_changes: pd.DataFrame,
+                                last_trade_date: datetime):
+
+        cash_changes = pd.DataFrame(new_cash_changes).set_index('Date')
+        cash_changes = pd.concat([cash_changes, ptf_cash_changes], axis=0).sort_index().loc[last_trade_date:]
+
+        duped = cash_changes.duplicated()
+        return cash_changes.loc[duped]
+
+    def _remove_duplicated_transaction(self, new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
+                                       last_trade_date: datetime):
+        duped = self._duplicated_transaction(new_transactions=new_transactions, ptf_transactions=ptf_transactions,
+                                             last_trade_date=last_trade_date)
         transactions = []
         for trx in new_transactions:
             merge = trx.df.merge(duped, indicator=True)
@@ -99,8 +132,8 @@ class QuestradeConnection(Questrade):
         return transactions
 
     @staticmethod
-    def duplicated_transaction(new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
-                               last_trade_date: datetime):
+    def _duplicated_transaction(new_transactions: List[Transaction], ptf_transactions: pd.DataFrame,
+                                last_trade_date: datetime):
         transactions = pd.concat([trx.df for trx in new_transactions])
         transactions = pd.concat([transactions, ptf_transactions], axis=0).sort_index().loc[last_trade_date:]
         duped = transactions.duplicated()
@@ -109,6 +142,14 @@ class QuestradeConnection(Questrade):
     @staticmethod
     def _filter_cash_changes(transactions: list):
         return [trx for trx in transactions if trx.get("type") in ["Deposits", "Withdrawals"]]
+
+    @staticmethod
+    def _make_cash_change(cash_change: dict):
+        date = dateutil.parser.isoparse(cash_change.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
+                                                                              tzinfo=None)
+        return {"Date": date,
+                "Direction": cash_change["type"][:-1].title(),
+                "Amount": float(cash_change["netAmount"])}
 
     def _make_transaction(self, transaction) -> Union[Transaction, None]:
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:

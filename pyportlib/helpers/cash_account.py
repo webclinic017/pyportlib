@@ -1,7 +1,5 @@
 from datetime import datetime
 from typing import List, Union
-
-import dateutil.parser
 import pandas as pd
 from ..utils import df_utils, files_utils
 from ..utils import logger
@@ -10,7 +8,7 @@ from ..utils import logger
 class CashAccount:
     NAME = "Cash Account"
     ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
-    CASH_INFO = ['Date', 'Type', 'Amount']
+    CASH_INFO = ['Date', 'Direction', 'Amount']
     CASH_FILENAME = "cash.csv"
 
     def __init__(self, account):
@@ -57,11 +55,12 @@ class CashAccount:
         c_ch = self.get_cash_changes()
         return c_ch.loc[self.get_cash_changes().index <= date, 'Amount'].sum()
 
-    def _add(self, date: datetime, direction: str, amount: float):
-        if direction not in ['deposit', 'withdrawal']:
+    def _write(self, date: datetime, direction: str, amount: float):
+        direction = direction.title()
+        if direction not in ['Deposit', 'Withdrawal']:
             raise Exception(f'cash direction type not supported {direction}')
 
-        self.cash_changes.loc[date, "Type"] = direction
+        self.cash_changes.loc[date, "Direction"] = direction
         self.cash_changes.loc[date, "Amount"] = amount
 
         self.cash_changes.to_csv(f"{self.directory}/{self.CASH_FILENAME}")
@@ -73,8 +72,8 @@ class CashAccount:
                 cash_changes = [cash_changes]
 
             for cc in cash_changes:
-                change = self._clean(cc)
-                self._add(date=change["date"], direction=change['direction'], amount=change['amount'])
+                change = self._check(cc)
+                self._write(date=change["Date"], direction=change['Direction'], amount=change['Amount'])
 
     def reset(self):
         empty_cash = self._empty_cash()
@@ -85,18 +84,9 @@ class CashAccount:
         return pd.DataFrame(columns=self.CASH_INFO).set_index('Date')
 
     @staticmethod
-    def _clean(cash_change: dict):
-        if cash_change.get("tradeDate"):
-            assert cash_change["type"] in ["Deposits", "Withdrawals"]
-            assert cash_change["netAmount"]
+    def _check(cash_change: dict):
+        assert isinstance(cash_change.get("Date"), datetime)
+        assert cash_change["Direction"] in ["Deposit", "Withdrawal"]
+        assert isinstance(cash_change["Amount"], float)
 
-            date = dateutil.parser.isoparse(cash_change.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
-            return {"date": date,
-                    "direction": cash_change["type"][:-1].lower(),
-                    "amount": float(cash_change["netAmount"])}
-        else:
-            assert isinstance(cash_change.get("date"), datetime)
-            assert cash_change["direction"] in ["deposit", "withdrawal"]
-            assert isinstance(cash_change["amount"], float)
-
-            return cash_change
+        return cash_change
