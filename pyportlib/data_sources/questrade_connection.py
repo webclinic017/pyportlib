@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Union, List
 import pandas as pd
-from pandas._libs.tslibs.offsets import BDay
 from pyportlib.helpers.cash_change import CashChange
 from ..utils import logger, config_utils
 from .questrade_api.questrade import Questrade
@@ -259,7 +258,7 @@ class QuestradeConnection(Questrade):
             price = position.prices.loc[date]
         except KeyError:
             try:
-                date = date + BDay(2)
+                date = date + dates_utils.bday(2)
                 price = position.prices.loc[date]
             except KeyError:
                 price = 0
