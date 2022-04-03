@@ -42,7 +42,7 @@ class Portfolio:
 
     def load_data(self) -> None:
         """
-        loads Portfolio object with current available data, mostly used to update some attributes
+        Loads Portfolio object with current available data, mostly used to update some attributes
         dependent on other objects or computations
         :return: None
         """
@@ -59,7 +59,7 @@ class Portfolio:
 
     def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
-        updates all of the market data of the portfolio (prices, fx)
+        Updates all of the market data of the portfolio (prices, fx)
         :return:
         """
         self._update_positions(fundamentals_and_dividends=fundamentals_and_dividends)
@@ -117,7 +117,7 @@ class Portfolio:
 
     def _load_positions(self, ) -> None:
         """
-        based on transaction data, loads all of the active and closed positions
+        Based on on the transaction data, loads all of the active and closed positions
         :return: None
         """
         self._positions = {}
@@ -138,7 +138,7 @@ class Portfolio:
 
     def _load_position_quantities(self) -> None:
         """
-        based on transaction data, loads all of the active and closed positions
+        Based on the transaction data, loads all of the active and closed positions
         :return: None
         """
         if len(self._positions):
@@ -163,7 +163,7 @@ class Portfolio:
 
     def add_transaction(self, transactions: Union[Transaction, List[Transaction]]) -> None:
         """
-        add transactions to portfolio
+        Add transactions to portfolio
         :param transactions: pyportlib transaction object, single or list
         :return: None
         """
