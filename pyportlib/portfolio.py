@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import Union, List, Dict
+
+from .helpers.cash_change import CashChange
 from .position import Position
 from .helpers.cash_account import CashAccount
 from .data_sources.data_reader import DataReader
@@ -198,7 +200,7 @@ class Portfolio:
         cash_c = pd.Series(data=cash, index=dates)
         return cash_c
 
-    def add_cash_change(self, cash_changes: Union[List[dict], dict]) -> None:
+    def add_cash_change(self, cash_changes: Union[List[CashChange], CashChange]) -> None:
         """
         add a cash deposit or withdrawal from the account
         dict need to include {date: datetime,

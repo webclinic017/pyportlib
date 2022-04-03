@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Union
 import pandas as pd
+
+from .cash_change import CashChange
 from ..utils import df_utils, files_utils
 from ..utils import logger
 
@@ -66,14 +68,14 @@ class CashAccount:
         self.cash_changes.to_csv(f"{self.directory}/{self.CASH_FILENAME}")
         self.load()
 
-    def add(self, cash_changes: Union[List[dict], dict]):
+    def add(self, cash_changes: Union[List[CashChange], CashChange]):
         if cash_changes:
             if not hasattr(cash_changes, '__iter__'):
                 cash_changes = [cash_changes]
 
             for cc in cash_changes:
-                change = self._check(cc)
-                self._write(date=change["Date"], direction=change['Direction'], amount=change['Amount'])
+                cc = cc.info
+                self._write(date=cc["Date"], direction=cc['Direction'], amount=cc['Amount'])
 
     def reset(self):
         empty_cash = self._empty_cash()
@@ -83,10 +85,3 @@ class CashAccount:
     def _empty_cash(self):
         return pd.DataFrame(columns=self.CASH_INFO).set_index('Date')
 
-    @staticmethod
-    def _check(cash_change: dict):
-        assert isinstance(cash_change.get("Date"), datetime)
-        assert cash_change["Direction"] in ["Deposit", "Withdrawal"]
-        assert isinstance(cash_change["Amount"], float)
-
-        return cash_change

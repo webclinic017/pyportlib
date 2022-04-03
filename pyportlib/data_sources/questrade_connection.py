@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Union, List
 import pandas as pd
 from pandas._libs.tslibs.offsets import BDay
+
+from pyportlib.helpers.cash_change import CashChange
 from ..utils import logger
 from .questrade_api.questrade import Questrade
 import dateutil.parser
@@ -90,14 +92,14 @@ class QuestradeConnection(Questrade):
         portfolio.add_cash_change(list_of_cash_changes)
         portfolio.add_transaction(list_of_transactions)
 
-    def _remove_duplicated_cash_change(self, new_cash_changes: List[dict], ptf_cash_changes: pd.DataFrame,
-                                       last_cash_change_date: datetime) -> List[dict]:
+    def _remove_duplicated_cash_change(self, new_cash_changes: List[CashChange], ptf_cash_changes: pd.DataFrame,
+                                       last_cash_change_date: datetime) -> List[CashChange]:
 
         duped = self._duplicated_cash_change(new_cash_changes, ptf_cash_changes, last_cash_change_date)
 
         cash_changes = []
         for cc in new_cash_changes:
-            df = pd.DataFrame([cc]).set_index('Date')
+            df = pd.DataFrame([cc.info]).set_index('Date')
             merge = df.merge(duped, indicator=True)
             if merge.empty:
                 cash_changes.append(cc)
@@ -107,10 +109,11 @@ class QuestradeConnection(Questrade):
         return cash_changes
 
     @staticmethod
-    def _duplicated_cash_change(new_cash_changes: List[dict], ptf_cash_changes: pd.DataFrame,
+    def _duplicated_cash_change(new_cash_changes: List[CashChange], ptf_cash_changes: pd.DataFrame,
                                 last_trade_date: datetime):
 
-        cash_changes = pd.DataFrame(new_cash_changes).set_index('Date')
+        cash_changes = [cc.info for cc in new_cash_changes]
+        cash_changes = pd.DataFrame(cash_changes).set_index('Date')
         cash_changes = pd.concat([cash_changes, ptf_cash_changes], axis=0).sort_index().loc[last_trade_date:]
 
         duped = cash_changes.duplicated()
@@ -146,9 +149,9 @@ class QuestradeConnection(Questrade):
     def _make_cash_change(cash_change: dict):
         date = dateutil.parser.isoparse(cash_change.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
                                                                               tzinfo=None)
-        return {"Date": date,
-                "Direction": cash_change["type"][:-1].title(),
-                "Amount": float(cash_change["netAmount"])}
+        return CashChange(date=date,
+                          direction=cash_change["type"][:-1].title(),
+                          amount=float(cash_change["netAmount"]))
 
     def _make_transaction(self, transaction) -> Union[Transaction, None]:
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
