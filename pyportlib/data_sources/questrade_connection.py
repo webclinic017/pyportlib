@@ -138,9 +138,11 @@ class QuestradeConnection(Questrade):
     def _duplicated_cash_change(new_cash_changes: List[CashChange], ptf_cash_changes: pd.DataFrame, last_trade_date: datetime) -> pd.DataFrame:
 
         cash_changes = [cc.info for cc in new_cash_changes]
-        cash_changes = pd.DataFrame(cash_changes).set_index('Date')
-        cash_changes = pd.concat([cash_changes, ptf_cash_changes], axis=0).sort_index().loc[last_trade_date:]
-
+        try:
+            cash_changes = pd.DataFrame(cash_changes).set_index('Date')
+            cash_changes = pd.concat([cash_changes, ptf_cash_changes], axis=0).sort_index().loc[last_trade_date:]
+        except KeyError:
+            cash_changes = pd.DataFrame()
         duped = cash_changes.duplicated()
         return cash_changes.loc[duped]
 
