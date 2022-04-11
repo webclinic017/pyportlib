@@ -232,7 +232,7 @@ class Portfolio:
         trx = trx.loc[trx.index <= date]
         trx_values = trx.Quantity * trx.Price
         trx = pd.concat([trx, trx_values], axis=1)
-
+        # FIXME cash is always using the fx from date and not historic
         trx_currencies = set(trx.Currency)
         for curr in trx_currencies:
             try:
