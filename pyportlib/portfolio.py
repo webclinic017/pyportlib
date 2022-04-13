@@ -236,7 +236,8 @@ class Portfolio:
         trx_currencies = set(trx.Currency)
         for curr in trx_currencies:
             try:
-                live_fx = self._fx.get(f'{curr}{self.currency}').loc[date]
+                live_fx = self._fx.get(f'{curr}{self.currency}').loc[set(trx.index)]
+
             except KeyError:
                 live_fx = self._fx.get(f'{curr}{self.currency}').loc[date - dates_utils.bday(1)]
             except Exception:
