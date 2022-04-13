@@ -44,7 +44,7 @@ def date_window(lookback: str = "1y", date: datetime = None):
 def last_bday():
     last = datetime.today()
     if last.isoweekday() in range(1, 6):
-        return last
+        return last.replace(hour=0, minute=0, second=0, microsecond=0)
     else:
         shift = timedelta(max(1, (last.weekday() + 6) % 7 - 3))
         return (last - shift).replace(hour=0, minute=0, second=0, microsecond=0)

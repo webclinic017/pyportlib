@@ -3,6 +3,7 @@ import pandas as pd
 import quantstats as qs
 from scipy.stats import norm
 from ..utils import ts
+from ..utils import logger
 
 
 def snapshot(pos, date: datetime = None, lookback: str = '1y', **kwargs):
@@ -46,6 +47,9 @@ def returns(pos, date: datetime = None, lookback: str = '1y', log: bool = False,
     if kwargs.get("include_cash"):
         del kwargs['include_cash']
     if not log:
+        if rets.empty:
+            logger.logging.error(f"{pos.ticker} prices missing")
+            return
         qs.plots.returns(rets, prepare_returns=False, **kwargs)
     elif log:
         qs.plots.log_returns(rets, prepare_returns=False, **kwargs)
