@@ -22,4 +22,4 @@ Update your portfolio with the questrade connection. Retreive account informatio
 Examples showing how to use are coming.
 
 ## Other
-Package also offers utility functions useful for any research workflow such as dates, calendar management and rolling date ranges.
+Package also offers utility functions useful for any quantitative/analytics research workflow such as indices symbols, calendar management and rolling date ranges.
