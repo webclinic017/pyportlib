@@ -4,7 +4,8 @@ import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
 from pandas._libs.tslibs.offsets import BDay
 from pyportlib.utils import logger
-
+import warnings
+warnings.filterwarnings('ignore')
 
 def get_market_days(start: datetime, end: datetime = None, market: str = None) -> List[datetime]:
     if market is None:
@@ -41,13 +42,20 @@ def date_window(lookback: str = "1y", date: datetime = None):
     return date
 
 
-def last_bday():
-    last = datetime.today()
-    if last.isoweekday() in range(1, 6):
-        return last.replace(hour=0, minute=0, second=0, microsecond=0)
+def last_bday(as_of: datetime = None):
+    if as_of is None:
+        as_of = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    if as_of.isoweekday() in range(1, 6):
+        last_bd = as_of
     else:
-        shift = timedelta(max(1, (last.weekday() + 6) % 7 - 3))
-        return (last - shift).replace(hour=0, minute=0, second=0, microsecond=0)
+        shift = timedelta(max(1, (as_of.weekday() + 6) % 7 - 3))
+        last_bd = (as_of - shift).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # check if holiday
+    check = get_market_days(start=last_bd, end=last_bd)
+    if not check:
+        return (last_bd - bday(1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    return last_bd
 
 
 def bday(n):

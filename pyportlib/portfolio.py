@@ -231,17 +231,20 @@ class Portfolio:
         trx = self.transactions
         trx = trx.loc[trx.index <= date]
         trx_values = trx.Quantity * trx.Price
-        trx = pd.concat([trx, trx_values], axis=1)
+        trx = pd.concat([trx, trx_values], axis=1).sort_index()
         # FIXME cash is always using the fx from date and not historic
         trx_currencies = set(trx.Currency)
         for curr in trx_currencies:
+            trx_idx = trx.loc[trx.Currency == curr, 0].index
             try:
-                live_fx = self._fx.get(f'{curr}{self.currency}').loc[date]
+                live_fx = self._fx.get(f'{curr}{self.currency}').reindex(trx_idx, method='ffill')
             except KeyError:
-                live_fx = self._fx.get(f'{curr}{self.currency}').loc[date - dates_utils.bday(1)]
+                raise KeyError("1")
+                # live_fx = self._fx.get(f'{curr}{self.currency}').loc[date - dates_utils.bday(1)]
             except Exception:
                 raise KeyError("fx data unavailable on trx date")
             trx.loc[trx.Currency == curr, 0] *= live_fx
+
         values = trx[0].sum() * -1
 
         fees = trx.Fees.sum()
@@ -286,9 +289,7 @@ class Portfolio:
         :return:
         """
         if end_date is None:
-            last = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
-            end_date = last
-            # end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
         if start_date is None:
             start_date = end_date
 
@@ -318,7 +319,7 @@ class Portfolio:
         :return:
         """
         if end_date is None:
-            end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
         if start_date is None:
             start_date = end_date
 
