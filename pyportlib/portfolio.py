@@ -3,7 +3,7 @@ from typing import Union, List, Dict
 
 from .helpers.cash_change import CashChange
 from .position import Position
-from .helpers.cash_account import CashAccount
+from .helpers.cash_manager import CashManager
 from .data_sources.data_reader import DataReader
 from .helpers.fx_rates import FxRates
 from .helpers.transaction import Transaction
@@ -23,7 +23,7 @@ class Portfolio:
         self._cash_history = pd.Series()
 
         # helpers
-        self._cash_account = CashAccount(account=self.account)
+        self._cash_manager = CashManager(account=self.account)
         self._datareader = DataReader()
         self._transaction_manager = TransactionManager(account=self.account)
         self._fx = FxRates(ptf_currency=currency, currencies=self._transaction_manager.get_currencies())
@@ -49,7 +49,7 @@ class Portfolio:
         self.start_date = self._transaction_manager.first_trx()
         self._fx.set_pairs(pairs=[f"{curr}{self.currency}" for curr in self._transaction_manager.get_currencies()])
 
-        self._cash_account.load()
+        self._cash_manager.load()
         self._transaction_manager.load()
         self._load_positions()
         self._load_position_quantities()
@@ -187,7 +187,7 @@ class Portfolio:
 
     @property
     def cash_changes(self) -> pd.DataFrame:
-        return self._cash_account.cash_changes
+        return self._cash_manager.cash_changes
 
     @property
     def cash_history(self):
@@ -212,7 +212,7 @@ class Portfolio:
         :return: None
         """
         if cash_changes:
-            self._cash_account.add(cash_changes)
+            self._cash_manager.add(cash_changes)
             logger.logging.info(f'cash change for {self.account} have been added')
             self.load_data()
             self._load_cash_history()
@@ -226,7 +226,7 @@ class Portfolio:
         if date is None:
             date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
 
-        changes = self._cash_account.get_cash_change(date)
+        changes = self._cash_manager.get_cash_change(date)
 
         trx = self.transactions
         trx = trx.loc[trx.index <= date]
@@ -339,7 +339,7 @@ class Portfolio:
         :return: None
         """
         self._transaction_manager.reset()
-        self._cash_account.reset()
+        self._cash_manager.reset()
         self._fx.reset()
         self.load_data()
 

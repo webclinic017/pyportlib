@@ -92,7 +92,7 @@ class QuestradeConnection(Questrade):
 
     def update_transactions(self, portfolio: Portfolio, start_date: datetime = None) -> None:
         """
-        Updates a pyportlib Portfolio transactions and cash changes and saves Portfolio
+        Updates a pyportlib Portfolio transactions and cash changes and saves the Portfolio
         :param portfolio: Portfolio
         :param start_date: Date to start transactions search in connected account
         :return: None
@@ -190,7 +190,7 @@ class QuestradeConnection(Questrade):
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
             if transaction.get('type') in ["Deposits", "Withdrawals"]:
                 return
-            logger.logging.error(f"{transaction.get('type')} not supported. might be dividend tax")
+            logger.logging.error(f"{transaction.get('type')} not supported. 'other' might be dividend withrawal tax")
             return
 
         date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
