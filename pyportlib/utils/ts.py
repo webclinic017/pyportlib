@@ -9,7 +9,7 @@ def prep_returns(pos, lookback: str, date: datetime = None, **kwargs) -> pd.Seri
         start_date = dates_utils.date_window(date=date, lookback=lookback)
     else:
         start_date = dates_utils.date_window(lookback=lookback)
-        date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        date = dates_utils.last_bday()
 
     try:
         ts_type = pos.name

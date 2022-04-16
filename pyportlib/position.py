@@ -120,7 +120,7 @@ class Position(object):
         """
 
         if end_date is None:
-            end_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = dates_utils.last_bday()
         if start_date is None:
             start_date = end_date
 
