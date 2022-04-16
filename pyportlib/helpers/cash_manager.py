@@ -7,7 +7,7 @@ from ..utils import df_utils, files_utils
 from ..utils import logger
 
 
-class CashAccount:
+class CashManager:
     NAME = "Cash Account"
     ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
     CASH_INFO = ['Date', 'Direction', 'Amount']
