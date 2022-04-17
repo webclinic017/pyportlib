@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 
-from ..utils import files_utils
+from ..utils import files_utils, dates_utils
 
 
 class BaseDataConnection:
@@ -57,7 +57,8 @@ class BaseDataConnection:
         Portfolio currency is 1
         :return:
         """
-        dates = pd.date_range(start=datetime(2000, 1, 1), end=datetime.today())
+        end = dates_utils.last_bday()
+        dates = pd.date_range(start=datetime(2000, 1, 1), end=end)
         data = [1 for _ in range(len(dates))]
         return pd.DataFrame(data=data, index=pd.Index(name='Date', data=dates), columns=['Close'])
 

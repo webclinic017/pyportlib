@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 
-from .data_sources.data_reader import DataReader
+from pyportlib.services.data_reader import DataReader
 from .utils import logger, dates_utils
 from .utils.time_series import TimeSeriesInterface
 

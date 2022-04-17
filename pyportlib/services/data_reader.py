@@ -1,10 +1,9 @@
 from datetime import datetime
 import pandas as pd
 
-from .base_data_connection import BaseDataConnection
+from ..data_sources.base_data_connection import BaseDataConnection
 from ..utils import logger, files_utils, config_utils
 from ..data_sources.yahoo_connection import YahooConnection
-from ..services.transaction_manager import TransactionManager
 
 
 class DataReader:
@@ -152,13 +151,11 @@ class DataReader:
         """
         return self._market_data_source.get_splits(ticker=ticker)
 
-    def last_data_point(self, account: str, ptf_currency: str = 'CAD') -> datetime:
+    def last_data_point(self, ptf_currency: str = 'CAD') -> datetime:
         """
         Find last data point fetched in locally saved files.
-        :param account: Portofolio account name
         :param ptf_currency: portfolio currency
         :return:
         """
         last_data = self.read_fx(f'{ptf_currency}{ptf_currency}').sort_index().index[-1]
-        last_trade = TransactionManager(account=account).transactions.index.max()
-        return max(last_data, last_trade)
+        return last_data

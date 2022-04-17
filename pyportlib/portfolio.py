@@ -5,7 +5,7 @@ import pandas as pd
 from .services.cash_change import CashChange
 from .position import Position
 from .services.cash_manager import CashManager
-from .data_sources.data_reader import DataReader
+from .services.data_reader import DataReader
 from .services.fx_rates import FxRates
 from .services.transaction import Transaction
 from .services.transaction_manager import TransactionManager
