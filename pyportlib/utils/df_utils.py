@@ -1,7 +1,5 @@
 from typing import List
 
-import pandas as pd
-
 
 def check_df_columns(df, columns: List[str]) -> bool:
     """
