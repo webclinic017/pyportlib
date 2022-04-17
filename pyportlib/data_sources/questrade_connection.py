@@ -245,7 +245,7 @@ class QuestradeConnection(Questrade):
                 splits = splits.loc[trade_date:].cumprod()
                 try:
                     split_factor = splits.iloc[-1]
-                except Exception:
+                except KeyError:
                     split_factor = 1
             else:
                 split_factor = 1
