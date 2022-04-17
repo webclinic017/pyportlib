@@ -8,7 +8,6 @@ and analytics.
 """
 
 from setuptools import setup, find_packages
-# from codecs import open
 import io
 from os import path
 
@@ -28,11 +27,11 @@ with io.open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
     requirements = [line.rstrip() for line in f]
 
 setup(
-    name='Portofolio',
+    name='pyportlib',
     version=version,
     description='Streamlines backtesting and portfolio performance tracking with one tool',
     long_description=long_description,
-    url='https://github.com/phil-lo/PortoFolio',
+    url='https://github.com/phil-lo/pyportlib',
     author='Philippe Lacroix-Ouellette',
     author_email='philippe.lacroix.ouellette@gmail.com.com',
     license='MIT License',

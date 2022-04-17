@@ -1,7 +1,3 @@
-/client_data/
-/config/
 /portfolio_reporting/
-/questrade_api/
-/simfin/
 /examples/ptf_summary.ipynb
-/old/
+/testing.py

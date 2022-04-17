@@ -1,13 +1,13 @@
 from datetime import datetime
 from typing import Union, List, Dict
 
-from .helpers.cash_change import CashChange
+from .services.cash_change import CashChange
 from .position import Position
-from .helpers.cash_manager import CashManager
+from .services.cash_manager import CashManager
 from .data_sources.data_reader import DataReader
-from .helpers.fx_rates import FxRates
-from .helpers.transaction import Transaction
-from .helpers.transaction_manager import TransactionManager
+from .services.fx_rates import FxRates
+from .services.transaction import Transaction
+from .services.transaction_manager import TransactionManager
 from .utils import dates_utils, logger, ts
 import pandas as pd
 
@@ -22,7 +22,7 @@ class Portfolio:
         self._market_value = pd.Series()
         self._cash_history = pd.Series()
 
-        # helpers
+        # services
         self._cash_manager = CashManager(account=self.account)
         self._datareader = DataReader()
         self._transaction_manager = TransactionManager(account=self.account)
