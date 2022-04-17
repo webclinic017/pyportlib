@@ -1,9 +1,10 @@
 from datetime import datetime
+import pandas as pd
+
 from .base_data_connection import BaseDataConnection
 from ..utils import logger, files_utils, config_utils
 from ..data_sources.yahoo_connection import YahooConnection
 from ..services.transaction_manager import TransactionManager
-import pandas as pd
 
 
 class DataReader:

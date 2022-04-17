@@ -1,6 +1,7 @@
 from typing import Union
 import pandas as pd
 import quantstats as qs
+
 from ..portfolio import Portfolio
 from ..data_sources.data_reader import DataReader
 from ..utils import files_utils

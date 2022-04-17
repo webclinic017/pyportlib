@@ -1,7 +1,9 @@
 from typing import List
+import pandas as pd
+
 from ..services.transaction import Transaction
 from ..utils import logger, df_utils, files_utils
-import pandas as pd
+
 
 
 class TransactionManager:

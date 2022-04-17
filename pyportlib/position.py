@@ -1,8 +1,9 @@
 from datetime import datetime
-from .data_sources.data_reader import DataReader
 import pandas as pd
+
+from .data_sources.data_reader import DataReader
 from .utils import logger, dates_utils
-from .utils.time_series_interface import TimeSeriesInterface
+from .utils.time_series import TimeSeriesInterface
 
 
 class Position(TimeSeriesInterface):

@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import Union, List
 import pandas as pd
-from pyportlib.services.cash_change import CashChange
+import dateutil.parser
+
+from ..services.cash_change import CashChange
 from ..utils import logger, config_utils
 from .questrade_api.questrade import Questrade
-import dateutil.parser
 from ..services.transaction import Transaction
 from ..portfolio import Portfolio
 from ..position import Position

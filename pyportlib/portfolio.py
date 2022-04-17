@@ -9,8 +9,8 @@ from .data_sources.data_reader import DataReader
 from .services.fx_rates import FxRates
 from .services.transaction import Transaction
 from .services.transaction_manager import TransactionManager
-from .utils import dates_utils, logger, time_series_interface
-from .utils.time_series_interface import TimeSeriesInterface
+from .utils import dates_utils, logger, time_series
+from .utils.time_series import TimeSeriesInterface
 
 
 class Portfolio(TimeSeriesInterface):
@@ -382,7 +382,7 @@ class Portfolio(TimeSeriesInterface):
         if lookback is None:
             lookback = "1y"
         open_positions = self.open_positions(date)
-        prices = {k: time_series_interface.prep_returns(v, lookback=lookback, date=date) for k, v in open_positions.items()}
+        prices = {k: time_series.prep_returns(v, lookback=lookback, date=date) for k, v in open_positions.items()}
         return pd.DataFrame(prices).fillna(0)
 
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):

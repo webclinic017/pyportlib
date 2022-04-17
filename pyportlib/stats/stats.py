@@ -4,30 +4,31 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 import quantstats as qs
-from ..utils import time_series_interface
+
+from ..utils import time_series
 
 
 def skew(pos, lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     return returns.skew()
 
 
 def kurtosis(pos, lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     return returns.kurtosis()
 
 
 def beta(pos, benchmark, lookback: str,
          date: datetime = None, **kwargs) -> float:
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = time_series_interface.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
     return round(matrix[0, 1] / matrix[1, 1], 2)
 
 
 def alpha(pos, benchmark, lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = time_series_interface.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
     matrix = np.cov(returns, benchmark)
     bet = matrix[0, 1] / matrix[1, 1]
     alph = returns.mean() - (bet * benchmark.mean())
@@ -35,8 +36,8 @@ def alpha(pos, benchmark, lookback: str, date: datetime = None, **kwargs) -> flo
 
 
 def rolling_alpha(pos, benchmark, lookback: str, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = time_series_interface.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
     df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
 
     corr = df.rolling(int(rolling_period)).corr().unstack()['returns']['benchmark']
@@ -48,12 +49,12 @@ def rolling_alpha(pos, benchmark, lookback: str, date: datetime = None, rolling_
 
 
 def annualized_volatility(pos, lookback: str, date: datetime = None, **kwargs) -> float:
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     return qs.stats.volatility(returns=returns, prepare_returns=False, annualize=True)
 
 
 def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, method: str = "gaussian", **kwargs) -> float:
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     if method == "gaussian":
         var = qs.stats.value_at_risk(returns=returns, confidence=quantile, prepare_returns=False)
         return abs(var)
@@ -64,7 +65,7 @@ def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, meth
 
 
 def rolling_var(pos, lookback: str, date: datetime = None, rolling_period: int = 252, quantile=0.95, **kwargs):
-    returns = time_series_interface.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     mean = returns.rolling(rolling_period).mean()
     var = returns.rolling(rolling_period).std()
     stat = norm.ppf(1-quantile, mean, var)

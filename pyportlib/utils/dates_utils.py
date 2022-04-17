@@ -3,8 +3,10 @@ from typing import List
 import pandas_market_calendars as mcal
 from dateutil.relativedelta import relativedelta
 from pandas._libs.tslibs.offsets import BDay
-from pyportlib.utils import logger
 import warnings
+
+from ..utils import logger
+
 warnings.filterwarnings('ignore')
 
 
