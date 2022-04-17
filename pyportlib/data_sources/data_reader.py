@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from .base_data_connection import BaseDataConnection
 from ..utils import logger, files_utils, config_utils
 from ..data_sources.yahoo_connection import YahooConnection
 from ..helpers.transaction_manager import TransactionManager
@@ -9,8 +11,8 @@ class DataReader(object):
     NAME = 'Data Reader'
 
     def __init__(self):
-        _prices_data_source = None
-        _statements_data_source = None
+        _prices_data_source: BaseDataConnection
+        _statements_data_source: BaseDataConnection
         self._set_sources()
 
     def __repr__(self):
@@ -40,8 +42,8 @@ class DataReader(object):
         :param ticker: stock ticker
         :return:
         """
-        directory = self._market_data_source.PRICES_DIRECTORY
-        filename = f"{self._market_data_source.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_prices.csv"
+        directory = self._market_data_source.prices_dir
+        filename = f"{self._market_data_source.file_prefix}_{ticker.replace('.TO', '_TO')}_prices.csv"
 
         if files_utils.check_file(directory=directory,
                                   file=filename):
@@ -61,8 +63,8 @@ class DataReader(object):
         :param currency_pair: fx pair ex. USDCAD or CADUSD
         :return:
         """
-        directory = self._market_data_source.FX_DIRECTORY
-        filename = f"{self._market_data_source.FILE_PREFIX}_{currency_pair}_fx.csv"
+        directory = self._market_data_source.fx_dir
+        filename = f"{self._market_data_source.file_prefix}_{currency_pair}_fx.csv"
 
         if files_utils.check_file(directory=directory,
                                   file=filename):
@@ -86,8 +88,8 @@ class DataReader(object):
         implemented = {'balance_sheet', 'cash_flow', 'income_statement'}
         if statement_type not in implemented:
             raise ValueError(f'enter valid statement type: {implemented}')
-        directory = self._market_data_source.STATEMENT_DIRECTORY
-        filename = f"{self._market_data_source.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_{statement_type}.csv"
+        directory = self._market_data_source.statement_dir
+        filename = f"{self._market_data_source.file_prefix}_{ticker.replace('.TO', '_TO')}_{statement_type}.csv"
 
         if files_utils.check_file(directory=directory, file=filename):
             df = pd.read_csv(f"{directory}/{filename}").set_index("Breakdown")
@@ -104,8 +106,8 @@ class DataReader(object):
         :param ticker:
         :return:
         """
-        directory = self._market_data_source.STATEMENT_DIRECTORY
-        filename = f"{self._market_data_source.FILE_PREFIX}_{ticker}_dividends.csv"
+        directory = self._market_data_source.statement_dir
+        filename = f"{self._market_data_source.file_prefix}_{ticker}_dividends.csv"
 
         if files_utils.check_file(directory=directory, file=filename):
             df = pd.read_csv(f"{directory}/{filename}")

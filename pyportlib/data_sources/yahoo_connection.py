@@ -1,30 +1,35 @@
-from datetime import datetime
 import pandas as pd
-from ..utils import logger, files_utils
+from .base_data_connection import BaseDataConnection
+from ..utils import logger
 from pandas_datareader import data as pdr
 import yfinance as yfin
 import yahoo_fin.stock_info as yf
 
 
-class YahooConnection(object):
-    DATA_DIRECTORY = files_utils.get_data_dir()
-    STATEMENT_DIRECTORY = files_utils.get_statements_data_dir()
-    PRICES_DIRECTORY = files_utils.get_price_data_dir()
-    FX_DIRECTORY = files_utils.get_fx_data_dir()
-    FILE_PREFIX = 'yfin'
-    NAME = 'Yahoo'
-    URL = ''
+class YahooConnection(BaseDataConnection):
+    _FILE_PREFIX = 'yfin'
+    _NAME = 'Yahoo'
+    _URL = ''
     yfin.pdr_override()
 
     def __init__(self):
-        pass
+        super().__init__()
 
     def __repr__(self):
-        return f"{self.NAME} API Connection"
+        return f"{self._NAME} API Connection"
+
+    @property
+    def file_prefix(self):
+        return self._FILE_PREFIX
 
     def get_prices(self, ticker: str) -> None:
-        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_prices.csv"
-        directory = self.PRICES_DIRECTORY
+        """
+        Retreives ticker price data and saves .csv file in correct directory
+        :param ticker:
+        :return:
+        """
+        filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_prices.csv"
+        directory = self.prices_dir
         ticker = self._convert_ticker(ticker)
         try:
             data = pdr.get_data_yahoo(ticker, progress=False)
@@ -41,8 +46,13 @@ class YahooConnection(object):
         logger.logging.debug(f"{ticker} loaded from yfinance api")
 
     def get_fx(self, currency_pair: str) -> None:
-        filename = f"{self.FILE_PREFIX}_{currency_pair}_fx.csv"
-        directory = self.FX_DIRECTORY
+        """
+        Retreives currency pair price data and saves .csv file in correct directory
+        :param currency_pair:
+        :return:
+        """
+        filename = f"{self.file_prefix}_{currency_pair}_fx.csv"
+        directory = self.fx_dir
 
         if currency_pair[:3] == currency_pair[-3:]:
             data = self._make_ptf_currency_df()
@@ -54,8 +64,13 @@ class YahooConnection(object):
         logger.logging.debug(f"{currency_pair} loaded from yfinance api")
 
     def get_balance_sheet(self, ticker: str):
-        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_balance_sheet.csv"
-        directory = self.STATEMENT_DIRECTORY
+        """
+        Retreives balance sheet data and saves .csv file in correct directory
+        :param ticker:
+        :return:
+        """
+        filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_balance_sheet.csv"
+        directory = self.statement_dir
         ticker = self._convert_ticker(ticker)
         try:
             bs = yf.get_balance_sheet(ticker)
@@ -65,8 +80,13 @@ class YahooConnection(object):
         logger.logging.debug(f"{ticker} balance_sheet loaded from yfinance api")
 
     def get_cash_flow(self, ticker: str):
-        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_cash_flow.csv"
-        directory = self.STATEMENT_DIRECTORY
+        """
+        Retreives cash flow data and saves .csv file in correct directory
+        :param ticker:
+        :return:
+        """
+        filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_cash_flow.csv"
+        directory = self.statement_dir
         ticker = self._convert_ticker(ticker)
 
         try:
@@ -77,8 +97,13 @@ class YahooConnection(object):
         logger.logging.debug(f"{ticker} cash flow loaded from yfinance api")
 
     def get_income_statement(self, ticker: str):
-        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_income_statement.csv"
-        directory = self.STATEMENT_DIRECTORY
+        """
+        Retreives income statement data and saves .csv file in correct directory
+        :param ticker:
+        :return:
+        """
+        filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_income_statement.csv"
+        directory = self.statement_dir
         ticker = self._convert_ticker(ticker)
 
         try:
@@ -89,8 +114,15 @@ class YahooConnection(object):
         logger.logging.debug(f"{ticker} income statement loaded from yfinance api")
 
     def get_dividends(self, ticker: str, start_date=None, end_date=None):
-        filename = f"{self.FILE_PREFIX}_{ticker.replace('.TO', '_TO')}_dividends.csv"
-        directory = self.STATEMENT_DIRECTORY
+        """
+        Retreives dividends data and saves .csv file in correct directory
+        :param ticker:
+        :param start_date:
+        :param end_date:
+        :return:
+        """
+        filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_dividends.csv"
+        directory = self.statement_dir
         ticker = self._convert_ticker(ticker)
         divs = yf.get_dividends(ticker, start_date=start_date, end_date=end_date, index_as_date=False)
         if divs.empty:
@@ -102,18 +134,22 @@ class YahooConnection(object):
             logger.logging.debug(f"{ticker} dividends loaded from yfinance api")
 
     def get_splits(self, ticker: str):
+        """
+        Retreives stock splits data
+        :param ticker:
+        :return:
+        """
         ticker = self._convert_ticker(ticker)
         splits = yfin.Ticker(ticker=ticker).get_splits()
         return splits
 
     @staticmethod
-    def _make_ptf_currency_df():
-        dates = pd.date_range(start=datetime(2000, 1, 1), end=datetime.today())
-        data = [1 for _ in range(len(dates))]
-        return pd.DataFrame(data=data, index=pd.Index(name='Date', data=dates), columns=['Close'])
-
-    @staticmethod
-    def _convert_ticker(ticker):
+    def _convert_ticker(ticker: str) -> str:
+        """
+        Convert any type of suffix to yahoo ticker
+        :param ticker:
+        :return:
+        """
         ticker = ticker.replace('.TRT', '.TO')
         ticker = ticker.replace(' ', '')
         ticker = ticker.replace('.UN', '-UN')
