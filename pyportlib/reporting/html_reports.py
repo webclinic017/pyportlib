@@ -9,10 +9,10 @@ from ..utils import files_utils
 OUT_DIR = files_utils.get_outputs_dir()
 
 
-def full_html(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
-              benchmark: Union[pd.Series, pd.DataFrame, str, Portfolio],
-              name: str,
-              rf=None) -> None:
+def full(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
+         benchmark: Union[pd.Series, pd.DataFrame, str, Portfolio],
+         name: str,
+         rf=None) -> None:
     """
     produces quantstats html report
     :param rf: riskfree rate

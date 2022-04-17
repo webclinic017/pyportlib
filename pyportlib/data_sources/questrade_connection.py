@@ -39,14 +39,12 @@ class QuestradeConnection(Questrade):
 
     def get_transactions(self, start_date: datetime = None, end_date: datetime = None) -> List[dict]:
         """
-        Get transactions within a date range from the connected account
+        Get transactions raw transactions data within a date range from the connected account
         :param start_date: Date to start search
         :param end_date: Date to stop search
         :return: List of dict containing transaction information
         """
-        if not end_date:
-            end_date = datetime.now().replace(hour=0, minute=0, second=0,
-                                              microsecond=0).astimezone().isoformat('T')
+        end_date = dates_utils.last_bday(as_of=end_date)
 
         date_rng = dates_utils.get_market_days(start=start_date, end=end_date)
         list_of_trx = []
@@ -60,7 +58,7 @@ class QuestradeConnection(Questrade):
 
         return list_of_trx
 
-    def to_cash_changes_list(self, transactions: List[dict]) -> List[CashChange]:
+    def _to_cash_changes_list(self, transactions: List[dict]) -> List[CashChange]:
         """
         Converts list of dicts containing cash change info to a list of CashChange objects
         :param transactions: List of dicts containing cash changes info
@@ -74,7 +72,7 @@ class QuestradeConnection(Questrade):
 
         return list_cc
 
-    def to_transactions_list(self, transactions: List[dict]) -> List[Transaction]:
+    def _to_transactions_list(self, transactions: List[dict]) -> List[Transaction]:
         """
         Converts list of dicts containing transaction info to a list of Transaction objects
         :param transactions: List of dicts containing transaction info
@@ -91,9 +89,9 @@ class QuestradeConnection(Questrade):
 
         return list_of_transactions
 
-    def update_transactions(self, portfolio: Portfolio, start_date: datetime = None) -> None:
+    def update_ptf(self, portfolio: Portfolio, start_date: datetime = None) -> None:
         """
-        Updates a pyportlib Portfolio transactions and cash changes and saves the Portfolio
+        Updates a pyportlib Portfolio transactions and cash changes and saves the Portfolio. Transactions and Cash Changes will not be duplicated.
         :param portfolio: Portfolio
         :param start_date: Date to start transactions search in connected account
         :return: None
@@ -107,8 +105,8 @@ class QuestradeConnection(Questrade):
                 logger.logging.error(f'no trades, specify start_date for transaction search (questrade_api)')
 
         transactions = self.get_transactions(start_date=last_trade)
-        list_of_cash_changes = self.to_cash_changes_list(transactions)
-        list_of_transactions = self.to_transactions_list(transactions)
+        list_of_cash_changes = self._to_cash_changes_list(transactions)
+        list_of_transactions = self._to_transactions_list(transactions)
 
         list_of_transactions = self._remove_duplicated_transaction(new_transactions=list_of_transactions,
                                                                    ptf_transactions=portfolio.transactions,
