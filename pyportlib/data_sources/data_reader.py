@@ -6,7 +6,7 @@ from ..helpers.transaction_manager import TransactionManager
 import pandas as pd
 
 
-class DataReader(object):
+class DataReader:
     NAME = 'Data Reader'
 
     def __init__(self):

@@ -4,7 +4,7 @@ from ..utils import logger, df_utils, files_utils
 import pandas as pd
 
 
-class TransactionManager(object):
+class TransactionManager:
     NAME = "Transactions Manager"
     ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
     TRANSACTION_FILENAME = "transactions.csv"

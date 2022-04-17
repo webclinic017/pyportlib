@@ -299,7 +299,7 @@ class Portfolio:
         except KeyError:
             transactions = transactions.loc[transactions.index >= start_date]
 
-        pnl = self._pnl_pos_apply(d=positions_to_compute, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
+        pnl = self._pnl_pos_apply(positions_dict=positions_to_compute, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
         return pnl
 
     def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False,
