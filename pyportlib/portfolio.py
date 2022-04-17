@@ -60,6 +60,7 @@ class Portfolio:
     def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
         Updates all of the market data of the portfolio (prices, fx)
+        :param fundamentals_and_dividends: True to update all statement and dividend data
         :return:
         """
         self._update_positions(fundamentals_and_dividends=fundamentals_and_dividends)
@@ -115,7 +116,7 @@ class Portfolio:
     def market_values(self) -> pd.Series:
         return self._market_value
 
-    def _load_positions(self, ) -> None:
+    def _load_positions(self) -> None:
         """
         Based on on the transaction data, loads all of the active and closed positions
         :return: None
@@ -175,8 +176,7 @@ class Portfolio:
                 ok, new_cash = self._check_trx(transaction=trx)
 
                 if not ok:
-                    logger.logging.error(
-                        f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
+                    logger.logging.error(f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
                 else:
                     self._transaction_manager.add(transaction=trx)
             self.load_data()
@@ -232,7 +232,6 @@ class Portfolio:
         trx = trx.loc[trx.index <= date]
         trx_values = trx.Quantity * trx.Price
         trx = pd.concat([trx, trx_values], axis=1).sort_index()
-        # FIXME cash is always using the fx from date and not historic
         trx_currencies = set(trx.Currency)
         for curr in trx_currencies:
             trx_idx = trx.loc[trx.Currency == curr, 0].index
@@ -300,8 +299,7 @@ class Portfolio:
         except KeyError:
             transactions = transactions.loc[transactions.index >= start_date]
 
-        pnl = self._pnl_pos_apply(d=positions_to_compute, start_date=start_date, end_date=end_date,
-                                  transactions=transactions, fx=self._fx.rates)
+        pnl = self._pnl_pos_apply(d=positions_to_compute, start_date=start_date, end_date=end_date, transactions=transactions, fx=self._fx.rates)
         return pnl
 
     def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False,
@@ -340,7 +338,7 @@ class Portfolio:
 
     def corr(self, lookback: str = None, date: datetime = None):
         """
-
+        Open positions correlations
         :param lookback:
         :param date:
         :return:
@@ -349,7 +347,7 @@ class Portfolio:
 
     def weights(self, date: datetime = None):
         """
-
+        Portfolio position weights in %
         :param date:
         :return:
         """
@@ -365,17 +363,17 @@ class Portfolio:
 
     def open_positions(self, date: datetime) -> Dict[str, Position]:
         """
-
-        :param date:
+        Dict with only active position on given date
+        :param date: Date to get open positions from
         :return:
         """
         return {k: v for k, v in self.positions.items() if round(v.quantities.loc[date]) != 0.}
 
     def open_positions_returns(self, lookback: str = None, date: datetime = None):
         """
-
-        :param lookback:
-        :param date:
+        Get returns from open positions on given date
+        :param lookback: ex. 1y or 10m to lookback from given date argument
+        :param date: last business day if none
         :return:
         """
         if date is None:
@@ -402,10 +400,10 @@ class Portfolio:
         return value < live_cash, new_cash
 
     @staticmethod
-    def _pnl_pos_apply(d, start_date: datetime, end_date: datetime, transactions: pd.DataFrame, fx: dict) -> pd.DataFrame:
+    def _pnl_pos_apply(positions_dict: dict, start_date: datetime, end_date: datetime, transactions: pd.DataFrame, fx: dict) -> pd.DataFrame:
         """
         Apply pnl function to values of position dict and return portfolio pnl df
-        :param d: positions dict
+        :param positions_dict: positions dict
         :param start_date:
         :param end_date:
         :param transactions: transaction to take into account on the pnl
@@ -413,6 +411,5 @@ class Portfolio:
         :return: pnl df
         """
 
-        pnl = {k: v.daily_pnl(start_date, end_date, transactions.loc[transactions.Ticker == k], fx)['total'] for k, v in
-               d.items()}
+        pnl = {k: v.daily_pnl(start_date, end_date, transactions.loc[transactions.Ticker == k], fx)['total'] for k, v in positions_dict.items()}
         return pd.DataFrame.from_dict(pnl, orient="columns").fillna(0)

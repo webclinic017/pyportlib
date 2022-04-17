@@ -21,7 +21,7 @@ def full_html(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
     :return: None
     """
     if isinstance(ptf, Portfolio):
-        ptf.update_data()
+        ptf.update_data(fundamentals_and_dividends=False)
         strategy_returns = ptf.pct_daily_total_pnl(start_date=ptf.start_date)
     else:
         strategy_returns = ptf

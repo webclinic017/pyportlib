@@ -188,7 +188,10 @@ class QuestradeConnection(Questrade):
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
             if transaction.get('type') in ["Deposits", "Withdrawals"]:
                 return
-            logger.logging.error(f"{transaction.get('type')} not supported. 'other' might be dividend withrawal tax")
+            if transaction.get('type').lower() == "other":
+                logger.logging.error(f"{transaction.get('type')} not supported. might be dividend withrawal tax")
+                return
+            logger.logging.error(f"{transaction.get('type')} not supported")
             return
 
         date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
