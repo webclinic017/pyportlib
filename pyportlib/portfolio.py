@@ -236,14 +236,9 @@ class Portfolio:
         trx_currencies = set(trx.Currency)
         for curr in trx_currencies:
             trx_idx = trx.loc[trx.Currency == curr, 0].index
-            try:
-                live_fx = self._fx.get(f'{curr}{self.currency}').reindex(trx_idx, method='ffill')
-            except KeyError:
-                raise KeyError("1")
-                # live_fx = self._fx.get(f'{curr}{self.currency}').loc[date - dates_utils.bday(1)]
-            except Exception:
-                raise KeyError("fx data unavailable on trx date")
-            trx.loc[trx.Currency == curr, 0] *= live_fx
+
+            live_fx = self._fx.get(f'{curr}{self.currency}').reindex(trx_idx, method='ffill')
+            trx.loc[trx.Currency == curr, 0] = trx.loc[trx.Currency == curr, 0].multiply(live_fx)
 
         values = trx[0].sum() * -1
 

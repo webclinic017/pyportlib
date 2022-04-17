@@ -1,5 +1,7 @@
 from typing import List
 
+import pandas as pd
+
 
 def check_df_columns(df, columns: List[str]) -> bool:
     """
@@ -14,3 +16,21 @@ def check_df_columns(df, columns: List[str]) -> bool:
         return True
     else:
         return False
+
+
+def red_green_cmap(value):
+    """
+      Colors elements in a dateframe
+      green if positive and red if
+      negative. Does not color NaN
+      values.
+      """
+
+    if value < 0:
+        color = 'red'
+    elif value > 0:
+        color = 'green'
+    else:
+        color = 'black'
+
+    return 'color: %s' % color
