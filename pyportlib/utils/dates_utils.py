@@ -43,8 +43,7 @@ def date_window(lookback: str = "1y", date: datetime = None) -> datetime:
     """
     amount = int(lookback[:-1])
     scale = lookback[-1]
-    if date is None:
-        date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    date = last_bday(as_of=date)
 
     if scale == "y":
         date = date + relativedelta(years=- amount)

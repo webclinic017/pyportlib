@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Union, List, Dict
+import pandas as pd
 
 from .services.cash_change import CashChange
 from .position import Position
@@ -8,11 +9,11 @@ from .data_sources.data_reader import DataReader
 from .services.fx_rates import FxRates
 from .services.transaction import Transaction
 from .services.transaction_manager import TransactionManager
-from .utils import dates_utils, logger, ts
-import pandas as pd
+from .utils import dates_utils, logger, time_series_interface
+from .utils.time_series_interface import TimeSeriesInterface
 
 
-class Portfolio:
+class Portfolio(TimeSeriesInterface):
 
     def __init__(self, account: str, currency: str):
         # attributes
@@ -34,7 +35,7 @@ class Portfolio:
         self._load_cash_history()
 
     @property
-    def name(self):
+    def ts_name(self):
         return "portfolio"
 
     def __repr__(self):
@@ -381,8 +382,14 @@ class Portfolio:
         if lookback is None:
             lookback = "1y"
         open_positions = self.open_positions(date)
-        prices = {k: ts.prep_returns(v, date=date, lookback=lookback) for k, v in open_positions.items()}
+        prices = {k: time_series_interface.prep_returns(v, lookback=lookback, date=date) for k, v in open_positions.items()}
         return pd.DataFrame(prices).fillna(0)
+
+    def returns(self, start_date: datetime, end_date: datetime, **kwargs):
+        ic = kwargs.get("include_cash") if kwargs.get("include_cash") else False
+        if kwargs.get("include_cash"):
+            del kwargs['include_cash']
+        return self.pct_daily_total_pnl(start_date=start_date, end_date=end_date, include_cash=ic, **kwargs).fillna(0)
 
     @staticmethod
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:

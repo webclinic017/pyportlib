@@ -2,9 +2,10 @@ from datetime import datetime
 from .data_sources.data_reader import DataReader
 import pandas as pd
 from .utils import logger, dates_utils
+from .utils.time_series_interface import TimeSeriesInterface
 
 
-class Position(object):
+class Position(TimeSeriesInterface):
 
     def __init__(self, ticker: str, local_currency: str = None, strategy: str = None):
         self.ticker = ticker.upper()
@@ -82,6 +83,7 @@ class Position(object):
 
     def _load_prices(self):
         self._prices = self._datareader.read_prices(ticker=self.ticker).astype(float).sort_index()
+        self._prices.name = self.ticker
 
     def npv(self) -> pd.Series:
         return self.prices.multiply(self.quantities).dropna()
@@ -185,3 +187,6 @@ class Position(object):
         """
         total = self.daily_pnl(start_date=start_date, end_date=end_date, transactions=transactions, fx=fx)['total']
         return total
+
+    def returns(self, start_date: datetime, end_date: datetime, **kwargs):
+        return self.prices.loc[start_date:end_date].pct_change().fillna(0)
