@@ -20,11 +20,11 @@ def check_df_columns(df, columns: List[str]) -> bool:
 
 def red_green_cmap(value):
     """
-      Colors elements in a dateframe
-      green if positive and red if
-      negative. Does not color NaN
-      values.
-      """
+    Colors elements in a dateframe
+    green if positive and red if
+    negative. Does not color NaN
+    values.
+    """
 
     if value < 0:
         color = 'red'
