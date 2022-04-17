@@ -30,7 +30,7 @@ class TransactionManager(object):
             except KeyError:
                 pass
             finally:
-                if df_utils.check_df_columns(df=trx, columns=Transaction.TRANSACTIONS_INFO):
+                if df_utils.check_df_columns(df=trx, columns=Transaction._INFO):
                     trx.set_index('Date', inplace=True)
                     trx.index.name = 'Date'
                     trx.index = pd.to_datetime(trx.index)
@@ -122,4 +122,4 @@ class TransactionManager(object):
 
     @staticmethod
     def empty_transactions():
-        return pd.DataFrame(columns=Transaction.TRANSACTIONS_INFO).set_index('Date')
+        return pd.DataFrame(columns=Transaction._INFO).set_index('Date')

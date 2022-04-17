@@ -3,10 +3,10 @@ import pandas as pd
 from ..utils import logger
 
 
-class Transaction(object):
-    TRANSACTIONS_INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
-    NAME = 'Transaction'
-    TRANSACTION_TYPES = ["Buy", "Sell", "Dividend"]
+class Transaction:
+    _NAME = 'Transaction'
+    _INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
+    _TYPES = ["Buy", "Sell", "Dividend"]
 
     def __init__(self,
                  date: datetime,
@@ -27,7 +27,7 @@ class Transaction(object):
         self.check()
 
     def __repr__(self):
-        return f"{self.NAME} - {self.date.date()} - {self.type} - {self.ticker}"
+        return f"{self._NAME} - {self.date.date()} - {self.type} - {self.ticker}"
 
     @property
     def df(self) -> pd.DataFrame:
@@ -43,19 +43,28 @@ class Transaction(object):
 
         return new
 
+    @property
+    def info(self):
+        return {'Ticker': self.ticker,
+                'Type': self.type,
+                'Quantity': self.quantity,
+                'Price': self.price,
+                'Fees': self.fees,
+                'Currency': self.currency}
+
     def check(self) -> None:
         """
         Checks if transaction object is valid
         :return:
         """
-        condition1 = self.type in self.TRANSACTION_TYPES
+        condition1 = self.type in self._TYPES
         # currencies = ['USD', 'CAD']
         # condition2 = self.currency in currencies
         condition3 = isinstance(self.date, datetime)
         condition4 = (self.quantity > 0 and self.type == 'Buy') or (self.quantity == 0 and self.type == 'Dividend') or (self.quantity < 0 and self.type == 'Sell')
 
         if not condition1:
-            logger.logging.error(f'transaction type {self.type} is invalid, must be in {self.TRANSACTION_TYPES}')
+            logger.logging.error(f'transaction type {self.type} is invalid, must be in {self._TYPES}')
             print(self.df)
         # if not condition2:
         #     logger.logging.error(f'transaction currency {self.type} is invalid, must be in {currencies}')
