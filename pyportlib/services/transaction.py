@@ -6,8 +6,8 @@ from ..utils import logger
 
 class Transaction:
     _NAME = 'Transaction'
-    _INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
     _TYPES = ["Buy", "Sell", "Dividend"]
+    _INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
 
     def __init__(self,
                  date: datetime,

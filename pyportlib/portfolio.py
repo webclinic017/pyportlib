@@ -7,6 +7,7 @@ from .position import Position
 from .services.cash_manager import CashManager
 from .services.data_reader import DataReader
 from .services.fx_rates import FxRates
+from .services.position_tagging import PositionTagging
 from .services.transaction import Transaction
 from .services.transaction_manager import TransactionManager
 from .utils import dates_utils, logger, time_series
@@ -27,16 +28,13 @@ class Portfolio(TimeSeriesInterface):
         self._cash_manager = CashManager(account=self.account)
         self._datareader = DataReader()
         self._transaction_manager = TransactionManager(account=self.account)
+        self._position_tags: PositionTagging
         self._fx = FxRates(ptf_currency=currency, currencies=self._transaction_manager.get_currencies())
 
         self.start_date = None
         # load data        
         self.load_data()
         self._load_cash_history()
-
-    @property
-    def ts_name(self):
-        return "portfolio"
 
     def __repr__(self):
         return self.account
@@ -47,7 +45,7 @@ class Portfolio(TimeSeriesInterface):
         dependent on other objects or computations
         :return: None
         """
-        self.start_date = self._transaction_manager.first_trx()
+        self.start_date = self._transaction_manager.first_transaction()
         self._fx.set_pairs(pairs=[f"{curr}{self.currency}" for curr in self._transaction_manager.get_currencies()])
 
         self._cash_manager.load()
@@ -88,7 +86,7 @@ class Portfolio(TimeSeriesInterface):
             return_flag = True
 
         if len(positions_to_compute):
-            last_date = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
+            last_date = self._datareader.last_data_point(ptf_currency=self.currency)
             dates = dates_utils.get_market_days(start=self.start_date, end=last_date)
             market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
@@ -117,16 +115,22 @@ class Portfolio(TimeSeriesInterface):
     def market_values(self) -> pd.Series:
         return self._market_value
 
+    def _position_tags(self) -> PositionTagging:
+        tickers = self._transaction_manager.all_tickers()
+        return PositionTagging(account=self.account, tickers=tickers)
+
     def _load_positions(self) -> None:
         """
         Based on on the transaction data, loads all of the active and closed positions
         :return: None
         """
         self._positions = {}
-        tickers = self._transaction_manager.all_positions()
+        tickers = self._transaction_manager.all_tickers()
+        position_tags = self._position_tags()
+
         for ticker in tickers:
             currency = self._transaction_manager.get_currency(ticker=ticker)
-            pos = Position(ticker, local_currency=currency)
+            pos = Position(ticker, local_currency=currency, tag=position_tags.get(ticker))
 
             if self.currency != pos.currency:
                 prices = pos.prices.multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
@@ -145,7 +149,7 @@ class Portfolio(TimeSeriesInterface):
         """
         if len(self._positions):
 
-            last_date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
+            last_date = self._datareader.last_data_point(ptf_currency=self.currency)
             dates = dates_utils.get_market_days(start=self.start_date, end=last_date)
             date_merge = pd.DataFrame(index=dates, columns=['qty'])
 
@@ -225,7 +229,7 @@ class Portfolio(TimeSeriesInterface):
         :return: float
         """
         if date is None:
-            date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
+            date = self._datareader.last_data_point(ptf_currency=self.currency)
 
         changes = self._cash_manager.get_cash_change(date)
 
@@ -257,7 +261,7 @@ class Portfolio(TimeSeriesInterface):
         """
         if len(self._positions):
             if end_date is None:
-                end_date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
+                end_date = self._datareader.last_data_point(ptf_currency=self.currency)
             if start_date is None:
                 start_date = self.start_date
             transactions = self.transactions.loc[start_date:]
@@ -284,7 +288,7 @@ class Portfolio(TimeSeriesInterface):
         :return:
         """
         if end_date is None:
-            end_date = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
+            end_date = self._datareader.last_data_point(ptf_currency=self.currency)
         if start_date is None:
             start_date = end_date
 
@@ -313,7 +317,7 @@ class Portfolio(TimeSeriesInterface):
         :return:
         """
         if end_date is None:
-            end_date = self._datareader.last_data_point(self.account, ptf_currency=self.currency)
+            end_date = self._datareader.last_data_point(ptf_currency=self.currency)
         if start_date is None:
             start_date = end_date
 
@@ -353,7 +357,7 @@ class Portfolio(TimeSeriesInterface):
         :return:
         """
         if date is None:
-            date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
+            date = self._datareader.last_data_point(ptf_currency=self.currency)
 
         port_mv = self.market_values.loc[date]
         weights_dict = {k: round(v.npv().loc[date] / port_mv, 5) for k, v in self.positions.items() if
@@ -378,7 +382,7 @@ class Portfolio(TimeSeriesInterface):
         :return:
         """
         if date is None:
-            date = self._datareader.last_data_point(account=self.account, ptf_currency=self.currency)
+            date = self._datareader.last_data_point(ptf_currency=self.currency)
         if lookback is None:
             lookback = "1y"
         open_positions = self.open_positions(date)

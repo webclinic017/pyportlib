@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Dict
 
 from ..utils import files_utils
 

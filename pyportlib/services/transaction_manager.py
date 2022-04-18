@@ -1,19 +1,17 @@
-from typing import List
 import pandas as pd
 
 from ..services.transaction import Transaction
 from ..utils import logger, df_utils, files_utils
 
 
-
 class TransactionManager:
     NAME = "Transactions Manager"
-    ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
-    TRANSACTION_FILENAME = "transactions.csv"
+    _ACCOUNTS_DIRECTORY = files_utils.get_accounts_dir()
+    _TRANSACTION_FILENAME = "transactions.csv"
 
     def __init__(self, account):
         self.account = account
-        self.directory = f"{self.ACCOUNTS_DIRECTORY}{self.account}"
+        self.directory = f"{self._ACCOUNTS_DIRECTORY}{self.account}"
         self._transactions = pd.DataFrame()
         self.load()
 
@@ -25,8 +23,8 @@ class TransactionManager:
         return self._transactions
 
     def load(self) -> None:
-        if files_utils.check_file(self.directory, self.TRANSACTION_FILENAME):
-            trx = pd.read_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
+        if files_utils.check_file(self.directory, self._TRANSACTION_FILENAME):
+            trx = pd.read_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
             try:
                 trx.drop(columns='Unnamed: 0', inplace=True)
             except KeyError:
@@ -46,14 +44,14 @@ class TransactionManager:
                 files_utils.make_dir(self.directory)
             # create empty transaction file in new directory
             empty_transactions = self.empty_transactions()
-            empty_transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
+            empty_transactions.to_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
             self._transactions = empty_transactions
 
     def _write_trx(self, transaction: Transaction) -> None:
         new = transaction.df
         self._transactions = pd.concat([self._transactions, new])
 
-        self._transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
+        self._transactions.to_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
         logger.logging.debug('transactions file updated')
 
     def _check_trx(self, transaction: Transaction) -> bool:
@@ -71,7 +69,7 @@ class TransactionManager:
             self._write_trx(transaction)
             logger.logging.info(f'{transaction} was added to account: {self.account}')
 
-    def all_positions(self) -> list:
+    def all_tickers(self) -> list:
         try:
             tickers = list(set(self._transactions.Ticker))
             return tickers
@@ -79,19 +77,10 @@ class TransactionManager:
             logger.logging.error(f'no tickers found for account: {self.account}')
             return []
 
-    def open_positions(self) -> list:
-        live_tickers = self._transactions.groupby('Ticker').sum()
-        try:
-            live_tickers = live_tickers.loc[live_tickers.Quantity > 0]
-            return list(live_tickers.index)
-        except AttributeError:
-            logger.logging.error(f'no tickers found for account: {self.account}')
-            return []
-
     def total_fees(self) -> float:
         return self._transactions.Fees.sum()
     
-    def first_trx(self, ticker: str = None):
+    def first_transaction(self, ticker: str = None):
         if len(self._transactions):
             if ticker:
                 return self._transactions.loc[self._transactions.Ticker == ticker].index.min()
@@ -99,7 +88,7 @@ class TransactionManager:
         else:
             return None
 
-    def last_trx(self, ticker: str = None):
+    def last_transaction(self, ticker: str = None):
         if len(self._transactions):
             if ticker:
                 return self._transactions.loc[self._transactions.Ticker == ticker].index.max()
@@ -114,13 +103,14 @@ class TransactionManager:
     def get_currency(self, ticker: str):
         return self._transactions.loc[self._transactions['Ticker'] == ticker, 'Currency'].iloc[0]
 
-    def from_csv(self, filename) -> List[Transaction]:
-        raise NotImplementedError()
-
     def reset(self):
         empty_transactions = self.empty_transactions()
-        empty_transactions.to_csv(f"{self.directory}/{self.TRANSACTION_FILENAME}")
+        empty_transactions.to_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
         self._transactions = empty_transactions
+
+    # TODO add splits after the position has already been added
+    def add_split(self, ticker: str, factor: float):
+        raise NotImplementedError()
 
     @staticmethod
     def empty_transactions():

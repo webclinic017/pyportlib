@@ -5,7 +5,7 @@ from ..utils import logger
 
 
 class FxRates:
-    NAME = "FX Rates"
+    _NAME = "FX Rates"
 
     def __init__(self, ptf_currency: str, currencies: List[str]):
         self.pairs = [f"{curr}{ptf_currency}" for curr in currencies]
@@ -15,7 +15,7 @@ class FxRates:
         self._load()
 
     def __repr__(self):
-        return self.NAME
+        return self._NAME
 
     def set_pairs(self, pairs: List[str]):
         self.pairs = pairs

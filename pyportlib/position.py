@@ -8,9 +8,9 @@ from .utils.time_series import TimeSeriesInterface
 
 class Position(TimeSeriesInterface):
 
-    def __init__(self, ticker: str, local_currency: str = None, strategy: str = None):
+    def __init__(self, ticker: str, local_currency: str = None, tag: str = None):
         self.ticker = ticker.upper()
-        self._strategy = strategy
+        self._tag = tag
         self._datareader = DataReader()
         self._prices = pd.Series()
         self._quantities = pd.Series()
@@ -22,19 +22,15 @@ class Position(TimeSeriesInterface):
             self.currency = local_currency
 
     @property
-    def name(self):
-        return "position"
+    def tag(self):
+        return self._tag
 
-    @property
-    def strategy(self):
-        return self._strategy
-
-    @strategy.setter
-    def strategy(self, value: str):
-        self._strategy = value
+    @tag.setter
+    def tag(self, value: str):
+        self._tag = value
 
     def __repr__(self):
-        return f"{self.ticker} - {self.currency} - {self.strategy}"
+        return f"{self.ticker} - {self.currency} - {self._tag}"
 
     def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
