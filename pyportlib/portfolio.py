@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import Union, List, Dict
+
+import numpy as np
 import pandas as pd
 
 from .services.cash_change import CashChange
@@ -52,7 +54,7 @@ class Portfolio(TimeSeriesInterface):
         self._transaction_manager.load()
         self._load_positions()
         self._load_position_quantities()
-        self._load_market_value()
+        self._load_market_value(return_flag=False)
 
         logger.logging.debug(f'{self.account} data loaded')
 
@@ -74,16 +76,16 @@ class Portfolio(TimeSeriesInterface):
         for position in self._positions.values():
             position.update_data(fundamentals_and_dividends=fundamentals_and_dividends)
 
-    def _load_market_value(self, **kwargs) -> None:
-        self._market_value = pd.Series()
+    def compute_market_value(self, **kwargs) -> pd.DataFrame:
         positions_to_compute = self.positions
-        return_flag = False
 
         # used for pnl what if scenarios where position are easily ommited from calculations
         if kwargs.get('positions_to_exclude'):
             positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
             positions_to_compute = {k: positions_to_compute[k] for k in positions_}
-            return_flag = True
+        if kwargs.get("tags"):
+            positions_to_compute = {pos.ticker: pos for pos in positions_to_compute.values() if
+                                    pos.tag in kwargs.get("tags")}
 
         if len(positions_to_compute):
             last_date = self._datareader.last_data_point(ptf_currency=self.currency)
@@ -102,22 +104,25 @@ class Portfolio(TimeSeriesInterface):
                     logger.logging.error(f'no market value computed for {position.ticker}')
 
             # used by pnl to return the value instead of setting it
-            if return_flag:
-                logger.logging.debug(f'{self.account} market_value computed')
-                return market_value.dropna()
-            elif not return_flag:
-                self._market_value = market_value.dropna()
-                logger.logging.debug(f'{self.account} market_value computed and set')
+            logger.logging.debug(f'{self.account} market_value computed and returned')
+            return market_value.dropna()
         else:
             logger.logging.debug(f"{self.account} no positions in portfolio")
 
+    def _load_market_value(self, **kwargs) -> None:
+        # self._market_value = pd.Series()
+        self._market_value = self.compute_market_value(**kwargs).dropna()
+
     @property
-    def market_values(self) -> pd.Series:
+    def market_value(self) -> pd.Series:
         return self._market_value
 
     def _position_tags(self) -> PositionTagging:
         tickers = self._transaction_manager.all_tickers()
         return PositionTagging(account=self.account, tickers=tickers)
+
+    def position_tags(self):
+        return list(set(self._position_tags().tags.values()))
 
     def _load_positions(self) -> None:
         """
@@ -203,7 +208,7 @@ class Portfolio(TimeSeriesInterface):
         Computes cash account for every date
         :return:
         """
-        dates = self.market_values.index
+        dates = self.market_value.index
         cash = [self.cash(date) for date in dates]
         cash_c = pd.Series(data=cash, index=dates)
         self._cash_history = cash_c
@@ -298,6 +303,9 @@ class Portfolio(TimeSeriesInterface):
             positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
             positions_to_compute = {k: positions_to_compute[k] for k in positions_}
 
+        if kwargs.get("tags"):
+            positions_to_compute = {pos.ticker: pos for pos in positions_to_compute.values() if pos.tag in kwargs.get("tags")}
+
         transactions = self.transactions.loc[self.transactions.Ticker.isin(positions_to_compute.keys())]
         try:
             transactions = transactions.loc[start_date:end_date]
@@ -321,12 +329,17 @@ class Portfolio(TimeSeriesInterface):
         if start_date is None:
             start_date = end_date
 
-        if include_cash:
-            market_vals = self.market_values.loc[start_date:end_date] + self._cash_history
+        if kwargs.get("tags") or kwargs.get("positions_to_exclude"):
+            market_vals = self.compute_market_value(return_flag=True, **kwargs).loc[start_date:end_date]
         else:
-            market_vals = self.market_values.loc[start_date:end_date]
+            market_vals = self.market_value.loc[start_date:end_date]
 
-        pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals).dropna()
+        if include_cash:
+            market_vals += self._cash_history.loc[start_date:end_date]
+
+        pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals)
+        pnl.replace([np.inf, -np.inf], np.nan, inplace=True)
+        pnl = pnl.fillna(0)
         pnl.name = self.account
         return pnl
 
@@ -338,6 +351,7 @@ class Portfolio(TimeSeriesInterface):
         """
         self._transaction_manager.reset()
         self._cash_manager.reset()
+        self._position_tags().reset()
         self._fx.reset()
         self.load_data()
 
@@ -359,7 +373,7 @@ class Portfolio(TimeSeriesInterface):
         if date is None:
             date = self._datareader.last_data_point(ptf_currency=self.currency)
 
-        port_mv = self.market_values.loc[date]
+        port_mv = self.market_value.loc[date]
         weights_dict = {k: round(v.npv().loc[date] / port_mv, 5) for k, v in self.positions.items() if
                         v.npv().loc[date] != 0}
         if not 0.9999 < sum(weights_dict.values()) < 1.001:
@@ -393,6 +407,7 @@ class Portfolio(TimeSeriesInterface):
         ic = kwargs.get("include_cash") if kwargs.get("include_cash") else False
         if kwargs.get("include_cash"):
             del kwargs['include_cash']
+
         return self.pct_daily_total_pnl(start_date=start_date, end_date=end_date, include_cash=ic, **kwargs).fillna(0)
 
     @staticmethod
