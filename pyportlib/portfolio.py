@@ -54,7 +54,7 @@ class Portfolio(TimeSeriesInterface):
         self._transaction_manager.load()
         self._load_positions()
         self._load_position_quantities()
-        self._load_market_value(return_flag=False)
+        self._load_market_value()
 
         logger.logging.debug(f'{self.account} data loaded')
 
@@ -76,7 +76,7 @@ class Portfolio(TimeSeriesInterface):
         for position in self._positions.values():
             position.update_data(fundamentals_and_dividends=fundamentals_and_dividends)
 
-    def compute_market_value(self, **kwargs) -> pd.DataFrame:
+    def compute_market_value(self, **kwargs) -> pd.Series:
         positions_to_compute = self.positions
 
         # used for pnl what if scenarios where position are easily ommited from calculations
@@ -90,7 +90,7 @@ class Portfolio(TimeSeriesInterface):
         if len(positions_to_compute):
             last_date = self._datareader.last_data_point(ptf_currency=self.currency)
             dates = dates_utils.get_market_days(start=self.start_date, end=last_date)
-            market_value = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
+            market_val = pd.Series(index=dates, data=[0 for _ in range(len(dates))])
 
             for position in positions_to_compute.values():
                 pos_val = position.quantities.shift(1).fillna(method="backfill").multiply(
@@ -98,24 +98,24 @@ class Portfolio(TimeSeriesInterface):
                 pos_val = pos_val.fillna(method='ffill')
                 pos_val = pos_val.fillna(0)
                 if pos_val.sum() != 0:
-                    market_value = market_value.add(pos_val)
-                    market_value = market_value.fillna(method='ffill')
+                    market_val = market_val.add(pos_val)
+                    market_val = market_val.fillna(method='ffill')
                 else:
                     logger.logging.error(f'no market value computed for {position.ticker}')
 
             # used by pnl to return the value instead of setting it
             logger.logging.debug(f'{self.account} market_value computed and returned')
-            return market_value.dropna()
+            return market_val.fillna(0)
         else:
             logger.logging.debug(f"{self.account} no positions in portfolio")
 
-    def _load_market_value(self, **kwargs) -> None:
-        # self._market_value = pd.Series()
-        self._market_value = self.compute_market_value(**kwargs).dropna()
+    def _load_market_value(self) -> None:
+        self._market_value = pd.Series()
+        self._market_value = self.compute_market_value()
 
     @property
     def market_value(self) -> pd.Series:
-        return self._market_value
+        return self._market_value.copy()
 
     def _position_tags(self) -> PositionTagging:
         tickers = self._transaction_manager.all_tickers()
