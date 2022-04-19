@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas as pd
 
 from ..services.transaction import Transaction
@@ -57,7 +59,7 @@ class TransactionManager:
     def _check_trx(self, transaction: Transaction) -> bool:
         new_qty = self._transactions.Quantity.loc[self._transactions.Ticker == transaction.ticker].sum() + transaction.quantity
 
-        if new_qty < 0:
+        if new_qty < 0:  # TODO determine if we really want to keep it long only (maybe set in portfolio config?)
             print(transaction.df)
             logger.logging.error(f'no short positions allowed, you sold {-1 * (transaction.quantity - (transaction.quantity - new_qty))} units too many')
             return False
@@ -108,9 +110,25 @@ class TransactionManager:
         empty_transactions.to_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
         self._transactions = empty_transactions
 
-    # TODO add splits after the position has already been added
-    def add_split(self, ticker: str, factor: float):
-        raise NotImplementedError()
+    def add_split(self, date: datetime, ticker: str, factor: float):
+        # TODO add split transaction in questrade as well, to correct historic transactions
+        """
+        Creates a split transaction and corrects historic ticker transactions for that split (manual split only?)
+        :param date: date of the split. Keeps track of manual splits
+        :param ticker: ticker of the split
+        :param factor: is set as the "price" of the transaction
+        :return:
+        """
+        currency = self.get_currency(ticker=ticker)
+        split = Transaction(date=date,
+                            ticker=ticker,
+                            transaction_type="Split",
+                            quantity=0,
+                            price=factor,
+                            fees=0,
+                            currency=currency)
+        return
+        self.add(split)
 
     @staticmethod
     def empty_transactions():

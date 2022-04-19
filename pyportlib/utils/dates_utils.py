@@ -64,7 +64,13 @@ def last_bday(as_of: datetime = None) -> datetime:
     :return:
     """
     if as_of is None:
-        as_of = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        as_of = datetime.today()
+
+        # before market open
+        if as_of.hour < 9 and as_of.minute < 30:
+            as_of = as_of - bday(1)
+
+        as_of = as_of.replace(hour=0, minute=0, second=0, microsecond=0)
     if as_of.isoweekday() in range(1, 6):
         last_bd = as_of
     else:

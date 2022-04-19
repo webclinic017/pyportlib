@@ -6,7 +6,7 @@ from ..utils import logger
 
 class Transaction:
     _NAME = 'Transaction'
-    _TYPES = ["Buy", "Sell", "Dividend"]
+    _TYPES = ["Buy", "Sell", "Dividend", "Split"]
     _INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
 
     def __init__(self,
