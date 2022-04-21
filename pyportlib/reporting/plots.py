@@ -5,196 +5,239 @@ from scipy.stats import norm
 
 from ..utils import time_series
 from ..utils import logger
+from ..utils.time_series import TimeSeriesInterface
 
 
-def snapshot(pos, date: datetime = None, lookback: str = '1y', **kwargs):
+def snapshot(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, **kwargs):
     """
-
-    :param pos: Position or Portfolio object to plot returns
+    Quantstats plot of returns
+    :param pos: Position, Portfolio or Pandas object to plot returns
     :param date: end date of observation
     :param lookback: string determining the start date. ex: '1y'
-    :param kwargs: optional arguments passed to quantstas plots module
-                    benchark returns pandas Series can be passed or a Position object
+    :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
     rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    if kwargs.get('benchmark') is not None:
-        kwargs['benchmark'] = time_series.prep_returns(kwargs.get('benchmark'), lookback=lookback, date=date)
 
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
+    # we don't want to pass these arguments
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
     qs.plots.snapshot(rets, **kwargs)
 
 
-def returns(pos, date: datetime = None, lookback: str = '1y', log: bool = False, **kwargs):
+def returns(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, log: bool = False, benchmark: TimeSeriesInterface = None, **kwargs):
     """
-
-    :param pos: Position object to plot returns
+    Quantstats plot of returns
+    :param pos: Position, Portfolio or Pandas object to plot returns
     :param date: end date of observation
     :param lookback: string determining the start date. ex: '1y'
     :param log: returns will be converted to log returns if True
-    :param kwargs: optional arguments passed to quantstas plots module,
-                    benchark returns pandas Series can be passed or a Position object
+    :param benchmark: Position, Portfolio or Pandas object to plot benchamrk returns
+    :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
     rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    if kwargs.get('benchmark') is not None:
-        kwargs['benchmark'] = time_series.prep_returns(kwargs.get('benchmark'), lookback=lookback, date=date)
 
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
+    if benchmark is not None:
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+        rets, benchmark = time_series.match_index(rets, benchmark)
+
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
     if not log:
-        if rets.empty:
-            logger.logging.error(f"{pos} prices missing")
-            return
-        qs.plots.returns(rets, prepare_returns=False, **kwargs)
+        qs.plots.returns(rets, benchmark=benchmark, prepare_returns=False, **kwargs)
     elif log:
-        qs.plots.log_returns(rets, prepare_returns=False, **kwargs)
+        qs.plots.log_returns(rets, benchmark=benchmark, prepare_returns=False, **kwargs)
 
 
-def distribution(pos, date: datetime = None, lookback: str = '1y', **kwargs):
+def distribution(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, **kwargs):
     """
-
-    :param pos: Position object to plot returns
+    Quantstats plot of returns distribution
+    :param pos: Position, Portfolio or Pandas object to plot returns
     :param date: end date of observation
     :param lookback: string determining the start date. ex: '1y'
-    :param kwargs: optional arguments passed to quantstas plots module
-                    benchark returns pandas Series can be passed or a Position object
+    :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
     rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    if kwargs.get('benchmark') is not None:
-        kwargs['benchmark'] = time_series.prep_returns(kwargs.get('benchmark'), lookback=lookback, date=date)
 
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
     qs.plots.histogram(rets, prepare_returns=False, **kwargs)
 
 
-def rolling_beta(pos, benchmark, date: datetime = None,
-                 lookback: str = '1y', **kwargs):
+def rolling_beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, date: datetime = None, lookback: str = None, **kwargs):
     """
-
-    :param benchmark:
-    :param pos: Position object to plot returns
+    Quantstats plot of rolling beta
+    :param pos: Position, Portfolio or Pandas object to plot returns
+    :param benchmark: Position, Portfolio or Pandas object to plot benchmark returns
     :param date: end date of observation
     :param lookback: string determining the start date. ex: '1y'
-    :param kwargs: optional arguments passed to quantstas plots module
-                    benchark returns pandas Series can be passed or a Position object
-    :return:
+    :param kwargs: PnL and Quantstats keyword arguments
+    :return
     """
     rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    bench_rets = time_series.prep_returns(benchmark, lookback=lookback, date=date)
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
-    qs.plots.rolling_beta(rets, benchmark=bench_rets, prepare_returns=False, **kwargs)
+
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
+    benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+    rets, benchmark = time_series.match_index(rets, benchmark)
+
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
+    qs.plots.rolling_beta(rets, benchmark=benchmark, prepare_returns=False, **kwargs)
 
 
-def rolling_vol(pos, date: datetime = None, lookback: str = '1y', **kwargs):
+def rolling_vol(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, benchmark: TimeSeriesInterface = None, **kwargs):
     """
-
-    :param pos: Position object to plot returns
+    Quantstats plot of rolling volatility
+    :param pos: Position, Portfolio or Pandas object to plot returns
     :param date: end date of observation
     :param lookback: string determining the start date. ex: '1y'
-    :param kwargs: optional arguments passed to quantstas plots module
-                    benchark returns pandas Series can be passed or a Position object
-    :return:
+    :param benchmark: Position, Portfolio or Pandas object to plot benchmark returns
+    :param kwargs: PnL and Quantstats keyword arguments
+    :return
     """
     rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    if kwargs.get('benchmark') is not None:
-        kwargs['benchmark'] = time_series.prep_returns(kwargs.get('benchmark'), lookback=lookback, date=date)
 
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
-    qs.plots.rolling_volatility(rets, **kwargs)
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
+    if benchmark is not None:
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+        rets, benchmark = time_series.match_index(rets, benchmark)
+
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
+    qs.plots.rolling_volatility(rets, benchmark=benchmark, **kwargs)
 
 
-def rolling_skew(pos, lookback: str, date: datetime = None,
-                 rolling_period: int = 252, **kwargs):
+def rolling_skew(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, rolling_period: int = 252, **kwargs):
+    """
+    Plot of rolling skewness
+    :param pos: Position, Portfolio or Pandas object to plot returns
+    :param date: end date of observation
+    :param lookback: string determining the start date. ex: '1y'
+    :param rolling_period: Length of rolling period in days
+    :param kwargs: PnL and Quantstats keyword arguments
+    :return:
+    """
     rets = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
     roll = rets.rolling(int(rolling_period)).skew()
 
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
-def rolling_kurtosis(pos, lookback: str, date: datetime = None,
-                     rolling_period: int = 252, **kwargs):
-    rets = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
-    roll = rets.rolling(int(rolling_period)).kurt()
-
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
-    qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
-
-
-def rolling_sharpe(pos, date: datetime = None, lookback: str = '1y', **kwargs):
+def rolling_kurtosis(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, rolling_period: int = 252, **kwargs):
     """
-
-    :param pos: Position object to plot returns
+    Plot of rolling kurtosis
+    :param pos: Position, Portfolio or Pandas object to plot returns
     :param date: end date of observation
     :param lookback: string determining the start date. ex: '1y'
-    :param kwargs: optional arguments passed to quantstas plots module
-                    benchark returns pandas Series can be passed or a Position object
+    :param rolling_period: Length of rolling period in days
+    :param kwargs: PnL and Quantstats keyword arguments
+    :return:
+    """
+    rets = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
+    roll = rets.rolling(int(rolling_period)).kurt()
+
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
+    qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
+
+
+def rolling_sharpe(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, benchmark: TimeSeriesInterface = None, **kwargs):
+    """
+    Quantstats plot of rolling sharp ratio
+    :param pos: Position, Portfolio or Pandas object to plot returns
+    :param date: end date of observation
+    :param lookback: string determining the start date. ex: '1y'
+    :param benchmark: Position, Portfolio or Pandas object to plot benchmark returns
+    :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
     rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    if kwargs.get('benchmark'):
-        kwargs['benchmark'] = time_series.prep_returns(kwargs.get('benchmark'), lookback=lookback, date=date)
 
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
-    qs.plots.rolling_sharpe(rets, **kwargs)
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
+    if benchmark is not None:
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+        rets, benchmark = time_series.match_index(rets, benchmark)
+
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
+    qs.plots.rolling_sharpe(rets, benchmark=benchmark, **kwargs)
 
 
-def rolling_var(pos, date: datetime = None, lookback: str = '1y', rolling_period: int = 252,
-                quantile=0.95, **kwargs):
+def rolling_var(pos: TimeSeriesInterface,
+                date: datetime = None,
+                lookback: str = None,
+                rolling_period: int = 252,
+                quantile=0.95,
+                benchmark: TimeSeriesInterface = None, **kwargs):
+    """
+
+    :param pos: Position, Portfolio or Pandas object to plot returns
+    :param date: end date of observation
+    :param lookback: string determining the start date. ex: '1y'
+    :param rolling_period: Length of rolling period in days
+    :param quantile: VaR percentile
+    :param benchmark: Position, Portfolio or Pandas object to plot returns
+    :param kwargs: PnL and Quantstats keyword arguments
+    :return:
+    """
     rets = time_series.prep_returns(ts=pos, lookback=lookback, date=date)
+
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+
     mean = rets.rolling(rolling_period).mean()
     var = rets.rolling(rolling_period).std()
     stat = norm.ppf(1 - quantile, mean, var)
     roll_var = pd.Series(stat, index=rets.index).dropna() * -1
 
-    if kwargs.get('benchmark') is not None:
-        kwargs['benchmark'] = time_series.prep_returns(kwargs.get('benchmark'), lookback=lookback, date=date)
+    if benchmark is not None:
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+        rets, benchmark = time_series.match_index(roll_var, benchmark)
 
-    if kwargs.get('positions_to_exclude'):
-        del kwargs['positions_to_exclude']
-    if kwargs.get("include_cash"):
-        del kwargs['include_cash']
-    if kwargs.get("tags"):
-        del kwargs['tags']
-    qs.plots.returns(roll_var, compound=False, prepare_returns=False, **kwargs)
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
+    qs.plots.returns(roll_var, benchmark=benchmark, compound=False, prepare_returns=False, **kwargs)

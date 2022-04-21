@@ -47,8 +47,9 @@ class DataReader:
         if files_utils.check_file(directory=directory,
                                   file=filename):
             df = pd.read_csv(f"{directory}/{filename}")
-            df = df.set_index('Date')
+            df = df.set_index('Date').dropna()
             df.index = pd.to_datetime(df.index)
+
             return df['Close']
         else:
             logger.logging.info(f'no price data to read for {ticker}, now fetching new data from api')

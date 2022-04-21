@@ -76,16 +76,15 @@ class Portfolio(TimeSeriesInterface):
         for position in self._positions.values():
             position.update_data(fundamentals_and_dividends=fundamentals_and_dividends)
 
-    def compute_market_value(self, **kwargs) -> pd.Series:
+    def compute_market_value(self, positions_to_exclude: List[str] = None, tags: List[str] = None) -> pd.Series:
         positions_to_compute = self.positions
 
         # used for pnl what if scenarios where position are easily ommited from calculations
-        if kwargs.get('positions_to_exclude'):
-            positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
+        if positions_to_exclude:
+            positions_ = set(positions_to_compute.keys()) - set(positions_to_exclude)
             positions_to_compute = {k: positions_to_compute[k] for k in positions_}
-        if kwargs.get("tags"):
-            positions_to_compute = {pos.ticker: pos for pos in positions_to_compute.values() if
-                                    pos.tag in kwargs.get("tags")}
+        if tags:
+            positions_to_compute = {pos.ticker: pos for pos in positions_to_compute.values() if pos.tag in tags}
 
         if len(positions_to_compute):
             last_date = self._datareader.last_data_point(ptf_currency=self.currency)
@@ -285,11 +284,13 @@ class Portfolio(TimeSeriesInterface):
         else:
             return 0
 
-    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, **kwargs) -> pd.DataFrame:
+    def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, positions_to_exclude: List[str] = None, tags: List[str] = None) -> pd.DataFrame:
         """
         Portfolio return per position in $ amount for specified date range
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
+        :param positions_to_exclude: List of ticker to exclude from calculation
+        :param tags: List of tags to compute return for
         :return:
         """
         if end_date is None:
@@ -299,12 +300,12 @@ class Portfolio(TimeSeriesInterface):
 
         positions_to_compute = self.positions
 
-        if kwargs.get('positions_to_exclude'):
-            positions_ = set(positions_to_compute.keys()) - set(kwargs.get('positions_to_exclude'))
+        if positions_to_exclude is not None:
+            positions_ = set(positions_to_compute.keys()) - set(positions_to_exclude)
             positions_to_compute = {k: positions_to_compute[k] for k in positions_}
 
-        if kwargs.get("tags"):
-            positions_to_compute = {pos.ticker: pos for pos in positions_to_compute.values() if pos.tag in kwargs.get("tags")}
+        if tags is not None:
+            positions_to_compute = {pos.ticker: pos for pos in positions_to_compute.values() if pos.tag in tags}
 
         transactions = self.transactions.loc[self.transactions.Ticker.isin(positions_to_compute.keys())]
         try:
@@ -316,12 +317,14 @@ class Portfolio(TimeSeriesInterface):
         return pnl
 
     def pct_daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, include_cash: bool = False,
-                            **kwargs) -> pd.Series:
+                            positions_to_exclude: List[str] = None, tags: List[str] = None) -> pd.Series:
         """
         Portfolio return in % of market value
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :param include_cash: If we include the cash amount at that time to calc the market value
+        :param tags: Specific position tags to compute
+        :param positions_to_exclude: List of tickers to exlude from computation
         :return:
         """
         if end_date is None:
@@ -329,15 +332,15 @@ class Portfolio(TimeSeriesInterface):
         if start_date is None:
             start_date = end_date
 
-        if kwargs.get("tags") or kwargs.get("positions_to_exclude"):
-            market_vals = self.compute_market_value(return_flag=True, **kwargs).loc[start_date:end_date]
+        if positions_to_exclude is not None or tags is not None:
+            market_vals = self.compute_market_value(positions_to_exclude=positions_to_exclude, tags=tags).loc[start_date:end_date]
         else:
             market_vals = self.market_value.loc[start_date:end_date]
 
         if include_cash:
             market_vals += self._cash_history.loc[start_date:end_date]
 
-        pnl = self.daily_total_pnl(start_date, end_date, **kwargs).sum(axis=1).divide(market_vals)
+        pnl = self.daily_total_pnl(start_date, end_date, positions_to_exclude=positions_to_exclude, tags=tags).sum(axis=1).divide(market_vals)
         pnl.replace([np.inf, -np.inf], np.nan, inplace=True)
         pnl = pnl.fillna(0)
         pnl.name = self.account
@@ -404,11 +407,13 @@ class Portfolio(TimeSeriesInterface):
         return pd.DataFrame(prices).fillna(0)
 
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):
-        ic = kwargs.get("include_cash") if kwargs.get("include_cash") else False
-        if kwargs.get("include_cash"):
-            del kwargs['include_cash']
+        include_cash = kwargs.get("include_cash") if kwargs.get("include_cash") is not None else False
 
-        return self.pct_daily_total_pnl(start_date=start_date, end_date=end_date, include_cash=ic, **kwargs).fillna(0)
+        return self.pct_daily_total_pnl(start_date=start_date,
+                                        end_date=end_date,
+                                        include_cash=include_cash,
+                                        positions_to_exclude=kwargs.get("positions_to_exclude"),
+                                        tags=kwargs.get("tags"))
 
     @staticmethod
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:

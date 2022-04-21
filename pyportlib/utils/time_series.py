@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Union
+from typing import Union, Tuple
 import pandas as pd
 
 from . import dates_utils
@@ -15,15 +15,17 @@ class TimeSeriesInterface(ABC):
         raise NotImplementedError()
 
 
-def prep_returns(ts: Union[TimeSeriesInterface, pd.DataFrame, pd.Series], lookback: str, date: datetime = None, **kwargs) -> pd.Series:
+def prep_returns(ts: Union[TimeSeriesInterface, pd.DataFrame, pd.Series], lookback: str = None, date: datetime = None, **kwargs) -> pd.Series:
     """
     Computes returns for a Position, Portfolio or Pandas objects
-    :param ts: time series object
-    :param lookback:
-    :param date:
-    :param kwargs:
+    :param ts: TimeSeriesInterface Object (Position, Portfolio) or Pandas object
+    :param lookback: string determining the start date. ex: '1y'
+    :param date: end date of observation
+    :param kwargs: PnL keyword arguments for Portfolio (tags, positions_to_exclude, include_cash)
     :return:
     """
+    if lookback is None:
+        lookback = "1y"
     end_date = dates_utils.last_bday(date)
     start_date = dates_utils.date_window(date=end_date, lookback=lookback)
 
@@ -31,3 +33,12 @@ def prep_returns(ts: Union[TimeSeriesInterface, pd.DataFrame, pd.Series], lookba
         return ts.loc[start_date:date].fillna(0)
 
     return ts.returns(start_date=start_date, end_date=end_date, **kwargs)
+
+
+def match_index(series1: pd.Series, series2: pd.Series) -> Tuple[pd.Series, pd.Series]:
+    if len(series1) < len(series2):
+        return series1, series2.loc[series2.index.isin(series1.index)]
+    elif len(series1) > len(series2):
+        return series1.loc[series1.index.isin(series2.index)], series2
+    else:
+        return series1, series2

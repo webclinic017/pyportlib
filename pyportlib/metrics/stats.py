@@ -5,39 +5,42 @@ import pandas as pd
 from scipy.stats import norm
 import quantstats as qs
 
+from pyportlib.utils.time_series import TimeSeriesInterface
 from ..utils import time_series
 
 
-def skew(pos, lookback: str, date: datetime = None, **kwargs) -> float:
+def skew(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     return returns.skew()
 
 
-def kurtosis(pos, lookback: str, date: datetime = None, **kwargs) -> float:
+def kurtosis(pos: TimeSeriesInterface, lookback: str, date: datetime = None, **kwargs) -> float:
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     return returns.kurtosis()
 
 
-def beta(pos, benchmark, lookback: str,
-         date: datetime = None, **kwargs) -> float:
+def beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns, benchmark = time_series.match_index(returns, benchmark)
     matrix = np.cov(returns, benchmark)
     return round(matrix[0, 1] / matrix[1, 1], 2)
 
 
-def alpha(pos, benchmark, lookback: str, date: datetime = None, **kwargs) -> float:
+def alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns, benchmark = time_series.match_index(returns, benchmark)
     matrix = np.cov(returns, benchmark)
     bet = matrix[0, 1] / matrix[1, 1]
     alph = returns.mean() - (bet * benchmark.mean())
     return alph*len(returns)
 
 
-def rolling_alpha(pos, benchmark, lookback: str, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
+def rolling_alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns, benchmark = time_series.match_index(returns, benchmark)
     df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
 
     corr = df.rolling(int(rolling_period)).corr().unstack()['returns']['benchmark']
@@ -48,7 +51,7 @@ def rolling_alpha(pos, benchmark, lookback: str, date: datetime = None, rolling_
     return rolling_alph*rolling_period
 
 
-def annualized_volatility(pos, lookback: str, date: datetime = None, **kwargs) -> float:
+def annualized_volatility(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     return qs.stats.volatility(returns=returns, prepare_returns=False, annualize=True)
 
@@ -64,7 +67,7 @@ def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, meth
         return abs(var)
 
 
-def rolling_var(pos, lookback: str, date: datetime = None, rolling_period: int = 252, quantile=0.95, **kwargs):
+def rolling_var(pos, lookback: str = None, date: datetime = None, rolling_period: int = 252, quantile=0.95, **kwargs):
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     mean = returns.rolling(rolling_period).mean()
     var = returns.rolling(rolling_period).std()
