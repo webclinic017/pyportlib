@@ -33,7 +33,7 @@ setup(
     long_description=long_description,
     url='https://github.com/phil-lo/pyportlib',
     author='Philippe Lacroix-Ouellette',
-    author_email='philippe.lacroix.ouellette@gmail.com.com',
+    author_email='philippe.lacroix.ouellette@gmail.com',
     license='MIT License',
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
