@@ -14,12 +14,12 @@ On the other hand, you can leverage the *Position* object to retreive and manipu
 
 Most of the stats and plots modules wrap around quantstats package. Currently has yahoo as implemented source (yfinance and yahoo_fin)
 
-See /examples/
+See */examples/*
 
 ## Questrade Connection
 Update your portfolio with the questrade connection. Retreive account information and transactions and *QuestradeConnection* can manage all of your portfolio changes.
 
-Examples showing how to use are coming.
+Example is available in */examples/*.
 
 ## Other
 Package also offers utility functions useful for any quantitative/analytics research workflow such as indices symbols, calendar management and rolling date ranges.
