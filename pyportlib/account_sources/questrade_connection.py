@@ -3,6 +3,7 @@ from typing import Union, List
 import pandas as pd
 import dateutil.parser
 
+from ..account_sources.base_account_source import BaseAccountSource
 from ..services.cash_change import CashChange
 from ..utils import logger, config_utils
 from .questrade_api.questrade import Questrade
@@ -12,7 +13,7 @@ from ..position import Position
 from ..utils import dates_utils
 
 
-class QuestradeConnection(Questrade):
+class QuestradeConnection(Questrade, BaseAccountSource):
     def __init__(self, account_name, **kwargs):
         super().__init__(**kwargs)
         self.account_name = account_name.upper()

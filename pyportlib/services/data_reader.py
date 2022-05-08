@@ -1,9 +1,9 @@
 from datetime import datetime
 import pandas as pd
 
-from ..data_sources.base_data_connection import BaseDataConnection
+from ..market_data_sources.base_data_connection import BaseDataConnection
 from ..utils import logger, files_utils, config_utils
-from ..data_sources.yahoo_connection import YahooConnection
+from ..market_data_sources.yahoo_connection import YahooConnection
 
 
 class DataReader:
