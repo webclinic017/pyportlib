@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Union, List, Dict
-
 import numpy as np
 import pandas as pd
 
@@ -182,7 +181,7 @@ class Portfolio(TimeSeriesInterface):
                 transactions = [transactions]
 
             for trx in transactions:
-                ok, new_cash = self._check_trx(transaction=trx)
+                ok, new_cash = self._enough_funds(transaction=trx)
 
                 if not ok:
                     logger.logging.error(f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
@@ -379,7 +378,7 @@ class Portfolio(TimeSeriesInterface):
         port_mv = self.market_value.loc[date]
         weights_dict = {k: round(v.npv().loc[date] / port_mv, 5) for k, v in self.positions.items() if
                         v.npv().loc[date] != 0}
-        if not 0.9999 < sum(weights_dict.values()) < 1.001:
+        if not 0.999 < sum(weights_dict.values()) < 1.001:
             raise ValueError(f'weights ({sum(weights_dict.values())}) do not add to 1')
         return weights_dict
 
@@ -419,7 +418,7 @@ class Portfolio(TimeSeriesInterface):
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
         return quantities.fillna(0).cumsum()
 
-    def _check_trx(self, transaction) -> tuple:
+    def _enough_funds(self, transaction) -> tuple:
         value = transaction.quantity * transaction.price
 
         if transaction.currency != self.currency:

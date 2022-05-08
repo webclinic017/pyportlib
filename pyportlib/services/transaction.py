@@ -59,20 +59,15 @@ class Transaction:
         :return:
         """
         condition1 = self.type in self._TYPES
-        # currencies = ['USD', 'CAD']
-        # condition2 = self.currency in currencies
-        condition3 = isinstance(self.date, datetime)
-        condition4 = (self.quantity > 0 and self.type == 'Buy') or (self.quantity == 0 and self.type == 'Dividend') or (self.quantity < 0 and self.type == 'Sell')
+        condition2 = isinstance(self.date, datetime)
+        condition3 = (self.quantity > 0 and self.type == 'Buy') or (self.quantity == 0 and self.type == 'Dividend') or (self.quantity < 0 and self.type == 'Sell')
 
         if not condition1:
             logger.logging.error(f'transaction type {self.type} is invalid, must be in {self._TYPES}')
             print(self.df)
-        # if not condition2:
-        #     logger.logging.error(f'transaction currency {self.type} is invalid, must be in {currencies}')
-        #     print(self.df)
-        if not condition3:
+        if not condition2:
             logger.logging.error(f'transaction date {self.date} is invalid, must be datetime')
             print(self.df)
-        if not condition4:
+        if not condition3:
             logger.logging.error(f'transaction type {self.type} and quantity {self.quantity} are invalid')
             print(self.df)

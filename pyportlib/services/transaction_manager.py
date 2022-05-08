@@ -57,14 +57,7 @@ class TransactionManager:
         logger.logging.debug('transactions file updated')
 
     def _check_trx(self, transaction: Transaction) -> bool:
-        new_qty = self._transactions.Quantity.loc[self._transactions.Ticker == transaction.ticker].sum() + transaction.quantity
-
-        if new_qty < 0:  # TODO determine if we really want to keep it long only (maybe set in portfolio config?)
-            print(transaction.df)
-            logger.logging.error(f'no short positions allowed, you sold {-1 * (transaction.quantity - (transaction.quantity - new_qty))} units too many')
-            return False
-        else:
-            return True
+        return True
 
     def add(self, transaction: Transaction) -> None:
         if self._check_trx(transaction):
