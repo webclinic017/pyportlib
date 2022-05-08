@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from datetime import datetime
 import pandas as pd
 
@@ -27,36 +26,28 @@ class BaseDataConnection:
     def fx_dir(self):
         return self._FX_DIRECTORY
 
-    @abstractmethod
     @property
     def file_prefix(self):
         raise NotImplementedError()
 
-    @abstractmethod
     def get_prices(self, ticker: str) -> None:
         raise NotImplementedError()
 
-    @abstractmethod
     def get_fx(self, currency_pair: str) -> None:
         raise NotImplementedError()
 
-    @abstractmethod
     def get_balance_sheet(self, ticker: str):
         raise NotImplementedError()
 
-    @abstractmethod
     def get_cash_flow(self, ticker: str):
         raise NotImplementedError()
 
-    @abstractmethod
     def get_income_statement(self, ticker: str):
         raise NotImplementedError()
 
-    @abstractmethod
     def get_dividends(self, ticker: str, start_date=None, end_date=None):
         raise NotImplementedError()
 
-    @abstractmethod
     def get_splits(self, ticker: str):
         raise NotImplementedError()
 
@@ -71,7 +62,6 @@ class BaseDataConnection:
         data = [1 for _ in range(len(dates))]
         return pd.DataFrame(data=data, index=pd.Index(name='Date', data=dates), columns=['Close'])
 
-    @abstractmethod
     @staticmethod
     def _convert_ticker(ticker: str) -> str:
         raise NotImplementedError()
