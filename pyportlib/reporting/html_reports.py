@@ -3,7 +3,7 @@ import pandas as pd
 import quantstats as qs
 
 from ..portfolio import Portfolio
-from pyportlib.services.data_reader import DataReader
+from ..services.data_reader import DataReader
 from ..utils import files_utils
 
 OUT_DIR = files_utils.get_outputs_dir()
