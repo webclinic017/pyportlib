@@ -30,9 +30,11 @@ def prep_returns(ts: Union[TimeSeriesInterface, pd.DataFrame, pd.Series], lookba
     start_date = dates_utils.date_window(date=end_date, lookback=lookback)
 
     if isinstance(ts, pd.Series) or isinstance(ts, pd.DataFrame):
-        return ts.loc[start_date:date].fillna(0)
-
-    return ts.returns(start_date=start_date, end_date=end_date, **kwargs)
+        series = ts.loc[start_date:date].fillna(0)
+    else:
+        series = ts.returns(start_date=start_date, end_date=end_date, **kwargs)
+    series = remove_front_zeroes(series)
+    return series
 
 
 def match_index(series1: pd.Series, series2: pd.Series) -> Tuple[pd.Series, pd.Series]:
@@ -42,3 +44,11 @@ def match_index(series1: pd.Series, series2: pd.Series) -> Tuple[pd.Series, pd.S
         return series1.loc[series1.index.isin(series2.index)], series2
     else:
         return series1, series2
+
+
+def remove_front_zeroes(series: pd.Series) -> pd.Series:
+    # TODO make more robust, may have 0 value not at start
+    sum = series.cumsum()
+    drop = sum.loc[sum == 0].index
+    series = series.drop(drop).copy()
+    return series
