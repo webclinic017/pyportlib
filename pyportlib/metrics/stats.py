@@ -38,7 +38,7 @@ def alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: st
 
 
 def rolling_alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
-    # FIXME not correct way to compute, maybe base on alpha function and loop dates...
+    # FIXME not ok
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
     returns, benchmark = time_series.match_index(returns, benchmark)

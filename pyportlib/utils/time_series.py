@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Union, Tuple
+
+import numpy as np
 import pandas as pd
 
 from . import dates_utils
@@ -33,7 +35,7 @@ def prep_returns(ts: Union[TimeSeriesInterface, pd.DataFrame, pd.Series], lookba
         series = ts.loc[start_date:date].fillna(0)
     else:
         series = ts.returns(start_date=start_date, end_date=end_date, **kwargs)
-    series = remove_front_zeroes(series)
+    series = remove_consecutive_zeroes(series)
     return series
 
 
@@ -46,9 +48,6 @@ def match_index(series1: pd.Series, series2: pd.Series) -> Tuple[pd.Series, pd.S
         return series1, series2
 
 
-def remove_front_zeroes(series: pd.Series) -> pd.Series:
-    # TODO make more robust, may have 0 value not at start
-    sum = series.cumsum()
-    drop = sum.loc[sum == 0].index
-    series = series.drop(drop).copy()
-    return series
+def remove_consecutive_zeroes(series: pd.Series, threshold: int = 4) -> pd.Series:
+    to_drop = series.eq(0).rolling(threshold).sum().isin([threshold, np.NaN])
+    return series.loc[~to_drop]
