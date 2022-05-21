@@ -182,9 +182,7 @@ class QuestradeConnection(Questrade, BaseAccountSource):
         :param transaction:
         :return: Transaction object
         """
-        # if not isinstance(transaction, dict):
-        #     raise ValueError("transaction must be a dict")
-
+        # TODO add splits
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
             if transaction.get('type') in ["Deposits", "Withdrawals"]:
                 return
