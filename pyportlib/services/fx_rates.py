@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 
 from pyportlib.services.data_reader import DataReader
 from ..utils import logger
@@ -7,7 +7,7 @@ from ..utils import logger
 class FxRates:
     _NAME = "FX Rates"
 
-    def __init__(self, ptf_currency: str, currencies: List[str]):
+    def __init__(self, ptf_currency: str, currencies: Set[str]):
         self.pairs = [f"{curr}{ptf_currency}" for curr in currencies]
         self.rates = {}
         self.datareader = DataReader()

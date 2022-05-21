@@ -26,7 +26,7 @@ class CashChange:
     def _check(self):
         assert isinstance(self.info.get("Date"), datetime)
         assert self.info["Direction"] in self._DIRECTIONS
-        assert isinstance(self.info["Amount"], float)
+        assert isinstance(self.info["Amount"], float) or isinstance(self.info["Amount"], int)
         if (self.direction == "Deposit" and self.amount < 0) or \
                 (self.direction == "Withdrawals" and self.amount > 0):
             logger.logging.error(f"{self.direction} and {self.amount} don't match")

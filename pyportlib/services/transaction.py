@@ -7,7 +7,7 @@ from ..utils import logger
 class Transaction:
     _NAME = 'Transaction'
     _TYPES = ["Buy", "Sell", "Dividend", "Split"]
-    _INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
+    INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']
 
     def __init__(self,
                  date: datetime,
@@ -60,7 +60,10 @@ class Transaction:
         """
         condition1 = self.type in self._TYPES
         condition2 = isinstance(self.date, datetime)
-        condition3 = (self.quantity > 0 and self.type == 'Buy') or (self.quantity == 0 and self.type == 'Dividend') or (self.quantity < 0 and self.type == 'Sell')
+        condition3 = (self.quantity > 0 and self.type == 'Buy') or \
+                     (self.quantity == 0 and self.type == 'Dividend') or \
+                     (self.quantity < 0 and self.type == 'Sell') or \
+                     (self.quantity == 0 and self.type == 'Split')
 
         if not condition1:
             logger.logging.error(f'transaction type {self.type} is invalid, must be in {self._TYPES}')

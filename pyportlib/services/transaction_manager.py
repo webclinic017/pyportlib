@@ -32,7 +32,7 @@ class TransactionManager:
             except KeyError:
                 pass
             finally:
-                if df_utils.check_df_columns(df=trx, columns=Transaction._INFO):
+                if df_utils.check_df_columns(df=trx, columns=Transaction.INFO):
                     trx.set_index('Date', inplace=True)
                     trx.index.name = 'Date'
                     trx.index = pd.to_datetime(trx.index)
@@ -56,12 +56,19 @@ class TransactionManager:
         self._transactions.to_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
         logger.logging.debug('transactions file updated')
 
-    def _check_trx(self, transaction: Transaction) -> bool:
+    def _save_trx_df(self) -> None:
+        self._transactions.to_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
+        logger.logging.debug('transactions file updated')
+
+    @staticmethod
+    def _check_trx(transaction: Transaction) -> bool:
+        assert transaction
         return True
 
     def add(self, transaction: Transaction) -> None:
         if self._check_trx(transaction):
             self._write_trx(transaction)
+
             logger.logging.info(f'{transaction} was added to account: {self.account}')
 
     def all_tickers(self) -> list:
@@ -91,11 +98,11 @@ class TransactionManager:
         else:
             return None
 
-    def get_currencies(self):
+    def get_currencies(self) -> set:
         currencies = set(self._transactions.Currency)
         return currencies
 
-    def get_currency(self, ticker: str):
+    def get_currency(self, ticker: str) -> str:
         return self._transactions.loc[self._transactions['Ticker'] == ticker, 'Currency'].iloc[0]
 
     def reset(self):
@@ -103,26 +110,18 @@ class TransactionManager:
         empty_transactions.to_csv(f"{self.directory}/{self._TRANSACTION_FILENAME}")
         self._transactions = empty_transactions
 
-    def add_split(self, date: datetime, ticker: str, factor: float):
-        # TODO add split transaction in questrade as well, to correct historic transactions
+    def add_split(self, transaction: Transaction):
         """
-        Creates a split transaction and corrects historic ticker transactions for that split (manual split only?)
-        :param date: date of the split. Keeps track of manual splits
-        :param ticker: ticker of the split
-        :param factor: is set as the "price" of the transaction
+        Creates a split and corrects historic ticker transactions for that split
+        :param transaction: split transaction
         :return:
         """
-        currency = self.get_currency(ticker=ticker)
-        split = Transaction(date=date,
-                            ticker=ticker,
-                            transaction_type="Split",
-                            quantity=0,
-                            price=factor,
-                            fees=0,
-                            currency=currency)
-        return
-        self.add(split)
+        self.add(transaction)
+
+        self._transactions.loc[(self._transactions['Ticker'] == transaction.ticker) & (self._transactions['Type'].isin(["Buy", "Sell"])), 'Price'] /= transaction.price
+        self._transactions.loc[(self._transactions['Ticker'] == transaction.ticker) & (self._transactions['Type'].isin(["Buy", "Sell"])), 'Quantity'] *= transaction.price
+        self._save_trx_df()
 
     @staticmethod
     def empty_transactions():
-        return pd.DataFrame(columns=Transaction._INFO).set_index('Date')
+        return pd.DataFrame(columns=Transaction.INFO).set_index('Date')

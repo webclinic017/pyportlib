@@ -106,6 +106,7 @@ class Portfolio(TimeSeriesInterface):
             return market_val.fillna(0)
         else:
             logger.logging.debug(f"{self.account} no positions in portfolio")
+            return pd.Series()
 
     def _load_market_value(self) -> None:
         self._market_value = pd.Series()
@@ -186,7 +187,10 @@ class Portfolio(TimeSeriesInterface):
                 if not ok:
                     logger.logging.error(f'{self.account}: transaction not added. not enough funds to perform this transaction, missing {-1 * new_cash} to complete')
                 else:
-                    self._transaction_manager.add(transaction=trx)
+                    if trx.type == "Split":
+                        self._transaction_manager.add_split(transaction=trx)
+                    else:
+                        self._transaction_manager.add(transaction=trx)
             self.load_data()
 
     @property
