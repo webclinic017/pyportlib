@@ -17,26 +17,38 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
     def __init__(self, account_name, **kwargs):
         super().__init__(**kwargs)
         self.account_name = account_name.upper()
+        self.active_accounts = self.active_accounts()
+        self.account_id = self.select_account()
 
-    def _get_account_id(self):
+    def select_account(self, select: str = "TFSA"):
+        if len(self.active_accounts) == 1:
+            return self.active_accounts.get([*self.active_accounts][0])
+        else:
+            return self.active_accounts.get(select)
+
+    def active_accounts(self):
         accounts = self.accounts.get('accounts')
-        tfsa_id = [acc for acc in accounts if acc.get('type') == self.account_name and acc.get('status') == 'Active'][
-            0].get('number')
-        return tfsa_id
+        active = {}
+        for account in accounts:
+            if account.get("status") == "Active":
+                info = {account.get("type"): account.get("number")}
+                active.update(info)
+
+        return active
 
     def get_positions(self):
         """
         Get positions from the connected account
         :return:
         """
-        return self.account_positions(self._get_account_id())
+        return self.account_positions(self.account_id)
 
     def get_balances(self):
         """
         Get balances from the connected account
         :return:
         """
-        return self.account_balances(self._get_account_id())
+        return self.account_balances(self.account_id)
 
     def get_transactions(self, start_date: datetime = None, end_date: datetime = None) -> List[dict]:
         """
@@ -52,8 +64,8 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
         for date in date_rng:
             date = date.isoformat('T') + '-05:00'
             kwargs = {'startTime': date, 'endTime': date}
-            trx = self.account_activities(self._get_account_id(), **kwargs).get('activities', self.account_activities(
-                self._get_account_id(), **kwargs))
+            trx = self.account_activities(self.account_id, **kwargs).get('activities', self.account_activities(
+                self.account_id, **kwargs))
             if trx:
                 list_of_trx.extend(trx)
 
