@@ -3,34 +3,40 @@ from time import time, strftime, localtime
 from datetime import timedelta
 
 
-def secondsToStr(elapsed=None):
+def _seconds_to_str(elapsed=None):
     if elapsed is None:
         return strftime("%Y-%m-%d %H:%M:%S", localtime())
     else:
         return str(timedelta(seconds=elapsed))
 
 
-def log(s, elapsed=None):
+def _log(s, elapsed=None):
     line = "="*40
     print(line)
-    print(secondsToStr(), '-', s)
+    print(_seconds_to_str(), '-', s)
     if elapsed:
         print("Elapsed time:", elapsed)
     print(line)
     print()
 
 
-def midlog(s):
+def log(msg: str) -> None:
+    """
+    Log (Print) the elapsed time with a msg
+    :param msg: String
+    :return:
+    """
     end = time()
     elapsed = end-start
-    log(s, secondsToStr(elapsed))
+    _log(msg, _seconds_to_str(elapsed))
 
 
-def endlog():
+def _endlog():
     end = time()
     elapsed = end-start
-    log("End Program", secondsToStr(elapsed))
+    _log("End Program", _seconds_to_str(elapsed))
+
 
 start = time()
-atexit.register(endlog)
-log("Start Program")
+atexit.register(_endlog)
+_log("Start Program")

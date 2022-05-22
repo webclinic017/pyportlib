@@ -3,10 +3,10 @@ from typing import List
 
 def check_df_columns(df, columns: List[str]) -> bool:
     """
-    Checks if dataframe contains columns
-    :param df: dataframe to be checked
-    :param columns: columns wanted
-    :return: True if df contains the columns
+    Checks if Pandas Dataframe contains columns
+    :param df: Pandas Dataframe to be checked
+    :param columns: columns to check
+    :return: True if Pandas Dataframe contains all the columns
     """
     condition1 = set(df.columns) == set(columns)
 

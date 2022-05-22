@@ -10,16 +10,14 @@ from ..utils import logger
 warnings.filterwarnings('ignore')
 
 
-def get_market_days(start: datetime, end: datetime = None, market: str = None) -> List[datetime]:
+def get_market_days(start: datetime, end: datetime = None, market: str = 'NYSE') -> List[datetime]:
     """
     Generate datetime list (index) for a date range with a specific calendar
-    :param start:
-    :param end:
-    :param market: market calendar
+    :param start: Start date of the range.
+    :param end: End date of the range.
+    :param market: Market calendar as in pandas_market_calendars. Default is "NYSE".
     :return:
     """
-    if market is None:
-        market = 'NYSE'
     if end is None:
         end = datetime.today()
     if start is None:
@@ -39,7 +37,7 @@ def get_market_days(start: datetime, end: datetime = None, market: str = None) -
 def date_window(lookback: str = "1y", date: datetime = None) -> datetime:
     """
     Returns date with look back: ex. 2022-01-01 with lookback 1y is 2021-01-01.
-    :param lookback: string: ex. "1y", "15m"
+    :param lookback: string: ex. "1y", "15m". Only m and y is supported to generate look back
     :param date: date to lookback from
     :return:
     """
@@ -59,9 +57,9 @@ def date_window(lookback: str = "1y", date: datetime = None) -> datetime:
 
 def last_bday(as_of: datetime = None) -> datetime:
     """
-    Returns the last busniess day if as_of is not a business day.
-    :param as_of: date
-    :return:
+    Returns the last busniess day. If as_of is a business day, it is the date that will be returned.
+    :param as_of: As of date to get the last business date from
+    :return: The last business day
     """
     if as_of is None:
         as_of = datetime.today()

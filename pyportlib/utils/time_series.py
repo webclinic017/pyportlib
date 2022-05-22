@@ -10,7 +10,7 @@ from . import dates_utils
 
 class TimeSeriesInterface(ABC):
     """
-    Interface from object that have returns for stats and plots
+    Interface from object that have returns
     """
     @abstractmethod
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):
@@ -40,6 +40,12 @@ def prep_returns(ts: Union[TimeSeriesInterface, pd.DataFrame, pd.Series], lookba
 
 
 def match_index(series1: pd.Series, series2: pd.Series) -> Tuple[pd.Series, pd.Series]:
+    """
+    Match the indexes of 2 Pandas Series objects. The shortest Series will be the one being matched to.
+    :param series1: Pandas Series
+    :param series2: Pandas Series
+    :return: A tuple containing both Series in the order they were given. (series1, series2)
+    """
     if len(series1) < len(series2):
         return series1, series2.loc[series2.index.isin(series1.index)]
     elif len(series1) > len(series2):
@@ -49,5 +55,11 @@ def match_index(series1: pd.Series, series2: pd.Series) -> Tuple[pd.Series, pd.S
 
 
 def remove_consecutive_zeroes(series: pd.Series, threshold: int = 4) -> pd.Series:
+    """
+    Removes the consecutive zeroes from a Pandas Series
+    :param series: Pandas Series
+    :param threshold: minimum number of consecutive zeroes that will be removed
+    :return:
+    """
     to_drop = series.eq(0).rolling(threshold).sum().isin([threshold, np.NaN])
     return series.loc[~to_drop]

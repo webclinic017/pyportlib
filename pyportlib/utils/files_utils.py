@@ -6,9 +6,9 @@ from ..utils.config_utils import create_default_config
 
 def check_file(directory: str, file: str) -> bool:
     """
-    checks if demanded file exists in specified directory
-    :param directory: string of the directory path
-    :param file: filename in specified directory
+    Checks if file exists in specified directory
+    :param directory: String of the directory path
+    :param file: String filename in specified directory
     :return: True if file exists
     """
     if len(directory):
@@ -24,8 +24,8 @@ def check_file(directory: str, file: str) -> bool:
 
 def check_dir(directory) -> bool:
     """
-    checks if directory exists
-    :param directory: string of the directory path
+    Checks if directory exists
+    :param directory: String of the directory path
     :return: True if directory exists
     """
     if os.path.exists(directory):
@@ -37,20 +37,20 @@ def check_dir(directory) -> bool:
 def make_dir(path) -> None:
     """
     Creates directory at specified path
-    :param path: string of directory path
+    :param path: String of directory path
     :return: None
     """
     os.makedirs(path)
 
 
-_client_dir = None
-_data_dir = None
-_accounts_dir = None
-_price_data_dir = None
-_fx_data_dir = None
-_statements_data_dir = None
-_config_dir = None
-_outputs_dir = None
+_client_dir: str
+_data_dir: str
+_accounts_dir: str
+_price_data_dir: str
+_fx_data_dir: str
+_statements_data_dir: str
+_config_dir: str
+_outputs_dir: str
 
 
 def _check_client_dir():
@@ -60,17 +60,16 @@ def _check_client_dir():
     """
     if _data_dir is None:
         msg = 'The pyportlib data directory has not been set by the user. ' \
-              'Please call the function pyportlib.set_data_dir() first.'
+              'Please call the function pyportlib.set_client_dir() first.'
         raise Exception(msg)
 
 
-def set_client_dir(data_dir=""):
+def set_client_dir(data_dir="") -> None:
     """
-    Set the directory where datasets are stored on disk
-    and create the directory if it does not exist.
+    Set the directory where data is stored on disk and create the directory if it does not exist.
 
-    :param data_dir: String with the directory-name.
-    :return: `None`
+    :param data_dir: String with the directory name.
+    :return: None
     """
     data_dir = f'~{data_dir}/pyportlib_client_data'
     global _client_dir, _data_dir, _accounts_dir, _price_data_dir, \
@@ -110,11 +109,9 @@ def set_client_dir(data_dir=""):
         create_default_config(_config_dir)
 
 
-def get_client_dir():
+def get_client_dir() -> str:
     """
-    Get the full path for the main data-directory where
-    datasets are saved on disk.
-
+    Get the full path for the main data directory where datasets are saved on disk.
     :return: String with the path for the data-directory.
     """
     # Ensure the data-directory has been set by the user.
@@ -122,10 +119,10 @@ def get_client_dir():
     return _client_dir
 
 
-def get_data_dir():
+def get_data_dir() -> str:
     """
     Get the full path for the data directory where
-    the files with datasets are temporarily stored.
+    the files are stored.
 
     :return: String with the path for the download directory.
     """
@@ -134,10 +131,10 @@ def get_data_dir():
     return _data_dir
 
 
-def get_accounts_dir():
+def get_accounts_dir() -> str:
     """
     Get the full path for the accounts directory where
-    the files with datasets are temporarily stored.
+    the files are stored.
 
     :return: String with the path for the accounts directory.
     """
@@ -146,10 +143,10 @@ def get_accounts_dir():
     return _accounts_dir
 
 
-def get_config_dir():
+def get_config_dir() -> str:
     """
     Get the full path for the accounts directory where
-    the files with datasets are temporarily stored.
+    the files are stored.
 
     :return: String with the path for the accounts directory.
     """
@@ -158,10 +155,10 @@ def get_config_dir():
     return _config_dir
 
 
-def get_price_data_dir():
+def get_price_data_dir() -> str:
     """
     Get the full path for the price directory where
-    the files with datasets are temporarily stored.
+    the files are stored.
 
     :return: String with the path for the price directory.
     """
@@ -170,10 +167,10 @@ def get_price_data_dir():
     return _price_data_dir
 
 
-def get_fx_data_dir():
+def get_fx_data_dir() -> str:
     """
     Get the full path for the fx directory where
-    the files with datasets are temporarily stored.
+    the files are stored.
 
     :return: String with the path for the fx directory.
     """
@@ -182,10 +179,10 @@ def get_fx_data_dir():
     return _fx_data_dir
 
 
-def get_statements_data_dir():
+def get_statements_data_dir() -> str:
     """
     Get the full path for the statements directory where
-    the files with datasets are temporarily stored.
+    the files are stored.
 
     :return: String with the path for the statements directory.
     """
@@ -194,12 +191,11 @@ def get_statements_data_dir():
     return _statements_data_dir
 
 
-def get_outputs_dir():
+def get_outputs_dir() -> str:
     """
-    Get the full path for the statements directory where
-    the files with datasets are temporarily stored.
+    Get the full path for the outputs directory
 
-    :return: String with the path for the statements directory.
+    :return: String with the path for the outputs directory.
     """
     # Ensure the data-directory has been set by the user.
     _check_client_dir()
