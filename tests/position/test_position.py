@@ -3,7 +3,7 @@ from datetime import datetime
 import pyportlib
 
 
-class TestAddTransactions:
+class TestPosition:
     date = datetime(2022, 5, 20)
 
     def test_get_price(self):
