@@ -109,7 +109,7 @@ class Portfolio(TimeSeriesInterface):
                     market_val = market_val.add(pos_val)
                     market_val = market_val.fillna(method='ffill')
                 else:
-                    logger.logging.error(f'no market value computed for {position.ticker}')
+                    logger.logging.debug(f'no market value computed for {position.ticker}')
 
             # used by pnl to return the value instead of setting it
             logger.logging.debug(f'{self.account} market_value computed and returned')

@@ -62,4 +62,4 @@ class PositionTagging:
     def _save(self) -> None:
         with open(self._filename, 'w', encoding='utf-8') as f:
             json.dump(self._tags, f, ensure_ascii=False, indent=1)
-        logger.logging.info("position tags saved")
+        logger.logging.debug("position tags saved")

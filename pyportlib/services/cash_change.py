@@ -10,8 +10,8 @@ class CashChange:
 
     def __init__(self, date: datetime, direction: str, amount: float):
         self.date = date
-        self.direction = direction
-        self.amount = amount
+        self.direction = direction.title()
+        self.amount = float(amount)
         self._check()
 
     def __repr__(self):
