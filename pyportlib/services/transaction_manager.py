@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import pandas as pd
 
 from ..services.transaction import Transaction
@@ -69,7 +67,7 @@ class TransactionManager:
         if self._check_trx(transaction):
             self._write_trx(transaction)
 
-            logger.logging.info(f'{transaction} was added to account: {self.account}')
+            logger.logging.debug(f'{transaction} was added to account: {self.account}')
 
     def all_tickers(self) -> list:
         try:
