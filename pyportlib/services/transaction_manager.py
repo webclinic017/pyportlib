@@ -1,7 +1,7 @@
 import pandas as pd
 
-from ..services.transaction import Transaction
-from ..utils import logger, df_utils, files_utils
+from pyportlib.services.transaction import Transaction
+from pyportlib.utils import logger, df_utils, files_utils
 
 
 class TransactionManager:
