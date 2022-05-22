@@ -55,10 +55,11 @@ def date_window(lookback: str = "1y", date: datetime = None) -> datetime:
     return date
 
 
-def last_bday(as_of: datetime = None) -> datetime:
+def last_bday(as_of: datetime = None, calendar: str = "NYSE") -> datetime:
     """
     Returns the last busniess day. If as_of is a business day, it is the date that will be returned.
     :param as_of: As of date to get the last business date from
+    :param calendar: String of the pandas calendar. default us 'NYSE'
     :return: The last business day
     """
     if as_of is None:
@@ -76,7 +77,7 @@ def last_bday(as_of: datetime = None) -> datetime:
         last_bd = (as_of - shift).replace(hour=0, minute=0, second=0, microsecond=0)
 
     # check if holiday
-    check = get_market_days(start=last_bd, end=last_bd)
+    check = get_market_days(start=last_bd, end=last_bd, market=calendar)
     if not check:
         return (last_bd - bday(1)).replace(hour=0, minute=0, second=0, microsecond=0)
     return last_bd

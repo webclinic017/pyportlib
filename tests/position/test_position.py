@@ -11,5 +11,7 @@ class TestPosition:
 
         assert pos
         assert round(pos.prices.loc[self.date], 4) == 137.59
+        assert pos.ticker == "AAPL"
+        assert pos.currency == 'USD'
 
 
