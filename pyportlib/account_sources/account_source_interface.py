@@ -5,7 +5,7 @@ from typing import List
 from ..portfolio import Portfolio
 
 
-class BaseAccountSource(ABC):
+class AccountSourceInterface(ABC):
 
     @abstractmethod
     def get_positions(self):
