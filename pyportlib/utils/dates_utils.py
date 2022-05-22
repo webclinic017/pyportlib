@@ -37,8 +37,8 @@ def get_market_days(start: datetime, end: datetime = None, market: str = 'NYSE')
 def date_window(lookback: str = "1y", date: datetime = None) -> datetime:
     """
     Returns date with look back: ex. 2022-01-01 with lookback 1y is 2021-01-01.
-    :param lookback: string: ex. "1y", "15m". Only m and y is supported to generate look back
-    :param date: date to lookback from
+    :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back
+    :param date: Date to lookback from
     :return:
     """
     amount = int(lookback[:-1])

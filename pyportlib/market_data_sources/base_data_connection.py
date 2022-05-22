@@ -10,6 +10,10 @@ class BaseDataConnection:
     _PRICES_DIRECTORY = files_utils.get_price_data_dir()
     _FX_DIRECTORY = files_utils.get_fx_data_dir()
 
+    _FILE_PREFIX: str
+    _NAME: str
+    _URL: str
+
     @property
     def data_dir(self):
         return self._DATA_DIRECTORY

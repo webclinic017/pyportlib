@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List
 
-from ..portfolio import Portfolio
+from pyportlib.portfolio import Portfolio
 
 
 class AccountSourceInterface(ABC):
