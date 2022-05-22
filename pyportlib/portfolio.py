@@ -44,6 +44,7 @@ class Portfolio(TimeSeriesInterface):
         """
         Loads Portfolio object with current available data, mostly used to update some attributes
         dependent on other objects or computations
+
         :return: None
         """
         self.start_date = self._transaction_manager.first_transaction()
@@ -60,6 +61,7 @@ class Portfolio(TimeSeriesInterface):
     def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
         Updates all of the market data of the portfolio (prices, fx)
+
         :param fundamentals_and_dividends: True to update all statement and dividend data
         :return:
         """
@@ -76,6 +78,14 @@ class Portfolio(TimeSeriesInterface):
             position.update_data(fundamentals_and_dividends=fundamentals_and_dividends)
 
     def compute_market_value(self, positions_to_exclude: List[str] = None, tags: List[str] = None) -> pd.Series:
+        """
+        Computes the daily market value of the portfolio
+
+        :param positions_to_exclude: Ticker of position to exclude from computations
+        :param tags: Tags to compute the market value of. If None, it will be the market value of the whole portfolio
+        :return:
+        """
+
         positions_to_compute = self.positions
 
         # used for pnl what if scenarios where position are easily ommited from calculations
@@ -126,6 +136,7 @@ class Portfolio(TimeSeriesInterface):
     def _load_positions(self) -> None:
         """
         Based on on the transaction data, loads all of the active and closed positions
+
         :return: None
         """
         self._positions = {}
@@ -149,6 +160,7 @@ class Portfolio(TimeSeriesInterface):
     def _load_position_quantities(self) -> None:
         """
         Based on the transaction data, loads all of the active and closed positions
+
         :return: None
         """
         if len(self._positions):
@@ -173,7 +185,8 @@ class Portfolio(TimeSeriesInterface):
 
     def add_transaction(self, transactions: Union[Transaction, List[Transaction]]) -> None:
         """
-        Add transactions to portfolio
+        Add transactions to portfolio and save transaction file
+
         :param transactions: pyportlib transaction object, single or list
         :return: None
         """
@@ -217,10 +230,8 @@ class Portfolio(TimeSeriesInterface):
 
     def add_cash_change(self, cash_changes: Union[List[CashChange], CashChange]) -> None:
         """
-        add a cash deposit or withdrawal from the account
-        dict need to include {date: datetime,
-                              direction: str = "withdrawal", "deposit",
-                              amount: float}
+        Add cash change (deposit or withdrawal) to portfolio through the CashChange object
+
         :return: None
         """
         if cash_changes:
@@ -232,6 +243,7 @@ class Portfolio(TimeSeriesInterface):
     def cash(self, date: datetime = None) -> float:
         """
         Cash available on given date
+
         :param date: datetime
         :return: float
         """
@@ -262,6 +274,7 @@ class Portfolio(TimeSeriesInterface):
     def dividends(self, start_date: datetime = None, end_date: datetime = None) -> float:
         """
         Accumulated dividend over date range for the entire portfolio
+
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :return:
@@ -290,6 +303,7 @@ class Portfolio(TimeSeriesInterface):
     def daily_total_pnl(self, start_date: datetime = None, end_date: datetime = None, positions_to_exclude: List[str] = None, tags: List[str] = None) -> pd.DataFrame:
         """
         Portfolio return per position in $ amount for specified date range
+
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :param positions_to_exclude: List of ticker to exclude from calculation
@@ -323,6 +337,7 @@ class Portfolio(TimeSeriesInterface):
                             positions_to_exclude: List[str] = None, tags: List[str] = None) -> pd.Series:
         """
         Portfolio return in % of market value
+
         :param start_date: start date of series (if only param, end_date is last date)
         :param end_date: start date of series (if only param, end_date the only date given in series)
         :param include_cash: If we include the cash amount at that time to calc the market value
@@ -353,6 +368,7 @@ class Portfolio(TimeSeriesInterface):
         """
         Resets transactions and cash flows from the portfolio object and erases the saved csv files associated to
         the portfolio
+
         :return: None
         """
         self._transaction_manager.reset()
@@ -364,6 +380,7 @@ class Portfolio(TimeSeriesInterface):
     def corr(self, lookback: str = None, date: datetime = None):
         """
         Open positions correlations
+
         :param lookback:
         :param date:
         :return:
@@ -373,6 +390,7 @@ class Portfolio(TimeSeriesInterface):
     def weights(self, date: datetime = None):
         """
         Portfolio position weights in %
+
         :param date:
         :return:
         """
@@ -389,6 +407,7 @@ class Portfolio(TimeSeriesInterface):
     def open_positions(self, date: datetime) -> Dict[str, Position]:
         """
         Dict with only active position on given date
+
         :param date: Date to get open positions from
         :return:
         """
@@ -397,6 +416,7 @@ class Portfolio(TimeSeriesInterface):
     def open_positions_returns(self, lookback: str = None, date: datetime = None):
         """
         Get returns from open positions on given date
+
         :param lookback: ex. 1y or 10m to lookback from given date argument
         :param date: last business day if none
         :return:
@@ -410,6 +430,15 @@ class Portfolio(TimeSeriesInterface):
         return pd.DataFrame(prices).fillna(0)
 
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):
+        """
+        Implementation of the returns method of the TimeSeriesInterface
+
+        :param start_date: datetime
+        :param end_date: datetime
+        :param kwargs:
+        :return:
+        """
+
         include_cash = kwargs.get("include_cash") if kwargs.get("include_cash") is not None else False
 
         return self.pct_daily_total_pnl(start_date=start_date,
@@ -422,7 +451,12 @@ class Portfolio(TimeSeriesInterface):
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
         return quantities.fillna(0).cumsum()
 
-    def _enough_funds(self, transaction) -> tuple:
+    def _enough_funds(self, transaction: Transaction) -> tuple:
+        """
+        If there is enough funds for transaction
+        :param transaction:
+        :return:
+        """
         value = transaction.quantity * transaction.price
 
         if transaction.currency != self.currency:
@@ -437,10 +471,11 @@ class Portfolio(TimeSeriesInterface):
     def _pnl_pos_apply(positions_dict: dict, start_date: datetime, end_date: datetime, transactions: pd.DataFrame, fx: dict) -> pd.DataFrame:
         """
         Apply pnl function to values of position dict and return portfolio pnl df
-        :param positions_dict: positions dict
-        :param start_date:
-        :param end_date:
-        :param transactions: transaction to take into account on the pnl
+
+        :param positions_dict: Positions dict
+        :param start_date: datetime
+        :param end_date: datetime
+        :param transactions: Transaction to take into account on the pnl
         :param fx: fx df
         :return: pnl df
         """

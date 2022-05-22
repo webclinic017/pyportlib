@@ -35,6 +35,7 @@ class Position(TimeSeriesInterface):
     def update_data(self, fundamentals_and_dividends: bool = False) -> None:
         """
         Updates all of the position's market data
+
         :param fundamentals_and_dividends: set True if you want to update undamentals and dividends data
         :return: None
         """
@@ -50,7 +51,8 @@ class Position(TimeSeriesInterface):
 
     def get_fundamentals(self, statement_type: str) -> pd.DataFrame:
         """
-        retreives the position's fundamentals by statement type
+        Retreives the position's fundamentals by statement type
+
         :param statement_type: choose from ('balance_sheet', 'cashflow', 'income_statement')
         :return: df with statement data
         """
@@ -59,6 +61,7 @@ class Position(TimeSeriesInterface):
     def get_splits(self) -> pd.DataFrame:
         """
         Retreives the position's stock splits
+
         :return:
         """
         return self._datareader.get_splits(ticker=self.ticker)
@@ -73,7 +76,8 @@ class Position(TimeSeriesInterface):
 
     def dividends(self) -> pd.DataFrame:
         """
-        retreives dividends of the position's stock
+        Retreives dividends of the position's stock
+
         :return:
         """
         return self._datareader.read_dividends(ticker=self.ticker)
@@ -111,6 +115,7 @@ class Position(TimeSeriesInterface):
                   fx: dict = None) -> pd.DataFrame:
         """
         Computes pnl of the position in $ amount by type of pnl
+
         :param fx: dict of fx pairs for conversion if there are transactions
         :param transactions: transactions from a portfolio, if none transactions are not considered
         :param start_date: start date of series (if only param, end_date is last date)
@@ -176,6 +181,7 @@ class Position(TimeSeriesInterface):
                         fx: dict = None) -> pd.DataFrame:
         """
         Computes total pnl of position in $ amount
+
         :param fx: dict of fx pairs for conversion if there are transactions
         :param transactions: transactions from a portfolio, if none transactions are not considered
         :param start_date: start date of series (if only param, end_date is last date)
@@ -186,4 +192,11 @@ class Position(TimeSeriesInterface):
         return total
 
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):
+        """
+        Implementation of the returns method of the TimeSeriesInterface
+        :param start_date: datetime
+        :param end_date: datetime
+        :param kwargs:
+        :return:
+        """
         return self.prices.loc[start_date:end_date].pct_change().fillna(0)
