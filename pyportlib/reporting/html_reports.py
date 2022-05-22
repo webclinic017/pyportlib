@@ -2,9 +2,9 @@ from typing import Union
 import pandas as pd
 import quantstats as qs
 
-from ..portfolio import Portfolio
-from ..services.data_reader import DataReader
-from ..utils import files_utils
+from pyportlib.portfolio import Portfolio
+from pyportlib.services.data_reader import DataReader
+from pyportlib.utils import files_utils
 
 OUT_DIR = files_utils.get_outputs_dir()
 
@@ -14,11 +14,12 @@ def full(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
          name: str,
          rf=None) -> None:
     """
-    produces quantstats html report
-    :param rf: riskfree rate
-    :param ptf: portfolio object or strategy returns
-    :param benchmark: benchmark returns in % or ticker of benchmark, portfolio object or series
+    Produces quantstats html report and saves it to the pyportlib outputs directory.
+
+    :param ptf: portfolio object or strategy returns from Pandas
+    :param benchmark: portfolio object or strategy returns from Pandas or a ticker
     :param name: name of saved file
+    :param rf: riskfree rate
     :return: None
     """
     if isinstance(ptf, Portfolio):

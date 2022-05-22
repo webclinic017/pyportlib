@@ -37,7 +37,8 @@ def kurtosis(pos: TimeSeriesInterface, lookback: str, date: datetime = None, **k
     return returns.kurtosis()
 
 
-def beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
+def beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None,
+         **kwargs) -> float:
     """
     Compute the beta of the returns distribution from a TimeSeries object on a benchmark on the specified time period.
 
@@ -55,7 +56,8 @@ def beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str
     return round(matrix[0, 1] / matrix[1, 1], 2)
 
 
-def alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
+def alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None,
+          **kwargs) -> float:
     """
     Compute the alpha of the returns distribution from a TimeSeries object on a benchmark on the specified time period.
 
@@ -75,8 +77,20 @@ def alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: st
     return alph*len(returns)
 
 
-def rolling_alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None, rolling_period: int = 252, **kwargs) -> pd.Series:
-    # FIXME not ok
+def rolling_alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None,
+                  rolling_period: int = 252, **kwargs) -> pd.Series:
+    """
+    Compute the gaussian rolling value at risk of the returns distribution from a TimeSeries object
+    with a specified quantile.
+
+    :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
+    :param benchmark: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series on which to compute Beta
+    :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
+    :param date: Date to lookback from
+    :param rolling_period: Number of trading days for the rolling period
+    :param kwargs: Portfolio PnL or Position PnL kwargs
+    :return:
+    """
     returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
     benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
     returns, benchmark = time_series.match_index(returns, benchmark)
@@ -129,7 +143,8 @@ def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, meth
     raise NotImplementedError(f"{method}")
 
 
-def rolling_var(pos, lookback: str = None, date: datetime = None, rolling_period: int = 252, quantile=0.95, **kwargs) -> pd.DataFrame:
+def rolling_var(pos, lookback: str = None, date: datetime = None, rolling_period: int = 252, quantile=0.95,
+                **kwargs) -> pd.Series:
     """
     Compute the gaussian rolling value at risk of the returns distribution from a TimeSeries object
     with a specified quantile.
@@ -173,7 +188,3 @@ def cluster_corr(corr_array, inplace=False):
     if isinstance(corr_array, pd.DataFrame):
         return corr_array.iloc[idx, :].T.iloc[idx, :]
     return corr_array[idx, :][:, idx]
-
-
-if __name__ == "__main__":
-    pass
