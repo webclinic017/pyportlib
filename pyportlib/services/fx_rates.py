@@ -27,11 +27,20 @@ class FxRates:
         self._load()
 
     def refresh(self):
+        """
+        Updates the objects
+        :return:
+        """
         for pair in self.pairs:
             self.datareader.update_fx(currency_pair=pair)
         self._load()
 
     def get(self, pair: str):
+        """
+        Retreives currency pair data. If pair is missing, it will be added.
+        :param pair:
+        :return:
+        """
         if len(pair) != 6:
             logger.logging.error(f'{pair} is not a valid pair, enter valid currency pair')
 

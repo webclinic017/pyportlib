@@ -26,7 +26,8 @@ class YahooConnection(BaseDataConnection):
     def get_prices(self, ticker: str) -> None:
         """
         Retreives ticker price data and saves .csv file in correct directory
-        :param ticker:
+
+        :param ticker: String Yahoo ticker
         :return:
         """
         filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_prices.csv"
@@ -49,7 +50,8 @@ class YahooConnection(BaseDataConnection):
     def get_fx(self, currency_pair: str) -> None:
         """
         Retreives currency pair price data and saves .csv file in correct directory
-        :param currency_pair:
+
+        :param currency_pair: String
         :return:
         """
         filename = f"{self.file_prefix}_{currency_pair}_fx.csv"
@@ -64,10 +66,10 @@ class YahooConnection(BaseDataConnection):
         data.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{currency_pair} loaded from yfinance api")
 
-    def get_balance_sheet(self, ticker: str):
+    def get_balance_sheet(self, ticker: str) -> None:
         """
         Retreives balance sheet data and saves .csv file in correct directory
-        :param ticker:
+        :param ticker: String Yahoo ticker
         :return:
         """
         filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_balance_sheet.csv"
@@ -80,10 +82,10 @@ class YahooConnection(BaseDataConnection):
         bs.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{ticker} balance_sheet loaded from yfinance api")
 
-    def get_cash_flow(self, ticker: str):
+    def get_cash_flow(self, ticker: str) -> None:
         """
         Retreives cash flow data and saves .csv file in correct directory
-        :param ticker:
+        :param ticker: String Yahoo ticker
         :return:
         """
         filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_cash_flow.csv"
@@ -97,10 +99,10 @@ class YahooConnection(BaseDataConnection):
         cf.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{ticker} cash flow loaded from yfinance api")
 
-    def get_income_statement(self, ticker: str):
+    def get_income_statement(self, ticker: str) -> None:
         """
         Retreives income statement data and saves .csv file in correct directory
-        :param ticker:
+        :param ticker: String Yahoo ticker
         :return:
         """
         filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_income_statement.csv"
@@ -114,12 +116,12 @@ class YahooConnection(BaseDataConnection):
         bs.to_csv(f"{directory}/{filename}")
         logger.logging.debug(f"{ticker} income statement loaded from yfinance api")
 
-    def get_dividends(self, ticker: str, start_date=None, end_date=None):
+    def get_dividends(self, ticker: str, start_date=None, end_date=None) -> None:
         """
         Retreives dividends data and saves .csv file in correct directory
-        :param ticker:
-        :param start_date:
-        :param end_date:
+        :param ticker: String Yahoo ticker
+        :param start_date: Datetime start date
+        :param end_date: Datetime end date
         :return:
         """
         filename = f"{self.file_prefix}_{ticker.replace('.TO', '_TO')}_dividends.csv"
@@ -134,10 +136,10 @@ class YahooConnection(BaseDataConnection):
             divs.to_csv(f"{directory}/{filename}")
             logger.logging.debug(f"{ticker} dividends loaded from yfinance api")
 
-    def get_splits(self, ticker: str):
+    def get_splits(self, ticker: str) -> pd.DataFrame:
         """
         Retreives stock splits data
-        :param ticker:
+        :param ticker: String Yahoo ticker
         :return:
         """
         ticker = self._convert_ticker(ticker)
@@ -148,7 +150,7 @@ class YahooConnection(BaseDataConnection):
     def _convert_ticker(ticker: str) -> str:
         """
         Convert any type of suffix to yahoo ticker
-        :param ticker:
+        :param ticker: Any ticker
         :return:
         """
         ticker = ticker.replace('.TRT', '.TO')

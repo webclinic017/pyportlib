@@ -18,27 +18,30 @@ class DataReader:
         return self.NAME
 
     def _set_sources(self) -> None:
+        """
+        Sets the data source from the config file
+        :return:
+        """
         prices_data_source = config_utils.fetch_data_sources('market_data')
         statements_data_source = config_utils.fetch_data_sources('statements')
         if prices_data_source == 'Yahoo':
-            market_data = YahooConnection()
+            self._market_data_source = YahooConnection()
         else:
             logger.logging.error(f'prices datasource: {prices_data_source} not valid')
             return None
 
         if prices_data_source == 'Yahoo':
-            statements = YahooConnection()
+            self._statements_data_source = YahooConnection()
         else:
             logger.logging.error(f'statements datasource: {statements_data_source} not valid')
             return None
-        self._market_data_source = market_data
-        self._statements_data_source = statements
 
     def read_prices(self, ticker: str) -> pd.Series:
         """
         Read prices saved locally in client data folder.
-        If no .csv found, prices will be fetched
-        :param ticker: stock ticker
+        If no .csv found, prices will be fetched with the data source
+
+        :param ticker: Stock ticker
         :return:
         """
         directory = self._market_data_source.prices_dir
@@ -60,7 +63,8 @@ class DataReader:
         """
         Read fx rates saved locally in client data folder.
         If no .csv found, rates will be fetched
-        :param currency_pair: fx pair ex. USDCAD or CADUSD
+
+        :param currency_pair: Fx pair ex. USDCAD or CADUSD
         :return:
         """
         directory = self._market_data_source.fx_dir
@@ -81,9 +85,10 @@ class DataReader:
         """
         Read statements saved locally in client data folder.
         If no .csv found, statements will be fetched
-        :param ticker: stocke ticker to read fundamentals data from
-        :param statement_type: choose from ('balance_sheet', 'cashflow', 'income_statement')
-        :return: dataframe with statement data
+
+        :param ticker: Stock ticker to read fundamentals data from
+        :param statement_type: Choose from ('balance_sheet', 'cashflow', 'income_statement')
+        :return: Dataframe with statement data
         """
         implemented = {'balance_sheet', 'cash_flow', 'income_statement'}
         if statement_type not in implemented:
@@ -99,11 +104,12 @@ class DataReader:
             self.update_statement(ticker=ticker, statement_type=statement_type)
             return self.read_fundamentals(ticker=ticker, statement_type=statement_type)
 
-    def read_dividends(self, ticker: str):
+    def read_dividends(self, ticker: str) -> pd.DataFrame:
         """
         Read dividends data saved locally in client data folder.
         If no .csv found, dividends data will be fetched
-        :param ticker:
+
+        :param ticker: Stock Ticker
         :return:
         """
         directory = self._market_data_source.statement_dir
@@ -119,13 +125,20 @@ class DataReader:
             self.update_dividends(ticker=ticker)
             return self.read_dividends(ticker)
 
-    def update_prices(self, ticker: str):
+    def update_prices(self, ticker: str) -> None:
         self._market_data_source.get_prices(ticker=ticker)
 
-    def update_fx(self, currency_pair: str):
+    def update_fx(self, currency_pair: str) -> None:
         self._market_data_source.get_fx(currency_pair=currency_pair)
 
-    def update_statement(self, ticker: str, statement_type: str):
+    def update_statement(self, ticker: str, statement_type: str) -> None:
+        """
+        Updates the statements data from the data source
+
+        :param ticker: Stock ticker
+        :param statement_type: 'balance_sheet', 'cash_flow', 'income_statement' or 'all'
+        :return:
+        """
         if statement_type == 'balance_sheet':
             self._statements_data_source.get_balance_sheet(ticker)
         elif statement_type == 'cash_flow':
@@ -140,13 +153,14 @@ class DataReader:
         else:
             raise NotImplementedError({statement_type})
 
-    def update_dividends(self, ticker: str):
+    def update_dividends(self, ticker: str) -> None:
         self._market_data_source.get_dividends(ticker=ticker)
 
-    def get_splits(self, ticker: str):
+    def get_splits(self, ticker: str) -> pd.DataFrame:
         """
         Read stock splits data saved locally in client data folder.
         If no .csv found, splits data will be fetched
+
         :param ticker:
         :return:
         """
@@ -155,6 +169,7 @@ class DataReader:
     def last_data_point(self, ptf_currency: str = 'CAD') -> datetime:
         """
         Find last data point fetched in locally saved files.
+
         :param ptf_currency: portfolio currency
         :return:
         """

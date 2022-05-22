@@ -25,7 +25,7 @@ class Transaction:
         self.price = price
         self.fees = fees
         self.currency = currency
-        self.check()
+        self._check()
 
     def __repr__(self):
         return f"{self._NAME} - {self.date.date()} - {self.type} - {self.ticker}"
@@ -45,7 +45,7 @@ class Transaction:
         return new
 
     @property
-    def info(self):
+    def info(self) -> dict:
         return {'Ticker': self.ticker,
                 'Type': self.type,
                 'Quantity': self.quantity,
@@ -53,7 +53,7 @@ class Transaction:
                 'Fees': self.fees,
                 'Currency': self.currency}
 
-    def check(self) -> None:
+    def _check(self) -> None:
         """
         Checks if transaction object is valid
         :return:

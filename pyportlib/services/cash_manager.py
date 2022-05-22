@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import List, Union
 import pandas as pd
 
-from .cash_change import CashChange
-from ..utils import df_utils, files_utils
-from ..utils import logger
+from pyportlib.services.cash_change import CashChange
+from pyportlib.utils import df_utils, files_utils
+from pyportlib.utils import logger
 
 
 class CashManager:
@@ -22,7 +22,11 @@ class CashManager:
     def __repr__(self):
         return self.NAME
 
-    def load(self):
+    def load(self) -> None:
+        """
+        Loads account cash changes from .csv of creates empty one if it is a new account
+        :return:
+        """
         if files_utils.check_file(self.directory, self.CASH_FILENAME):
             cash = pd.read_csv(f"{self.directory}/{self.CASH_FILENAME}")
             try:
@@ -50,12 +54,9 @@ class CashManager:
     def cash_changes(self):
         return self._cash_changes
 
-    def get_cash_changes(self):
-        return self.cash_changes
-
-    def get_cash_change(self, date):
-        c_ch = self.get_cash_changes()
-        return c_ch.loc[self.get_cash_changes().index <= date, 'Amount'].sum()
+    def get_cash_change(self, date: datetime):
+        c_ch = self.cash_changes
+        return c_ch.loc[self.cash_changes.index <= date, 'Amount'].sum()
 
     def _write(self, date: datetime, direction: str, amount: float):
         direction = direction.title()

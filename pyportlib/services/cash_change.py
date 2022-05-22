@@ -18,12 +18,20 @@ class CashChange:
         return f"{self._NAME} - {self.date.date()} - {self.direction} - {self.amount}"
 
     @property
-    def info(self):
+    def info(self) -> dict:
+        """
+        Cash change information
+        :return:
+        """
         return {"Date": self.date,
                 "Direction": self.direction,
                 "Amount": self.amount}
 
     def _check(self):
+        """
+        Checks if cash change is valid
+        :return:
+        """
         assert isinstance(self.info.get("Date"), datetime)
         assert self.info["Direction"] in self._DIRECTIONS
         assert isinstance(self.info["Amount"], float) or isinstance(self.info["Amount"], int)
