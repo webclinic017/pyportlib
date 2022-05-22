@@ -3,7 +3,7 @@ from typing import Union, List
 import pandas as pd
 import dateutil.parser
 
-from ..account_sources.base_account_source import BaseAccountSource
+from ..account_sources.interface_account_source import BaseAccountSource
 from ..services.cash_change import CashChange
 from ..utils import logger, config_utils
 from .questrade_api.questrade import Questrade

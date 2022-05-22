@@ -225,7 +225,7 @@ class Portfolio(TimeSeriesInterface):
         """
         if cash_changes:
             self._cash_manager.add(cash_changes)
-            logger.logging.info(f'cash change for {self.account} have been added')
+            logger.logging.debug(f'cash change for {self.account} have been added')
             self.load_data()
             self._load_cash_history()
 

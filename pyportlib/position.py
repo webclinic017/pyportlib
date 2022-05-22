@@ -46,7 +46,7 @@ class Position(TimeSeriesInterface):
     def _update_prices(self):
         self._datareader.update_prices(ticker=self.ticker)
         self._load_prices()
-        logger.logging.info(f'{self} prices updated with local currency')
+        logger.logging.debug(f'{self} prices updated with local currency')
 
     def get_fundamentals(self, statement_type: str) -> pd.DataFrame:
         """
@@ -65,11 +65,11 @@ class Position(TimeSeriesInterface):
 
     def _update_dividends(self):
         self._datareader.update_dividends(ticker=self.ticker)
-        logger.logging.info(f'{self} dividends updated with local currency')
+        logger.logging.debug(f'{self} dividends updated with local currency')
 
     def _update_fundamentals(self):
         self._datareader.update_statement(ticker=self.ticker, statement_type='all')
-        logger.logging.info(f'{self} statements updated with local currency')
+        logger.logging.debug(f'{self} statements updated with local currency')
 
     def dividends(self) -> pd.DataFrame:
         """
