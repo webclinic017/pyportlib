@@ -26,3 +26,10 @@ class TestStats:
         var = pyportlib.stats.skew(self.p, date=self.end_date, lookback='1y')
 
         assert round(var, 5) == 2.27105
+
+    def test_weights_plot_no_error(self):
+        pyportlib.plots.position_allocation(self.p, date=self.date)
+
+    def test_strategy_weights_plot_no_error(self):
+        pyportlib.plots.strategy_allocation(self.p, date=self.date)
+

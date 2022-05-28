@@ -254,3 +254,21 @@ def rolling_var(pos: TimeSeriesInterface,
     [kwargs.pop(key, None) for key in kwargs_to_remove]
 
     qs.plots.returns(roll_var, benchmark=benchmark, compound=False, prepare_returns=False, **kwargs)
+
+
+def position_allocation(ptf: TimeSeriesInterface, date: datetime = None, **kwargs):
+    try:
+        weights = ptf.position_weights(date=date)
+    except AttributeError:
+        raise ValueError("Use a Portfolio object")
+
+    weights.plot.pie(autopct='%1.1f%%', fontsize=12, **kwargs)
+
+
+def strategy_allocation(ptf: TimeSeriesInterface, date: datetime = None, **kwargs):
+    try:
+        weights = ptf.strategy_weights(date=date)
+    except AttributeError:
+        raise ValueError("Use a Portfolio object")
+
+    weights.plot.pie(autopct='%1.1f%%', fontsize=12, **kwargs)

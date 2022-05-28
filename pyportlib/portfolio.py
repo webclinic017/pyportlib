@@ -387,7 +387,7 @@ class Portfolio(TimeSeriesInterface):
         """
         return self.open_positions_returns(lookback=lookback, date=date).corr()
 
-    def weights(self, date: datetime = None):
+    def position_weights(self, date: datetime = None) -> pd.Series:
         """
         Portfolio position weights in %
 
@@ -398,11 +398,45 @@ class Portfolio(TimeSeriesInterface):
             date = self._datareader.last_data_point(ptf_currency=self.currency)
 
         port_mv = self.market_value.loc[date]
-        weights_dict = {k: round(v.npv().loc[date] / port_mv, 5) for k, v in self.positions.items() if
-                        v.npv().loc[date] != 0}
-        if not 0.999 < sum(weights_dict.values()) < 1.001:
-            raise ValueError(f'weights ({sum(weights_dict.values())}) do not add to 1')
-        return weights_dict
+
+        weights = pd.Series(name='Position Allocations')
+        for k, v in self.positions.items():
+            try:
+                calc_wt = v.npv().loc[date] != 0
+            except KeyError:
+                calc_wt = False
+            if calc_wt:
+                weights[k] = v.npv().loc[date]
+
+        weights /= port_mv
+        if not 0.999 < weights.sum() < 1.001:
+            raise ValueError(f'weights ({weights.sum()}) do not add to 1')
+        return weights
+
+    def strategy_weights(self, date: datetime = None) -> pd.Series:
+        """
+        Portfolio strategy tags weights in %
+
+        :param date:
+        :return:
+        """
+        if date is None:
+            date = self._datareader.last_data_point(ptf_currency=self.currency)
+
+        port_mv = self.market_value.loc[date]
+        tags = self.position_tags()
+        weights = pd.Series(name='Strategy Allocations', index=tags, data=[0 for _ in range(len(tags))])
+        for k, v in self.positions.items():
+            try:
+                calc_wt = v.npv().loc[date] != 0
+            except KeyError:
+                calc_wt = False
+            if calc_wt:
+                weights[v.tag] += v.npv().loc[date]
+        weights /= port_mv
+        if not 0.999 < weights.sum() < 1.001:
+            raise ValueError(f'weights ({weights.sum()}) do not add to 1')
+        return weights
 
     def open_positions(self, date: datetime) -> Dict[str, Position]:
         """
