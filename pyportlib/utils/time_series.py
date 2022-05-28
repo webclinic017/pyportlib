@@ -60,7 +60,7 @@ def remove_leading_zeroes(series: pd.Series) -> pd.Series:
     :param series: Pandas Series
     :return:
     """
-    to_drop = series.eq(not 0).cumsum().isin([0, np.NaN])
+    to_drop = (series != 0).cumsum().isin([0, np.NaN])
     return series.loc[~to_drop]
 
 

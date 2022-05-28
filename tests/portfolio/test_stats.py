@@ -7,7 +7,7 @@ class TestStats:
     p = pyportlib.Portfolio(account="Testing", currency="CAD")
     start = datetime(2022, 1, 1)
     date = datetime(2022, 5, 12)
-    split_date = datetime(2022, 5, 20)
+    end_date = datetime(2022, 5, 20)
 
     def setup_ptf(self):
         self.p.reset()
@@ -21,6 +21,8 @@ class TestStats:
                                     "USD")
         self.p.add_transaction(trx)
 
-    def test_pnl(self):
+    def test_skew(self):
         self.setup_ptf()
-        var = pyportlib.stats.skew(self.p, lookback='1y')
+        var = pyportlib.stats.skew(self.p, date=self.end_date, lookback='1y')
+
+        assert round(var, 5) == 2.27105
