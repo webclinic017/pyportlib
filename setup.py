@@ -67,7 +67,7 @@ setup(
     platforms=['any'],
     keywords="""quant algotrading algorithmic-trading quantitative-trading
                 quantitative-analysis algo-trading visualization plotting""",
-    packages=find_packages(exclude=['docs', 'examples']),
+    packages=find_packages(exclude=['docs', 'examples', 'tests']),
     install_requires=requirements,
     entry_points={
         'console_scripts': [

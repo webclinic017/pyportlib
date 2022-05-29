@@ -6,3 +6,4 @@ numpy>=1.20.3
 scipy>=1.7.2
 yahoo_fin >= 0.8.9.1
 pandas_datareader >= 0.10.0
+pandas_market_calendars>=3.2
