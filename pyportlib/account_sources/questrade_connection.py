@@ -258,6 +258,8 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
                     split_factor = splits.iloc[-1]
                 except KeyError:
                     split_factor = 1
+                except IndexError:
+                    split_factor = 1
             else:
                 split_factor = 1
         else:
