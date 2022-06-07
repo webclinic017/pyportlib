@@ -33,9 +33,9 @@ class TestStats:
     def test_strategy_weights_plot_no_error(self):
         pyportlib.plots.strategy_allocation(self.p, date=self.date)
 
-    def test_weights(self):
+    def test_weights_no_error_real_ptf(self):
         ptf = pyportlib.Portfolio(account='questrade_tfsa', currency="CAD")
         ptf.position_weights()
-        # pyportlib.plots.position_allocation(ptf)
+        pyportlib.plots.position_allocation(ptf)
         pyportlib.plots.strategy_allocation(ptf)
 
