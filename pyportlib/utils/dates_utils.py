@@ -46,9 +46,9 @@ def date_window(lookback: str = "1y", date: datetime = None) -> datetime:
     date = last_bday(as_of=date)
 
     if scale == "y":
-        date = date + relativedelta(years=- amount)
+        date = date - relativedelta(years=amount)
     elif scale == "m":
-        date = date + relativedelta(months=- amount)
+        date = date - relativedelta(months=amount)
     else:
         logger.logging.error(f"lookback scale {scale} not supported. choose (y or m)")
 

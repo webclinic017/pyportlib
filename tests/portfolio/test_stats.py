@@ -36,4 +36,6 @@ class TestStats:
     def test_weights(self):
         ptf = pyportlib.Portfolio(account='questrade_tfsa', currency="CAD")
         ptf.position_weights()
-        pyportlib.plots.position_allocation(ptf, date=self.date)
+        # pyportlib.plots.position_allocation(ptf)
+        pyportlib.plots.strategy_allocation(ptf)
+

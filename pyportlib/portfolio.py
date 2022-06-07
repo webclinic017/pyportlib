@@ -406,10 +406,14 @@ class Portfolio(TimeSeriesInterface):
             try:
                 weights[k] = v.npv().loc[date]
             except KeyError:
-                weights[k] = v.npv().iloc[-1]
+                try:
+                    _date = date - dates_utils.bday(1)
+                    weights[k] = v.npv().loc[_date]
+                except KeyError:
+                    logger.logging.error(f"no data for {k}")
 
         weights /= port_mv
-        if not 0.999 < weights.sum() < 1.001:
+        if not 0.99 < weights.sum() < 1.01:
             ValueError(f"Weights do not add to 1: {weights.sum()}")
         return weights
 
@@ -426,16 +430,21 @@ class Portfolio(TimeSeriesInterface):
         port_mv = self.market_value.loc[date]
         tags = self.position_tags()
         weights = pd.Series(name='Strategy Allocations', index=tags, data=[0 for _ in range(len(tags))])
-        for k, v in self.positions.items():
+
+        open_positions = self.open_positions(date=date)
+        for k, v in open_positions.items():
             try:
-                calc_wt = v.npv().loc[date] != 0
-            except KeyError:
-                calc_wt = False
-            if calc_wt:
                 weights[v.tag] += v.npv().loc[date]
+            except KeyError:
+                try:
+                    _date = date - dates_utils.bday(1)
+                    weights[v.tag] += v.npv().loc[_date]
+                except KeyError:
+                    pass
+
         weights /= port_mv
         if not 0.999 < weights.sum() < 1.001:
-            raise ValueError(f'weights ({weights.sum()}) do not add to 1')
+            raise ValueError(f"Weights do not add to 1: {weights.sum()}")
         return weights
 
     def open_positions(self, date: datetime) -> Dict[str, Position]:
