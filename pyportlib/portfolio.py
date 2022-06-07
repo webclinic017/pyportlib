@@ -400,17 +400,17 @@ class Portfolio(TimeSeriesInterface):
         port_mv = self.market_value.loc[date]
 
         weights = pd.Series(name='Position Allocations')
-        for k, v in self.positions.items():
+        open_positions = self.open_positions(date=date)
+
+        for k, v in open_positions.items():
             try:
-                calc_wt = v.npv().loc[date] != 0
-            except KeyError:
-                calc_wt = False
-            if calc_wt:
                 weights[k] = v.npv().loc[date]
+            except KeyError:
+                weights[k] = v.npv().iloc[-1]
 
         weights /= port_mv
         if not 0.999 < weights.sum() < 1.001:
-            raise ValueError(f'weights ({weights.sum()}) do not add to 1')
+            ValueError(f"Weights do not add to 1: {weights.sum()}")
         return weights
 
     def strategy_weights(self, date: datetime = None) -> pd.Series:
