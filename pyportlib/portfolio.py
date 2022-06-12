@@ -173,10 +173,9 @@ class Portfolio(TimeSeriesInterface):
                 trx = self._transaction_manager.transactions.loc[
                     (self._transaction_manager.transactions.Ticker == position.ticker)
                     & (self._transaction_manager.transactions.Type != 'Dividend')]
-
-                date_merge.loc[:, 'qty'] = trx[['Quantity']].reset_index().groupby('Date').sum()
-
-                pos_qty = self._make_qty_series(date_merge.loc[:, 'qty'])
+                df = trx[['Quantity']].reset_index().groupby('Date').sum()
+                df = df.join(date_merge, how='outer')['Quantity']
+                pos_qty = self._make_qty_series(df)
                 position.quantities = pos_qty
             logger.logging.debug(f'{self.account} quantities computed')
 
