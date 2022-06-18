@@ -142,7 +142,7 @@ class Position(TimeSeriesInterface):
         pnl = pnl.fillna(0)
 
         if not transactions.empty:
-            transactions = transactions[:end_date].reset_index()
+            transactions = transactions[transactions.index <= end_date].reset_index()
             ptf_currency = list(fx.keys())[0][3:]
             for trx_idx in range(len(transactions)):
                 trx = transactions.iloc[trx_idx]

@@ -195,11 +195,11 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
         :return: Transaction object
         """
         # TODO add splits
-        if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers']:
+        if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers'] or "SPLIT" in transaction.get("description"):
             if transaction.get('type') in ["Deposits", "Withdrawals"]:
                 return
             if transaction.get('type').lower() == "other":
-                logger.logging.error(f"{transaction.get('type')} not supported. might be dividend withrawal tax")
+                logger.logging.error(f"{transaction.get('type')} not supported")
                 return
             logger.logging.error(f"{transaction.get('type')} not supported")
             return
