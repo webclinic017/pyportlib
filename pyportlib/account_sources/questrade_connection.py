@@ -194,7 +194,6 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
         :param transaction:
         :return: Transaction object
         """
-        # TODO add splits
         if transaction.get('type') not in ['Trades', 'Dividends', 'Transfers'] or "SPLIT" in transaction.get("description"):
             if transaction.get('type') in ["Deposits", "Withdrawals"]:
                 return

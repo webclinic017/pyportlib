@@ -146,6 +146,8 @@ class Position(TimeSeriesInterface):
             ptf_currency = list(fx.keys())[0][3:]
             for trx_idx in range(len(transactions)):
                 trx = transactions.iloc[trx_idx]
+                if trx.Type == "Split":
+                    continue
                 try:
                     start_qty = self._quantities.shift(1).fillna(0).loc[trx.Date]
                 except KeyError:
