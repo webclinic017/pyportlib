@@ -200,7 +200,7 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
             if transaction.get('type').lower() == "other":
                 logger.logging.error(f"{transaction.get('type')} not supported")
                 return
-            logger.logging.error(f"{transaction.get('type')} not supported")
+            logger.logging.error(f"{transaction.get('description')} not supported")
             return
 
         date = dateutil.parser.isoparse(transaction.get('tradeDate')).replace(hour=0, minute=0, second=0, microsecond=0,
