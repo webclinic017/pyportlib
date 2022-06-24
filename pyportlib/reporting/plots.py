@@ -272,3 +272,28 @@ def strategy_allocation(ptf: TimeSeriesInterface, date: datetime = None, **kwarg
         raise ValueError("Use a Portfolio object")
 
     weights.plot.pie(autopct='%1.1f%%', fontsize=12, **kwargs)
+
+
+def excess_returns(pos: TimeSeriesInterface,
+                   benchmark: TimeSeriesInterface,
+                   date: datetime = None,
+                   lookback: str = None,
+                   **kwargs):
+    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
+    bench = time_series.prep_returns(benchmark, lookback=lookback, date=date, **kwargs)
+
+    if rets.empty:
+        logger.logging.error(f"{pos} prices missing")
+        return
+    if bench.empty:
+        logger.logging.error(f"benchmark prices missing")
+        return
+
+    rets, bench = time_series.match_index(rets, bench)
+
+    kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
+    [kwargs.pop(key, None) for key in kwargs_to_remove]
+
+    total = rets - bench
+    qs.plots.returns(total, prepare_returns=False, **kwargs)
+
