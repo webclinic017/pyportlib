@@ -280,7 +280,7 @@ def excess_returns(pos: TimeSeriesInterface,
                    lookback: str = None,
                    **kwargs):
     rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    bench = time_series.prep_returns(benchmark, lookback=lookback, date=date, **kwargs)
+    bench = time_series.prep_returns(benchmark, lookback=lookback, date=date, include_cash=False)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
