@@ -413,7 +413,7 @@ class Portfolio(TimeSeriesInterface):
 
         weights /= port_mv
         if not 0.99 < weights.sum() < 1.01:
-            ValueError(f"Weights do not add to 1: {weights.sum()}")
+            logger.logging.error(f"Weights do not add to 1: {weights.sum()}")
         return weights
 
     def strategy_weights(self, date: datetime = None) -> pd.Series:
@@ -443,7 +443,7 @@ class Portfolio(TimeSeriesInterface):
 
         weights /= port_mv
         if not 0.999 < weights.sum() < 1.001:
-            raise ValueError(f"Weights do not add to 1: {weights.sum()}")
+            logger.logging.error(f"Weights do not add to 1: {weights.sum()}")
         return weights
 
     def open_positions(self, date: datetime) -> Dict[str, Position]:

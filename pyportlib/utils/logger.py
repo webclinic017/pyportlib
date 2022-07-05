@@ -5,7 +5,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s',
                     )
 
-log_format = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s: in %(funcName)s")
+log_format = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s - in %(funcName)s from %(module)s")
 
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(log_format)
