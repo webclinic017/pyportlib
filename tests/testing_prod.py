@@ -8,6 +8,6 @@ ptf = p.Portfolio("questrade_tfsa", "CAD")
 #                         include_cash=True,
 #                         )
 
-ptf.positions.get("XIU.TO").daily_total_pnl(start_date=datetime(2022, 7, 1),
-                                            end_date=datetime(2022, 7, 5),
-                                            fx=ptf._fx)
+# ptf.positions.get("VOO").daily_total_pnl(start_date=datetime(2022, 7, 1),
+#                                             end_date=datetime(2022, 7, 5),
+#                                             fx=ptf._fx)

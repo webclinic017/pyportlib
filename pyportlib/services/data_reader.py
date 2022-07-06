@@ -30,7 +30,7 @@ class DataReader:
             logger.logging.error(f'prices datasource: {prices_data_source} not valid')
             return None
 
-        if prices_data_source == 'Yahoo':
+        if statements_data_source == 'Yahoo':
             self._statements_data_source = YahooConnection()
         else:
             logger.logging.error(f'statements datasource: {statements_data_source} not valid')
@@ -55,7 +55,7 @@ class DataReader:
 
             return df['Close']
         else:
-            logger.logging.info(f'no price data to read for {ticker}, now fetching new data from api')
+            logger.logging.info(f'no price data to read for {ticker}, fetching new data from api')
             self.update_prices(ticker=ticker)
             return self.read_prices(ticker)
 
@@ -77,7 +77,7 @@ class DataReader:
             df.index = pd.to_datetime(df.index)
             return df['Close']
         else:
-            logger.logging.info(f'no fx data to read for {currency_pair}, now fetching new data from api')
+            logger.logging.info(f'no fx data to read for {currency_pair}, fetching new data from api')
             self.update_fx(currency_pair=currency_pair)
             return self.read_fx(currency_pair)
 

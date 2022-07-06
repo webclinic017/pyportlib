@@ -3,7 +3,7 @@
 
 """Portofolio: Portfolio analytics and stock data daba management
 https://github.com/phil-lo/PortoFolio
-Portofolio manages your stock data, transactions and allows for easy portfolio creation
+pyportlib manages your stock data, transactions and allows for easy portfolio creation
 and analytics.
 """
 
