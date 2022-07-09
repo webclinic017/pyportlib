@@ -1,7 +1,7 @@
 import json
 from typing import List
 
-from ..utils import files_utils
+from pyportlib.utils import files_utils
 
 
 def make_config_dir(directory: str) -> None:

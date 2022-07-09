@@ -1,7 +1,7 @@
 from typing import List, Set
 
 from pyportlib.services.data_reader import DataReader
-from ..utils import logger
+from pyportlib.utils import logger
 
 
 class FxRates:

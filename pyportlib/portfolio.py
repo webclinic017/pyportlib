@@ -3,16 +3,16 @@ from typing import Union, List, Dict
 import numpy as np
 import pandas as pd
 
-from .services.cash_change import CashChange
-from .position import Position
-from .services.cash_manager import CashManager
-from .services.data_reader import DataReader
-from .services.fx_rates import FxRates
-from .services.position_tagging import PositionTagging
-from .services.transaction import Transaction
-from .services.transaction_manager import TransactionManager
-from .utils import dates_utils, logger, time_series
-from .utils.time_series import TimeSeriesInterface
+from pyportlib.services.cash_change import CashChange
+from pyportlib.position import Position
+from pyportlib.services.cash_manager import CashManager
+from pyportlib.services.data_reader import DataReader
+from pyportlib.services.fx_rates import FxRates
+from pyportlib.services.position_tagging import PositionTagging
+from pyportlib.services.transaction import Transaction
+from pyportlib.services.transaction_manager import TransactionManager
+from pyportlib.utils import dates_utils, logger, time_series
+from pyportlib.utils.time_series import TimeSeriesInterface
 
 
 class Portfolio(TimeSeriesInterface):

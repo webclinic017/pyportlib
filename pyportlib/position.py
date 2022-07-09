@@ -2,8 +2,8 @@ from datetime import datetime
 import pandas as pd
 
 from pyportlib.services.data_reader import DataReader
-from .utils import logger, dates_utils
-from .utils.time_series import TimeSeriesInterface
+from pyportlib.utils import logger, dates_utils
+from pyportlib.utils.time_series import TimeSeriesInterface
 
 
 class Position(TimeSeriesInterface):
