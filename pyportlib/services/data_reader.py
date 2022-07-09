@@ -8,10 +8,10 @@ from pyportlib.market_data_sources.yahoo_connection import YahooConnection
 
 class DataReader:
     NAME = 'Data Reader'
+    _prices_data_source: BaseDataConnection
+    _statements_data_source: BaseDataConnection
 
     def __init__(self):
-        _prices_data_source: BaseDataConnection
-        _statements_data_source: BaseDataConnection
         self._set_sources()
 
     def __repr__(self):
@@ -24,13 +24,13 @@ class DataReader:
         """
         prices_data_source = config_utils.fetch_data_sources('market_data')
         statements_data_source = config_utils.fetch_data_sources('statements')
-        if prices_data_source == 'Yahoo':
+        if prices_data_source == 'yahoo':
             self._market_data_source = YahooConnection()
         else:
             logger.logging.error(f'prices datasource: {prices_data_source} not valid')
             return None
 
-        if statements_data_source == 'Yahoo':
+        if statements_data_source == 'yahoo':
             self._statements_data_source = YahooConnection()
         else:
             logger.logging.error(f'statements datasource: {statements_data_source} not valid')
