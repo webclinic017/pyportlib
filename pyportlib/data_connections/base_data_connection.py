@@ -1,8 +1,8 @@
 from datetime import datetime
 import pandas as pd
 
-from data_connections.interfaces.imarket_data_connection import IMarketDataSource
-from data_connections.interfaces.istatements_data_source import IStatementsDataSource
+from pyportlib.data_connections.interfaces.imarket_data_connection import IMarketDataSource
+from pyportlib.data_connections.interfaces.istatements_data_source import IStatementsDataSource
 from pyportlib.utils import files_utils, dates_utils
 
 

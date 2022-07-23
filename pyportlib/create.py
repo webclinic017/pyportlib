@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from containers.services_container import ServicesContainer
+from pyportlib.containers.services_container import ServicesContainer
 from pyportlib.containers.datareader_container import DataReaderContainer
 from pyportlib.containers.portfolio_container import PortfolioContainer
 from pyportlib.containers.position_container import PositionContainer

@@ -10,7 +10,7 @@ from pyportlib.services.interfaces.itransaction import ITransaction
 from pyportlib.services.interfaces.icash_change import ICashChange
 
 
-class IPortfolio(ABC):
+class IPortfolio(ITimeSeries):
     start_date: Union[datetime, None]
 
     @abstractmethod

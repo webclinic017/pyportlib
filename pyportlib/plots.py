@@ -1,7 +1,8 @@
 from datetime import datetime
 import quantstats as qs
 
-from pyportlib.metrics import stats
+from pyportlib.portfolio.iportfolio import IPortfolio
+from pyportlib import stats
 from pyportlib.utils import time_series
 from pyportlib.utils import logger
 from pyportlib.utils.time_series import ITimeSeries
@@ -256,7 +257,7 @@ def rolling_var(pos: ITimeSeries,
     qs.plots.returns(roll_var, benchmark=benchmark, compound=False, prepare_returns=False, **kwargs)
 
 
-def position_allocation(ptf: ITimeSeries, date: datetime = None, **kwargs):
+def position_allocation(ptf: IPortfolio, date: datetime = None, **kwargs):
     try:
         weights = ptf.position_weights(date=date)
     except AttributeError:
@@ -265,7 +266,7 @@ def position_allocation(ptf: ITimeSeries, date: datetime = None, **kwargs):
     weights.plot.pie(autopct='%1.1f%%', fontsize=12, **kwargs)
 
 
-def strategy_allocation(ptf: ITimeSeries, date: datetime = None, **kwargs):
+def strategy_allocation(ptf: IPortfolio, date: datetime = None, **kwargs):
     try:
         weights = ptf.strategy_weights(date=date)
     except AttributeError:
@@ -296,4 +297,3 @@ def excess_returns(pos: ITimeSeries,
 
     total = rets - bench
     qs.plots.returns(total, prepare_returns=False, **kwargs)
-
