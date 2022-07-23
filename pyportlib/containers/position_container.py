@@ -1,6 +1,6 @@
 from dependency_injector import providers, containers
 
-from pyportlib import Position
+from pyportlib.position.position import Position
 
 
 class PositionContainer(containers.DeclarativeContainer):

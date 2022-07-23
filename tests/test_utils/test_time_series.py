@@ -23,4 +23,3 @@ class TestTimeSeries:
         assert result.iloc[0] != 0
         assert result[15] == 0
         assert result.iloc[-1] == 1
-

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List
 
-from pyportlib.portfolio import Portfolio
+from pyportlib.portfolio.iportfolio import IPortfolio
 
 
 class AccountSourceInterface(ABC):
@@ -20,5 +20,5 @@ class AccountSourceInterface(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def update_ptf(self, portfolio: Portfolio, start_date: datetime = None) -> None:
+    def update_ptf(self, portfolio: IPortfolio, start_date: datetime = None) -> None:
         raise NotImplementedError()

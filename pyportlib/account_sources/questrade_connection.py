@@ -3,13 +3,13 @@ from typing import Union, List
 import pandas as pd
 import dateutil.parser
 
-from portfolio.iportfolio import IPortfolio
+from pyportlib.portfolio.iportfolio import IPortfolio
+from pyportlib.position.iposition import IPosition
 from pyportlib.account_sources.account_source_interface import AccountSourceInterface
 from pyportlib.services.cash_change import CashChange
 from pyportlib.utils import logger, config_utils
 from pyportlib.account_sources.questrade_api.questrade import Questrade
 from pyportlib.services.transaction import Transaction
-from pyportlib.position import Position
 from pyportlib.utils import dates_utils
 from pyportlib import create
 
@@ -268,7 +268,7 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
         return split_factor
 
     @staticmethod
-    def _transfer_cost(position: Position, date: datetime) -> float:
+    def _transfer_cost(position: IPosition, date: datetime) -> float:
         try:
             price = position.prices.loc[date]
         except KeyError:

@@ -1,12 +1,13 @@
 from datetime import datetime
 import pandas as pd
 
+from pyportlib.position.iposition import IPosition
 from pyportlib.services.data_reader import DataReader
 from pyportlib.utils import logger, dates_utils
 from pyportlib.utils.time_series import TimeSeriesInterface
 
 
-class Position(TimeSeriesInterface):
+class Position(IPosition, TimeSeriesInterface):
 
     def __init__(self, ticker: str,
                  datareader: DataReader,

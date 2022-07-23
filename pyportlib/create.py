@@ -1,7 +1,8 @@
-from containers.data_source_container import DataSourceContainer
-from containers.portfolio_container import PortfolioContainer
-from containers.position_container import PositionContainer
-from utils import config_utils
+from pyportlib.containers.data_source_container import DataSourceContainer
+from pyportlib.containers.portfolio_container import PortfolioContainer
+from pyportlib.containers.position_container import PositionContainer
+from pyportlib.position.iposition import IPosition
+from pyportlib.utils import config_utils
 
 data_source_config = config_utils.data_source_config()
 
@@ -30,7 +31,7 @@ def portfolio(account: str, currency: str):
     return ptf
 
 
-def position(ticker: str, local_currency: str = None, tag: str = None):
+def position(ticker: str, local_currency: str = None, tag: str = None) -> IPosition:
     datareader = datareader_container.datareader()
 
     position = position_container.position(ticker=ticker,

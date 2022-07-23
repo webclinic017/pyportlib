@@ -1,9 +1,9 @@
 from dependency_injector import providers, containers
 
-from pyportlib import Portfolio
-from services.cash_manager import CashManager
-from services.fx_rates import FxRates
-from services.transaction_manager import TransactionManager
+from pyportlib.portfolio.portfolio import Portfolio
+from pyportlib.services.cash_manager import CashManager
+from pyportlib.services.fx_rates import FxRates
+from pyportlib.services.transaction_manager import TransactionManager
 
 
 class PortfolioContainer(containers.DeclarativeContainer):

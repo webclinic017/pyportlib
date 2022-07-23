@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 
-from market_data_sources.yahoo_connection import YahooConnection
-from services.data_reader import DataReader
+from pyportlib.market_data_sources.yahoo_connection import YahooConnection
+from pyportlib.services.data_reader import DataReader
 
 
 class DataSourceContainer(containers.DeclarativeContainer):

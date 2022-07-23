@@ -1,4 +1,4 @@
-from pyportlib.reporting import plots, html_reports
+from pyportlib.reporting import plots
 from pyportlib.services.transaction import Transaction
 from pyportlib.services.cash_change import CashChange
 from pyportlib.utils.files_utils import set_client_dir, get_client_dir
