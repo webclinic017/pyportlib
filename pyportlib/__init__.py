@@ -1,3 +1,7 @@
+from pyportlib.utils import files_utils
+
+files_utils.set_client_dir()
+
 from pyportlib.reporting import plots
 from pyportlib.services.transaction import Transaction
 from pyportlib.services.cash_change import CashChange
@@ -7,3 +11,4 @@ from pyportlib.utils.indices import Index
 from pyportlib.metrics import stats
 from pyportlib.account_sources.questrade_connection import QuestradeConnection
 from pyportlib import create
+
