@@ -1,5 +1,9 @@
-from datetime import datetime
-
 import pyportlib as p
 
-ptf = p.Portfolio("questrade_tfsa", "CAD")
+
+class TestProd:
+
+    def test_create_large_ptf(self):
+        ptf = p.Portfolio("questrade_tfsa", "CAD")
+
+        assert ptf
