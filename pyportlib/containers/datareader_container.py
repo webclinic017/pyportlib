@@ -1,12 +1,11 @@
 from dependency_injector import containers, providers
 
-from pyportlib.market_data_sources.yahoo_connection import YahooConnection
+from pyportlib.data_connections.yahoo_connection import YahooConnection
 from pyportlib.services.data_reader import DataReader
 
 
-class DataSourceContainer(containers.DeclarativeContainer):
+class DataReaderContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
-
     yahoo = providers.Singleton(YahooConnection)
 
     market_data_source = providers.Selector(config.market_data,

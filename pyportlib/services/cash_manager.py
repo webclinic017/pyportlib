@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import List, Union
 import pandas as pd
 
-from pyportlib.services.cash_change import CashChange
 from pyportlib.utils import df_utils, files_utils
 from pyportlib.utils import logger
+from pyportlib.services.interfaces.icash_change import ICashChange
 
 
 class CashManager:
@@ -69,7 +69,7 @@ class CashManager:
         self.cash_changes.to_csv(f"{self.directory}/{self.CASH_FILENAME}")
         self.load()
 
-    def add(self, cash_changes: Union[List[CashChange], CashChange]):
+    def add(self, cash_changes: Union[List[ICashChange], ICashChange]):
         if cash_changes:
             if not hasattr(cash_changes, '__iter__'):
                 cash_changes = [cash_changes]

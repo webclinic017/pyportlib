@@ -5,8 +5,9 @@ from typing import List, Dict, Union
 import pandas as pd
 
 from pyportlib.position.iposition import IPosition
-from pyportlib import Transaction, CashChange
-from pyportlib.utils.time_series import TimeSeriesInterface
+from pyportlib.utils.time_series import ITimeSeries
+from pyportlib.services.interfaces.itransaction import ITransaction
+from pyportlib.services.interfaces.icash_change import ICashChange
 
 
 class IPortfolio(ABC):
@@ -40,12 +41,12 @@ class IPortfolio(ABC):
 
     @property
     @abstractmethod
-    def positions(self) -> Dict[str, Union[TimeSeriesInterface, IPosition]]:
+    def positions(self) -> Dict[str, Union[ITimeSeries, IPosition]]:
         """
         """
 
     @abstractmethod
-    def add_transaction(self, transactions: Union[Transaction, List[Transaction]]) -> None:
+    def add_transaction(self, transactions: Union[ITransaction, List[ITransaction]]) -> None:
         """
         """
 
@@ -68,7 +69,7 @@ class IPortfolio(ABC):
         """
 
     @abstractmethod
-    def add_cash_change(self, cash_changes: Union[List[CashChange], CashChange]) -> None:
+    def add_cash_change(self, cash_changes: Union[List[ICashChange], ICashChange]) -> None:
         """
         """
 
@@ -116,7 +117,7 @@ class IPortfolio(ABC):
         """
 
     @abstractmethod
-    def open_positions(self, date: datetime) -> Dict[str, Union[TimeSeriesInterface, IPosition]]:
+    def open_positions(self, date: datetime) -> Dict[str, Union[ITimeSeries, IPosition]]:
         """
         """
 

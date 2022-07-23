@@ -5,19 +5,19 @@ import pandas as pd
 
 import pyportlib.create
 from pyportlib.portfolio.iportfolio import IPortfolio
-from pyportlib.services.cash_change import CashChange
 from pyportlib.position.iposition import IPosition
 from pyportlib.services.cash_manager import CashManager
 from pyportlib.services.data_reader import DataReader
 from pyportlib.services.fx_rates import FxRates
 from pyportlib.services.position_tagging import PositionTagging
-from pyportlib.services.transaction import Transaction
 from pyportlib.services.transaction_manager import TransactionManager
 from pyportlib.utils import dates_utils, logger, time_series
-from pyportlib.utils.time_series import TimeSeriesInterface
+from pyportlib.utils.time_series import ITimeSeries
+from pyportlib.services.interfaces.icash_change import ICashChange
+from pyportlib.services.interfaces.itransaction import ITransaction
 
 
-class Portfolio(IPortfolio, TimeSeriesInterface):
+class Portfolio(IPortfolio, ITimeSeries):
 
     def __init__(self, account: str, currency: str,
                  datareader: DataReader,
@@ -160,7 +160,7 @@ class Portfolio(IPortfolio, TimeSeriesInterface):
         logger.logging.debug(f'positions for {self.account} loaded')
 
     @property
-    def positions(self) -> Dict[str, Union[IPosition, TimeSeriesInterface]]:
+    def positions(self) -> Dict[str, Union[IPosition, ITimeSeries]]:
         return self._positions
 
     def _load_position_quantities(self) -> None:
@@ -188,7 +188,7 @@ class Portfolio(IPortfolio, TimeSeriesInterface):
         else:
             logger.logging.debug(f'{self.account} no positions in portfolio')
 
-    def add_transaction(self, transactions: Union[Transaction, List[Transaction]]) -> None:
+    def add_transaction(self, transactions: Union[ITransaction, List[ITransaction]]) -> None:
         """
         Add transactions to portfolio and save transaction file
 
@@ -233,7 +233,7 @@ class Portfolio(IPortfolio, TimeSeriesInterface):
         cash_c = pd.Series(data=cash, index=dates)
         self._cash_history = cash_c
 
-    def add_cash_change(self, cash_changes: Union[List[CashChange], CashChange]) -> None:
+    def add_cash_change(self, cash_changes: Union[List[ICashChange], ICashChange]) -> None:
         """
         Add cash change (deposit or withdrawal) to portfolio through the CashChange object
 
@@ -452,7 +452,7 @@ class Portfolio(IPortfolio, TimeSeriesInterface):
             logger.logging.error(f"Weights do not add to 1: {weights.sum()}")
         return weights
 
-    def open_positions(self, date: datetime) -> Dict[str, Union[IPosition, TimeSeriesInterface]]:
+    def open_positions(self, date: datetime) -> Dict[str, Union[IPosition, ITimeSeries]]:
         """
         Dict with only active position on given date
 
@@ -479,7 +479,7 @@ class Portfolio(IPortfolio, TimeSeriesInterface):
 
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):
         """
-        Implementation of the returns method of the TimeSeriesInterface
+        Implementation of the returns method of the ITimeSeries
 
         :param start_date: datetime
         :param end_date: datetime
@@ -499,7 +499,7 @@ class Portfolio(IPortfolio, TimeSeriesInterface):
     def _make_qty_series(quantities: Union[pd.Series, pd.DataFrame]) -> Union[pd.Series, pd.DataFrame]:
         return quantities.fillna(0).cumsum()
 
-    def _enough_funds(self, transaction: Transaction) -> tuple:
+    def _enough_funds(self, transaction: ITransaction) -> tuple:
         """
         If there is enough funds for transaction
         :param transaction:

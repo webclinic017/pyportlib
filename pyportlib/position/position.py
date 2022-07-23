@@ -4,10 +4,10 @@ import pandas as pd
 from pyportlib.position.iposition import IPosition
 from pyportlib.services.data_reader import DataReader
 from pyportlib.utils import logger, dates_utils
-from pyportlib.utils.time_series import TimeSeriesInterface
+from pyportlib.utils.time_series import ITimeSeries
 
 
-class Position(IPosition, TimeSeriesInterface):
+class Position(IPosition, ITimeSeries):
 
     def __init__(self, ticker: str,
                  datareader: DataReader,
@@ -200,7 +200,7 @@ class Position(IPosition, TimeSeriesInterface):
 
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):
         """
-        Implementation of the returns method of the TimeSeriesInterface
+        Implementation of the returns method of the ITimeSeries
         :param start_date: datetime
         :param end_date: datetime
         :param kwargs:

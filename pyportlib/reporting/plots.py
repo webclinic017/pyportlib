@@ -4,10 +4,10 @@ import quantstats as qs
 from pyportlib.metrics import stats
 from pyportlib.utils import time_series
 from pyportlib.utils import logger
-from pyportlib.utils.time_series import TimeSeriesInterface
+from pyportlib.utils.time_series import ITimeSeries
 
 
-def snapshot(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, **kwargs):
+def snapshot(pos: ITimeSeries, date: datetime = None, lookback: str = None, **kwargs):
     """
     Quantstats snapshot plot of returns
 
@@ -29,8 +29,8 @@ def snapshot(pos: TimeSeriesInterface, date: datetime = None, lookback: str = No
     qs.plots.snapshot(rets, **kwargs)
 
 
-def returns(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, log: bool = False,
-            benchmark: TimeSeriesInterface = None, **kwargs):
+def returns(pos: ITimeSeries, date: datetime = None, lookback: str = None, log: bool = False,
+            benchmark: ITimeSeries = None, **kwargs):
     """
     Quantstats plot of returns
 
@@ -61,7 +61,7 @@ def returns(pos: TimeSeriesInterface, date: datetime = None, lookback: str = Non
         qs.plots.log_returns(rets, benchmark=benchmark, prepare_returns=False, **kwargs)
 
 
-def distribution(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None, **kwargs):
+def distribution(pos: ITimeSeries, date: datetime = None, lookback: str = None, **kwargs):
     """
     Quantstats plot of returns distribution
 
@@ -83,7 +83,7 @@ def distribution(pos: TimeSeriesInterface, date: datetime = None, lookback: str 
     qs.plots.histogram(rets, prepare_returns=False, **kwargs)
 
 
-def rolling_beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, date: datetime = None, lookback: str = None,
+def rolling_beta(pos: ITimeSeries, benchmark: ITimeSeries, date: datetime = None, lookback: str = None,
                  **kwargs):
     """
     Quantstats plot of rolling beta
@@ -110,8 +110,8 @@ def rolling_beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, date:
     qs.plots.rolling_beta(rets, benchmark=benchmark, prepare_returns=False, **kwargs)
 
 
-def rolling_vol(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None,
-                benchmark: TimeSeriesInterface = None, **kwargs):
+def rolling_vol(pos: ITimeSeries, date: datetime = None, lookback: str = None,
+                benchmark: ITimeSeries = None, **kwargs):
     """
     Quantstats plot of rolling volatility
 
@@ -138,7 +138,7 @@ def rolling_vol(pos: TimeSeriesInterface, date: datetime = None, lookback: str =
     qs.plots.rolling_volatility(rets, benchmark=benchmark, **kwargs)
 
 
-def rolling_skew(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, rolling_period: int = 252,
+def rolling_skew(pos: ITimeSeries, lookback: str = None, date: datetime = None, rolling_period: int = 252,
                  **kwargs):
     """
     Plot of rolling skewness
@@ -164,7 +164,7 @@ def rolling_skew(pos: TimeSeriesInterface, lookback: str = None, date: datetime 
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
-def rolling_kurtosis(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, rolling_period: int = 252,
+def rolling_kurtosis(pos: ITimeSeries, lookback: str = None, date: datetime = None, rolling_period: int = 252,
                      **kwargs):
     """
     Plot of rolling kurtosis
@@ -190,8 +190,8 @@ def rolling_kurtosis(pos: TimeSeriesInterface, lookback: str = None, date: datet
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
-def rolling_sharpe(pos: TimeSeriesInterface, date: datetime = None, lookback: str = None,
-                   benchmark: TimeSeriesInterface = None, **kwargs):
+def rolling_sharpe(pos: ITimeSeries, date: datetime = None, lookback: str = None,
+                   benchmark: ITimeSeries = None, **kwargs):
     """
     Quantstats plot of rolling sharp ratio
 
@@ -218,12 +218,12 @@ def rolling_sharpe(pos: TimeSeriesInterface, date: datetime = None, lookback: st
     qs.plots.rolling_sharpe(rets, benchmark=benchmark, **kwargs)
 
 
-def rolling_var(pos: TimeSeriesInterface,
+def rolling_var(pos: ITimeSeries,
                 date: datetime = None,
                 lookback: str = None,
                 rolling_period: int = 252,
                 quantile=0.95,
-                benchmark: TimeSeriesInterface = None, **kwargs):
+                benchmark: ITimeSeries = None, **kwargs):
     """
     Plots rolling value at risk on a specific quantile
 
@@ -256,7 +256,7 @@ def rolling_var(pos: TimeSeriesInterface,
     qs.plots.returns(roll_var, benchmark=benchmark, compound=False, prepare_returns=False, **kwargs)
 
 
-def position_allocation(ptf: TimeSeriesInterface, date: datetime = None, **kwargs):
+def position_allocation(ptf: ITimeSeries, date: datetime = None, **kwargs):
     try:
         weights = ptf.position_weights(date=date)
     except AttributeError:
@@ -265,7 +265,7 @@ def position_allocation(ptf: TimeSeriesInterface, date: datetime = None, **kwarg
     weights.plot.pie(autopct='%1.1f%%', fontsize=12, **kwargs)
 
 
-def strategy_allocation(ptf: TimeSeriesInterface, date: datetime = None, **kwargs):
+def strategy_allocation(ptf: ITimeSeries, date: datetime = None, **kwargs):
     try:
         weights = ptf.strategy_weights(date=date)
     except AttributeError:
@@ -274,8 +274,8 @@ def strategy_allocation(ptf: TimeSeriesInterface, date: datetime = None, **kwarg
     weights.plot.pie(autopct='%1.1f%%', fontsize=12, **kwargs)
 
 
-def excess_returns(pos: TimeSeriesInterface,
-                   benchmark: TimeSeriesInterface,
+def excess_returns(pos: ITimeSeries,
+                   benchmark: ITimeSeries,
                    date: datetime = None,
                    lookback: str = None,
                    **kwargs):

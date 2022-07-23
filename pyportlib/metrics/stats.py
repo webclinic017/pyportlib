@@ -5,11 +5,11 @@ import pandas as pd
 from scipy.stats import norm
 import quantstats as qs
 
-from pyportlib.utils.time_series import TimeSeriesInterface
+from pyportlib.utils.time_series import ITimeSeries
 from pyportlib.utils import time_series
 
 
-def skew(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
+def skew(pos: ITimeSeries, lookback: str = None, date: datetime = None, **kwargs) -> float:
     """
     Compute the skew of the returns distribution from a TimeSeries object
 
@@ -23,7 +23,7 @@ def skew(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, 
     return returns.skew()
 
 
-def kurtosis(pos: TimeSeriesInterface, lookback: str, date: datetime = None, **kwargs) -> float:
+def kurtosis(pos: ITimeSeries, lookback: str, date: datetime = None, **kwargs) -> float:
     """
     Compute the kurtosis of the returns distribution from a TimeSeries object
 
@@ -37,7 +37,7 @@ def kurtosis(pos: TimeSeriesInterface, lookback: str, date: datetime = None, **k
     return returns.kurtosis()
 
 
-def beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None,
+def beta(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: datetime = None,
          **kwargs) -> float:
     """
     Compute the beta of the returns distribution from a TimeSeries object on a benchmark on the specified time period.
@@ -56,7 +56,7 @@ def beta(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str
     return round(matrix[0, 1] / matrix[1, 1], 2)
 
 
-def alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None,
+def alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: datetime = None,
           **kwargs) -> float:
     """
     Compute the alpha of the returns distribution from a TimeSeries object on a benchmark on the specified time period.
@@ -77,7 +77,7 @@ def alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: st
     return alph*len(returns)
 
 
-def rolling_alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, lookback: str = None, date: datetime = None,
+def rolling_alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: datetime = None,
                   rolling_period: int = 252, **kwargs) -> pd.Series:
     """
     Compute the gaussian rolling value at risk of the returns distribution from a TimeSeries object
@@ -104,7 +104,7 @@ def rolling_alpha(pos: TimeSeriesInterface, benchmark: TimeSeriesInterface, look
     return rolling_alph * rolling_period
 
 
-def annualized_volatility(pos: TimeSeriesInterface, lookback: str = None, date: datetime = None, **kwargs) -> float:
+def annualized_volatility(pos: ITimeSeries, lookback: str = None, date: datetime = None, **kwargs) -> float:
     """
     Compute the annualized volatility of the returns distribution from a TimeSeries object
 

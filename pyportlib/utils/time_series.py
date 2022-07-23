@@ -8,7 +8,7 @@ import pandas as pd
 from pyportlib.utils import dates_utils
 
 
-class TimeSeriesInterface(ABC):
+class ITimeSeries(ABC):
     """
     Interface from object that have returns
     """
@@ -17,10 +17,10 @@ class TimeSeriesInterface(ABC):
         raise NotImplementedError()
 
 
-def prep_returns(ts: Union[TimeSeriesInterface, pd.DataFrame, pd.Series], lookback: str = None, date: datetime = None, **kwargs) -> pd.Series:
+def prep_returns(ts: Union[ITimeSeries, pd.DataFrame, pd.Series], lookback: str = None, date: datetime = None, **kwargs) -> pd.Series:
     """
     Computes returns for a Position, Portfolio or Pandas objects
-    :param ts: TimeSeriesInterface Object (Position, Portfolio) or Pandas object
+    :param ts: ITimeSeries Object (Position, Portfolio) or Pandas object
     :param lookback: string determining the start date. ex: '1y'
     :param date: end date of observation
     :param kwargs: PnL keyword arguments for Portfolio (tags, positions_to_exclude, include_cash)

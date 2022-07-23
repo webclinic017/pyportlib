@@ -1,4 +1,7 @@
-from pyportlib.containers.data_source_container import DataSourceContainer
+from datetime import datetime
+
+from containers.services_container import ServicesContainer
+from pyportlib.containers.datareader_container import DataReaderContainer
 from pyportlib.containers.portfolio_container import PortfolioContainer
 from pyportlib.containers.position_container import PositionContainer
 from pyportlib.position.iposition import IPosition
@@ -8,18 +11,19 @@ data_source_config = config_utils.data_source_config()
 
 ptf_container = PortfolioContainer()
 position_container = PositionContainer()
-datareader_container = DataSourceContainer(config=data_source_config)
+services_container = ServicesContainer()
+datareader_container = DataReaderContainer(config=data_source_config)
 
 
 def portfolio(account: str, currency: str):
     datareader = datareader_container.datareader()
 
-    cash_manager = ptf_container.cash_manager(account=account)
-    transaction_manager = ptf_container.transaction_manager(account=account)
+    cash_manager = services_container.cash_manager(account=account)
+    transaction_manager = services_container.transaction_manager(account=account)
 
     required_currencies = transaction_manager.get_currencies()
 
-    fx = ptf_container.fx(ptf_currency=currency, currencies=required_currencies, datareader=datareader)
+    fx = services_container.fx(ptf_currency=currency, currencies=required_currencies, datareader=datareader)
 
     ptf = ptf_container.ptf(account=account,
                             currency=currency,
@@ -40,3 +44,28 @@ def position(ticker: str, local_currency: str = None, tag: str = None) -> IPosit
                                            datareader=datareader)
 
     return position
+
+
+def transaction(date: datetime,
+                ticker: str,
+                transaction_type: str,
+                quantity: int,
+                price: float,
+                fees: float,
+                currency: str):
+    trx = services_container.transaction(date=date,
+                                         ticker=ticker,
+                                         transaction_type=transaction_type,
+                                         quantity=quantity,
+                                         price=price,
+                                         fees=fees,
+                                         currency=currency)
+
+    return trx
+
+
+def cash_change(date: datetime, direction: str, amount: float):
+    cc = services_container.cash_change(date=date,
+                                        direction=direction,
+                                        amount=amount)
+    return cc
