@@ -4,7 +4,7 @@ import pyportlib
 
 
 class TestAddTransactions:
-    p = pyportlib.Portfolio(account="Testing", currency="CAD")
+    p = pyportlib.create.portfolio(account="Testing", currency="CAD")
     start = datetime(2022, 1, 1)
     date = datetime(2022, 5, 12)
     split_date = datetime(2022, 5, 20)

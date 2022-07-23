@@ -4,7 +4,7 @@ import pyportlib
 
 
 class TestStats:
-    p = pyportlib.Portfolio(account="Testing", currency="CAD")
+    p = pyportlib.create.portfolio(account="Testing", currency="CAD")
     start = datetime(2022, 1, 1)
     date = datetime(2022, 5, 12)
     end_date = datetime(2022, 5, 20)
@@ -34,8 +34,7 @@ class TestStats:
         pyportlib.plots.strategy_allocation(self.p, date=self.date)
 
     def test_weights_no_error_real_ptf(self):
-        ptf = pyportlib.Portfolio(account='questrade_tfsa', currency="CAD")
+        ptf = pyportlib.create.portfolio(account='questrade_tfsa', currency="CAD")
         ptf.position_weights()
         pyportlib.plots.position_allocation(ptf)
         pyportlib.plots.strategy_allocation(ptf)
-

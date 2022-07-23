@@ -30,7 +30,7 @@ def fetch_tickers_to_ignore() -> List[str]:
     return list(tickers.values())
 
 
-def fetch_data_sources(source_type: str):
+def data_source_config():
     """
     Fetch the datasources specified in the config file. Should not be used by user.
     :param source_type:
@@ -38,7 +38,7 @@ def fetch_data_sources(source_type: str):
     """
     with open(f'{files_utils.get_config_dir()}config.json') as myfile:
         data = json.loads(myfile.read())
-    source = data['datasource'][source_type]
+    source = data['datasource']
 
     return source
 

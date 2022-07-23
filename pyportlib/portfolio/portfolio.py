@@ -3,8 +3,10 @@ from typing import Union, List, Dict
 import numpy as np
 import pandas as pd
 
+import pyportlib.create
+from pyportlib.portfolio.iportfolio import IPortfolio
 from pyportlib.services.cash_change import CashChange
-from pyportlib.position import Position
+from pyportlib.position.iposition import IPosition
 from pyportlib.services.cash_manager import CashManager
 from pyportlib.services.data_reader import DataReader
 from pyportlib.services.fx_rates import FxRates
@@ -15,9 +17,13 @@ from pyportlib.utils import dates_utils, logger, time_series
 from pyportlib.utils.time_series import TimeSeriesInterface
 
 
-class Portfolio(TimeSeriesInterface):
+class Portfolio(IPortfolio, TimeSeriesInterface):
 
-    def __init__(self, account: str, currency: str):
+    def __init__(self, account: str, currency: str,
+                 datareader: DataReader,
+                 transaction_manager: TransactionManager,
+                 cash_manager: CashManager,
+                 fx: FxRates):
         # attributes
         self.account = account
         self._positions = {}
@@ -26,11 +32,11 @@ class Portfolio(TimeSeriesInterface):
         self._cash_history = pd.Series()
 
         # services
-        self._cash_manager = CashManager(account=self.account)
-        self._datareader = DataReader()
-        self._transaction_manager = TransactionManager(account=self.account)
+        self._cash_manager = cash_manager
+        self._datareader = datareader
+        self._transaction_manager = transaction_manager
         self._position_tags: PositionTagging
-        self._fx = FxRates(ptf_currency=currency, currencies=self._transaction_manager.get_currencies())
+        self._fx = fx
 
         self.start_date = None
         # load data        
@@ -145,7 +151,7 @@ class Portfolio(TimeSeriesInterface):
 
         for ticker in tickers:
             currency = self._transaction_manager.get_currency(ticker=ticker)
-            pos = Position(ticker, local_currency=currency, tag=position_tags.get(ticker))
+            pos = pyportlib.create.position(ticker, local_currency=currency, tag=position_tags.get(ticker))
 
             if self.currency != pos.currency:
                 prices = pos.prices.multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
@@ -154,7 +160,7 @@ class Portfolio(TimeSeriesInterface):
         logger.logging.debug(f'positions for {self.account} loaded')
 
     @property
-    def positions(self) -> Dict[str, Position]:
+    def positions(self) -> Dict[str, Union[IPosition, TimeSeriesInterface]]:
         return self._positions
 
     def _load_position_quantities(self) -> None:
@@ -446,7 +452,7 @@ class Portfolio(TimeSeriesInterface):
             logger.logging.error(f"Weights do not add to 1: {weights.sum()}")
         return weights
 
-    def open_positions(self, date: datetime) -> Dict[str, Position]:
+    def open_positions(self, date: datetime) -> Dict[str, Union[IPosition, TimeSeriesInterface]]:
         """
         Dict with only active position on given date
 

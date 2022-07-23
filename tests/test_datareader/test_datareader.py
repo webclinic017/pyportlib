@@ -1,11 +1,15 @@
 from datetime import datetime
 
-from pyportlib.services.data_reader import DataReader
+from containers.data_source_container import DataSourceContainer
+from utils import config_utils
 
 
 class TestDataReader:
     date = datetime(2022, 5, 20)
-    dr = DataReader()
+    data_source_config = config_utils.data_source_config()
+
+    datareader_container = DataSourceContainer(config=data_source_config)
+    dr = datareader_container.datareader()
 
     def test_read_prices(self):
         prices = self.dr.read_prices("AAPL")
