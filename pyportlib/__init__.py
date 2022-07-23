@@ -10,5 +10,5 @@ from pyportlib.utils import dates_utils, files_utils, time_series, df_utils
 from pyportlib.utils.indices import Index
 from pyportlib.metrics import stats
 from pyportlib.account_sources.questrade_connection import QuestradeConnection
-from pyportlib import create
+import pyportlib.create
 

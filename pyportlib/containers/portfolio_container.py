@@ -7,8 +7,6 @@ from pyportlib.services.transaction_manager import TransactionManager
 
 
 class PortfolioContainer(containers.DeclarativeContainer):
-    config = providers.Configuration()
-
     transaction_manager = providers.Factory(TransactionManager)
     cash_manager = providers.Factory(CashManager)
     fx = providers.Factory(FxRates)

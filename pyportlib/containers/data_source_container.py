@@ -11,7 +11,6 @@ class DataSourceContainer(containers.DeclarativeContainer):
 
     market_data_source = providers.Selector(config.market_data,
                                             yahoo=yahoo)
-
     statements_data_source = providers.Selector(config.statements,
                                                 yahoo=yahoo)
 
