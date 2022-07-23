@@ -3,14 +3,15 @@ from typing import Union, List
 import pandas as pd
 import dateutil.parser
 
+from portfolio.iportfolio import IPortfolio
 from pyportlib.account_sources.account_source_interface import AccountSourceInterface
 from pyportlib.services.cash_change import CashChange
 from pyportlib.utils import logger, config_utils
 from pyportlib.account_sources.questrade_api.questrade import Questrade
 from pyportlib.services.transaction import Transaction
-from pyportlib.portfolio import Portfolio
 from pyportlib.position import Position
 from pyportlib.utils import dates_utils
+from pyportlib import create
 
 
 class QuestradeConnection(Questrade, AccountSourceInterface):
@@ -102,7 +103,7 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
 
         return list_of_transactions
 
-    def update_ptf(self, portfolio: Portfolio, start_date: datetime = None) -> None:
+    def update_ptf(self, portfolio: IPortfolio, start_date: datetime = None) -> None:
         """
         Updates a pyportlib Portfolio transactions and cash changes and saves the Portfolio. Transactions and Cash Changes will not be duplicated.
         :param portfolio: Portfolio
@@ -212,7 +213,7 @@ class QuestradeConnection(Questrade, AccountSourceInterface):
         fees = abs(transaction.get('commission'))
 
         if not isinstance(ticker, float) and ticker:
-            pos = Position(ticker=ticker, local_currency=currency)
+            pos = create.position(ticker=ticker, local_currency=currency)
         else:
             logger.logging.error(f"{ticker} not supported")
             return

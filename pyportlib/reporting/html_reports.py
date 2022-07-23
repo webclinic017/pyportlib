@@ -2,14 +2,14 @@ from typing import Union
 import pandas as pd
 import quantstats as qs
 
-from pyportlib.portfolio import Portfolio
+from pyportlib.portfolio import IPortfolio
 from pyportlib.services.data_reader import DataReader
 from pyportlib.utils import files_utils
 
 OUT_DIR = files_utils.get_outputs_dir()
 
 
-def full(ptf: Union[Portfolio, pd.Series, pd.DataFrame],
+def full(ptf: Union[IPortfolio, pd.Series, pd.DataFrame],
          benchmark: Union[pd.Series, pd.DataFrame, str, Portfolio],
          name: str,
          rf=None) -> None:

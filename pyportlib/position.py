@@ -8,10 +8,14 @@ from pyportlib.utils.time_series import TimeSeriesInterface
 
 class Position(TimeSeriesInterface):
 
-    def __init__(self, ticker: str, local_currency: str = None, tag: str = None):
+    def __init__(self, ticker: str,
+                 datareader: DataReader,
+                 local_currency: str = None,
+                 tag: str = None,
+                 ):
         self.ticker = ticker.upper()
         self._tag = tag
-        self._datareader = DataReader()
+        self._datareader = datareader
         self._prices = pd.Series()
         self._quantities = pd.Series()
         self._load_prices()

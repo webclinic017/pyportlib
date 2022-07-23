@@ -1,9 +1,8 @@
-import pyportlib as p
-
+import pyportlib
 
 class TestProd:
 
     def test_create_large_ptf(self):
-        ptf = p.Portfolio("questrade_tfsa", "CAD")
+        ptf = pyportlib.create.portfolio("questrade_tfsa", "CAD")
 
         assert ptf
