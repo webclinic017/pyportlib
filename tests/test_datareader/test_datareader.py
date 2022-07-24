@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from containers.data_source_container import DataSourceContainer
+from containers.datareader_container import DataReaderContainer
 from utils import config_utils
 
 
@@ -8,7 +8,7 @@ class TestDataReader:
     date = datetime(2022, 5, 20)
     data_source_config = config_utils.data_source_config()
 
-    datareader_container = DataSourceContainer(config=data_source_config)
+    datareader_container = DataReaderContainer(config=data_source_config)
     dr = datareader_container.datareader()
 
     def test_read_prices(self):

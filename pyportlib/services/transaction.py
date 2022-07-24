@@ -2,9 +2,10 @@ from datetime import datetime
 import pandas as pd
 
 from pyportlib.utils import logger
+from pyportlib.services.interfaces.itransaction import ITransaction
 
 
-class Transaction:
+class Transaction(ITransaction):
     _NAME = 'Transaction'
     _TYPES = ["Buy", "Sell", "Dividend", "Split"]
     INFO = ['Date', 'Ticker', 'Type', 'Quantity', 'Price', 'Fees', 'Currency']

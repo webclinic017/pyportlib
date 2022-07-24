@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from pyportlib.utils import logger
+from pyportlib.services.interfaces.icash_change import ICashChange
 
 
-class CashChange:
+class CashChange(ICashChange):
     _NAME = "CashChange"
     _DIRECTIONS = ["Deposit", "Withdrawal"]
     _INFO = ['Date', 'Direction', 'Amount']

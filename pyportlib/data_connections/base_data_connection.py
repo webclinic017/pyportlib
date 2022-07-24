@@ -1,10 +1,12 @@
 from datetime import datetime
 import pandas as pd
 
-from ..utils import files_utils, dates_utils
+from pyportlib.data_connections.interfaces.imarket_data_connection import IMarketDataSource
+from pyportlib.data_connections.interfaces.istatements_data_source import IStatementsDataSource
+from pyportlib.utils import files_utils, dates_utils
 
 
-class BaseDataConnection:
+class BaseDataConnection(IMarketDataSource, IStatementsDataSource):
     _DATA_DIRECTORY = files_utils.get_data_dir()
     _STATEMENT_DIRECTORY = files_utils.get_statements_data_dir()
     _PRICES_DIRECTORY = files_utils.get_price_data_dir()

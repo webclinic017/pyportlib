@@ -11,14 +11,14 @@ class TestStats:
 
     def setup_ptf(self):
         self.p.reset()
-        self.p.add_cash_change(cash_changes=pyportlib.CashChange(self.start, "Deposit", 1000000.))
-        trx = pyportlib.Transaction(self.date,
-                                    "AAPL",
-                                    "Buy",
-                                    10,
-                                    100,
-                                    0,
-                                    "USD")
+        self.p.add_cash_change(cash_changes=pyportlib.create.cash_change(self.start, "Deposit", 1000000.))
+        trx = pyportlib.create.transaction(self.date,
+                                           "AAPL",
+                                           "Buy",
+                                           10,
+                                           100,
+                                           0,
+                                           "USD")
         self.p.add_transaction(trx)
 
     def test_skew(self):

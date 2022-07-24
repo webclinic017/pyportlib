@@ -11,17 +11,17 @@ class TestAddTransactions:
 
     def setup_ptf(self):
         self.p.reset()
-        self.p.add_cash_change(cash_changes=pyportlib.CashChange(self.start, "Deposit", 1000000.))
+        self.p.add_cash_change(cash_changes=pyportlib.create.cash_change(self.start, "Deposit", 1000000.))
 
     def test_add_transaction(self):
         self.setup_ptf()
-        trx = pyportlib.Transaction(self.date,
-                                    "AAPL",
-                                    "Buy",
-                                    10,
-                                    100,
-                                    0,
-                                    "USD")
+        trx = pyportlib.create.transaction(self.date,
+                                           "AAPL",
+                                           "Buy",
+                                           10,
+                                           100,
+                                           0,
+                                           "USD")
         self.p.add_transaction(trx)
 
         assert len(self.p.transactions) == 1
@@ -29,22 +29,22 @@ class TestAddTransactions:
 
     def test_add_split(self):
         self.setup_ptf()
-        trx = pyportlib.Transaction(self.date,
-                                    "AAPL",
-                                    "Buy",
-                                    10,
-                                    100,
-                                    0,
-                                    "USD")
+        trx = pyportlib.create.transaction(self.date,
+                                           "AAPL",
+                                           "Buy",
+                                           10,
+                                           100,
+                                           0,
+                                           "USD")
         self.p.add_transaction(trx)
 
-        split = pyportlib.Transaction(self.split_date,
-                                      "AAPL",
-                                      "Split",
-                                      0,
-                                      2,
-                                      0,
-                                      "USD")
+        split = pyportlib.create.transaction(self.split_date,
+                                             "AAPL",
+                                             "Split",
+                                             0,
+                                             2,
+                                             0,
+                                             "USD")
         self.p.add_transaction(split)
 
         assert self.p.transactions.loc[self.date, "Price"] == 50

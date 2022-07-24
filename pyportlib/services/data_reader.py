@@ -1,7 +1,7 @@
 from datetime import datetime
 import pandas as pd
 
-from pyportlib.market_data_sources.base_data_connection import BaseDataConnection
+from pyportlib.data_connections.base_data_connection import BaseDataConnection
 from pyportlib.utils import logger, files_utils
 
 
