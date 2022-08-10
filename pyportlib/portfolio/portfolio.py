@@ -154,7 +154,12 @@ class Portfolio(IPortfolio, ITimeSeries):
             pos = pyportlib.create.position(ticker, local_currency=currency, tag=position_tags.get(ticker))
 
             if self.currency != pos.currency:
-                prices = pos.prices.multiply(self._fx.get(f"{pos.currency}{self.currency}"), fill_value=None).dropna()
+                fx = self._fx.get(f"{pos.currency}{self.currency}")
+                prices = pos.prices.multiply(fx, fill_value=None).dropna()
+
+                if pos.prices.index[-1] != fx.index[-1]:
+                    prices.loc[pos.prices.index[-1]] = pos.prices.iloc[-1] * fx.iloc[-1]
+
                 pos.prices = prices
             self._positions[ticker] = pos
         logger.logging.debug(f'positions for {self.account} loaded')
