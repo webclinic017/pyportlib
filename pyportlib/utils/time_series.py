@@ -17,22 +17,30 @@ class ITimeSeries(ABC):
         raise NotImplementedError()
 
 
-def prep_returns(ts: Union[ITimeSeries, pd.DataFrame, pd.Series], lookback: str = None, date: datetime = None, **kwargs) -> pd.Series:
+def prep_returns(ts: Union[ITimeSeries, pd.DataFrame, pd.Series], start_date: datetime = None, end_date: datetime = None, lookback: str = None, **kwargs) -> pd.Series:
     """
     Computes returns for a Position, Portfolio or Pandas objects
     :param ts: ITimeSeries Object (Position, Portfolio) or Pandas object
     :param lookback: string determining the start date. ex: '1y'
-    :param date: end date of observation
+    :param start_date: start date of observation
+    :param end_date: end date of observation
     :param kwargs: PnL keyword arguments for Portfolio (tags, positions_to_exclude, include_cash)
     :return:
     """
-    if lookback is None:
-        lookback = "1y"
-    end_date = dates_utils.last_bday(date)
-    start_date = dates_utils.date_window(date=end_date, lookback=lookback)
+    if lookback is not None:
+        end_date = dates_utils.last_bday(end_date)
+        start_date = dates_utils.date_window(lookback=lookback, date=end_date)
+    elif start_date is None:
+        if lookback is None:
+            lookback = '1y'
+        start_date = dates_utils.date_window(lookback=lookback, date=end_date)
+        end_date = dates_utils.last_bday(end_date)
+    else:
+        start_date = dates_utils.last_bday(start_date)
+        end_date = dates_utils.last_bday(end_date)
 
     if isinstance(ts, pd.Series) or isinstance(ts, pd.DataFrame):
-        series = ts.loc[start_date:date].fillna(0)
+        series = ts.loc[start_date:end_date].fillna(0)
     else:
         series = ts.returns(start_date=start_date, end_date=end_date, **kwargs)
     series = remove_leading_zeroes(series)

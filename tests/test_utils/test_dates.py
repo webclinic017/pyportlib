@@ -20,7 +20,12 @@ class TestDates:
 
         assert day == datetime(2022, 5, 20)
 
-    def test_datewindow(self):
+    def test_datewindow_with_lookback(self):
         window = dates_utils.date_window('1y', datetime(2022, 1, 1))
 
         assert window == datetime(2020, 12, 31)
+
+    def test_datewindow_lookback_none(self):
+        window = dates_utils.date_window(date=datetime(2022, 1, 1))
+
+        assert window == datetime(2021, 12, 31)

@@ -387,15 +387,16 @@ class Portfolio(IPortfolio, ITimeSeries):
         self._fx.reset()
         self.load_data()
 
-    def corr(self, lookback: str = None, date: datetime = None):
+    def corr(self, lookback: str = None, end_date: datetime = None, start_date: datetime = None):
         """
         Open positions correlations
 
         :param lookback:
-        :param date:
+        :param start_date:
+        :param end_date:
         :return:
         """
-        return self.open_positions_returns(lookback=lookback, date=date).corr()
+        return self.open_positions_returns(lookback=lookback, end_date=end_date, start_date=start_date).corr()
 
     def position_weights(self, date: datetime = None) -> pd.Series:
         """
@@ -466,20 +467,19 @@ class Portfolio(IPortfolio, ITimeSeries):
         """
         return {k: v for k, v in self.positions.items() if round(v.quantities.loc[date]) != 0.}
 
-    def open_positions_returns(self, lookback: str = None, date: datetime = None):
+    def open_positions_returns(self, lookback: str = None, end_date: datetime = None, start_date: datetime = None):
         """
         Get returns from open positions on given date
 
         :param lookback: ex. 1y or 10m to lookback from given date argument
-        :param date: last business day if none
+        :param start_date: last business day if none
+        :param end_date: last business day if none
         :return:
         """
-        if date is None:
-            date = self._datareader.last_data_point(ptf_currency=self.currency)
-        if lookback is None:
-            lookback = "1y"
-        open_positions = self.open_positions(date)
-        prices = {k: time_series.prep_returns(v, lookback=lookback, date=date) for k, v in open_positions.items()}
+        if end_date is None:
+            end_date = self._datareader.last_data_point(ptf_currency=self.currency)
+        open_positions = self.open_positions(end_date)
+        prices = {k: time_series.prep_returns(v, lookback=lookback, end_date=end_date, start_date=start_date) for k, v in open_positions.items()}
         return pd.DataFrame(prices).fillna(0)
 
     def returns(self, start_date: datetime, end_date: datetime, **kwargs):
