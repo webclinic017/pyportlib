@@ -23,7 +23,7 @@ class TestStats:
 
     def test_skew(self):
         self.setup_ptf()
-        var = pyportlib.stats.skew(self.p, date=self.end_date, lookback='1y')
+        var = pyportlib.stats.skew(self.p, end_date=self.end_date, lookback='1y')
 
         assert round(var, 5) == 2.27105
 

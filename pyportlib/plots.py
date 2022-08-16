@@ -8,17 +8,18 @@ from pyportlib.utils import logger
 from pyportlib.utils.time_series import ITimeSeries
 
 
-def snapshot(pos: ITimeSeries, date: datetime = None, lookback: str = None, **kwargs):
+def snapshot(pos: ITimeSeries, start_date: datetime = None, end_date: datetime = None, lookback: str = None, **kwargs):
     """
     Quantstats snapshot plot of returns
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
-    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
@@ -30,27 +31,28 @@ def snapshot(pos: ITimeSeries, date: datetime = None, lookback: str = None, **kw
     qs.plots.snapshot(rets, **kwargs)
 
 
-def returns(pos: ITimeSeries, date: datetime = None, lookback: str = None, log: bool = False,
+def returns(pos: ITimeSeries, start_date: datetime = None, end_date: datetime = None, lookback: str = None, log: bool = False,
             benchmark: ITimeSeries = None, **kwargs):
     """
     Quantstats plot of returns
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param log: returns will be converted to log returns if True
     :param benchmark: Position, Portfolio or Pandas object to plot benchamrk returns
     :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
-    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
         return
 
     if benchmark is not None:
-        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, start_date=start_date, end=end_date)
         rets, benchmark = time_series.match_index(rets, benchmark)
 
     kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
@@ -62,17 +64,18 @@ def returns(pos: ITimeSeries, date: datetime = None, lookback: str = None, log: 
         qs.plots.log_returns(rets, benchmark=benchmark, prepare_returns=False, **kwargs)
 
 
-def distribution(pos: ITimeSeries, date: datetime = None, lookback: str = None, **kwargs):
+def distribution(pos: ITimeSeries, start_date: datetime = None, end_date: datetime = None, lookback: str = None, **kwargs):
     """
     Quantstats plot of returns distribution
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
-    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
@@ -84,7 +87,7 @@ def distribution(pos: ITimeSeries, date: datetime = None, lookback: str = None, 
     qs.plots.histogram(rets, prepare_returns=False, **kwargs)
 
 
-def rolling_beta(pos: ITimeSeries, benchmark: ITimeSeries, date: datetime = None, lookback: str = None,
+def rolling_beta(pos: ITimeSeries, benchmark: ITimeSeries, start_date: datetime = None, end_date: datetime = None, lookback: str = None,
                  **kwargs):
     """
     Quantstats plot of rolling beta
@@ -92,17 +95,18 @@ def rolling_beta(pos: ITimeSeries, benchmark: ITimeSeries, date: datetime = None
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param benchmark: Position, Portfolio or Pandas object to plot benchmark returns
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: PnL and Quantstats keyword arguments
     :return
     """
-    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
         return
 
-    benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+    benchmark = time_series.prep_returns(benchmark, lookback=lookback, start_date=start_date, end=end_date)
     rets, benchmark = time_series.match_index(rets, benchmark)
 
     kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
@@ -111,26 +115,27 @@ def rolling_beta(pos: ITimeSeries, benchmark: ITimeSeries, date: datetime = None
     qs.plots.rolling_beta(rets, benchmark=benchmark, prepare_returns=False, **kwargs)
 
 
-def rolling_vol(pos: ITimeSeries, date: datetime = None, lookback: str = None,
+def rolling_vol(pos: ITimeSeries, start_date: datetime = None, end_date: datetime = None, lookback: str = None,
                 benchmark: ITimeSeries = None, **kwargs):
     """
     Quantstats plot of rolling volatility
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param benchmark: Position, Portfolio or Pandas object to plot benchmark returns
     :param kwargs: PnL and Quantstats keyword arguments
     :return
     """
-    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
         return
 
     if benchmark is not None:
-        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, start_date=start_date, end=end_date)
         rets, benchmark = time_series.match_index(rets, benchmark)
 
     kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
@@ -139,19 +144,20 @@ def rolling_vol(pos: ITimeSeries, date: datetime = None, lookback: str = None,
     qs.plots.rolling_volatility(rets, benchmark=benchmark, **kwargs)
 
 
-def rolling_skew(pos: ITimeSeries, lookback: str = None, date: datetime = None, rolling_period: int = 252,
+def rolling_skew(pos: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None, rolling_period: int = 252,
                  **kwargs):
     """
     Plot of rolling skewness
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param rolling_period: Length of rolling period in days
     :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
-    rets = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
@@ -165,19 +171,20 @@ def rolling_skew(pos: ITimeSeries, lookback: str = None, date: datetime = None, 
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
-def rolling_kurtosis(pos: ITimeSeries, lookback: str = None, date: datetime = None, rolling_period: int = 252,
+def rolling_kurtosis(pos: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None, rolling_period: int = 252,
                      **kwargs):
     """
     Plot of rolling kurtosis
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param rolling_period: Length of rolling period in days
     :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
-    rets = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
@@ -191,26 +198,27 @@ def rolling_kurtosis(pos: ITimeSeries, lookback: str = None, date: datetime = No
     qs.plots.returns(returns=roll, compound=False, cumulative=False, prepare_returns=False, **kwargs)
 
 
-def rolling_sharpe(pos: ITimeSeries, date: datetime = None, lookback: str = None,
+def rolling_sharpe(pos: ITimeSeries, start_date: datetime = None, end_date: datetime = None, lookback: str = None,
                    benchmark: ITimeSeries = None, **kwargs):
     """
     Quantstats plot of rolling sharp ratio
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param benchmark: Position, Portfolio or Pandas object to plot benchmark returns
     :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
-    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
+    rets = time_series.prep_returns(pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
         return
 
     if benchmark is not None:
-        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, start_date=start_date, end=end_date)
         rets, benchmark = time_series.match_index(rets, benchmark)
 
     kwargs_to_remove = ['positions_to_exclude', 'include_cash', 'tags']
@@ -220,7 +228,7 @@ def rolling_sharpe(pos: ITimeSeries, date: datetime = None, lookback: str = None
 
 
 def rolling_var(pos: ITimeSeries,
-                date: datetime = None,
+                start_date: datetime = None, end_date: datetime = None,
                 lookback: str = None,
                 rolling_period: int = 252,
                 quantile=0.95,
@@ -230,24 +238,25 @@ def rolling_var(pos: ITimeSeries,
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param rolling_period: Length of rolling period in days
     :param quantile: VaR percentile
     :param benchmark: Position, Portfolio or Pandas object to plot returns
     :param kwargs: PnL and Quantstats keyword arguments
     :return:
     """
-    rets = time_series.prep_returns(ts=pos, lookback=lookback, date=date)
+    rets = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end=end_date)
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")
         return
 
-    roll_var = stats.rolling_var(pos=rets, lookback=lookback, date=date,
+    roll_var = stats.rolling_var(pos=rets, lookback=lookback, start_date=start_date, end=end_date,
                                  rolling_period=rolling_period, quantile=quantile, **kwargs)
 
     if benchmark is not None:
-        benchmark = time_series.prep_returns(benchmark, lookback=lookback, date=date)
-        benchmark = stats.rolling_var(pos=benchmark, lookback=lookback, date=date,
+        benchmark = time_series.prep_returns(benchmark, lookback=lookback, start_date=start_date, end=end_date)
+        benchmark = stats.rolling_var(pos=benchmark, lookback=lookback, start_date=start_date, end=end_date,
                                       rolling_period=rolling_period, quantile=quantile, **kwargs)
         roll_var, benchmark = time_series.match_index(roll_var, benchmark)
 
@@ -257,7 +266,7 @@ def rolling_var(pos: ITimeSeries,
     qs.plots.returns(roll_var, benchmark=benchmark, compound=False, prepare_returns=False, **kwargs)
 
 
-def position_allocation(ptf: IPortfolio, date: datetime = None, **kwargs):
+def position_allocation(ptf: IPortfolio, date=None, **kwargs):
     try:
         weights = ptf.position_weights(date=date)
     except AttributeError:
@@ -266,7 +275,7 @@ def position_allocation(ptf: IPortfolio, date: datetime = None, **kwargs):
     weights.plot.pie(autopct='%1.1f%%', fontsize=12, **kwargs)
 
 
-def strategy_allocation(ptf: IPortfolio, date: datetime = None, **kwargs):
+def strategy_allocation(ptf: IPortfolio, date=None, **kwargs):
     try:
         weights = ptf.strategy_weights(date=date)
     except AttributeError:
@@ -277,11 +286,11 @@ def strategy_allocation(ptf: IPortfolio, date: datetime = None, **kwargs):
 
 def excess_returns(pos: ITimeSeries,
                    benchmark: ITimeSeries,
-                   date: datetime = None,
+                   start_date: datetime = None, end_date: datetime = None,
                    lookback: str = None,
                    **kwargs):
-    rets = time_series.prep_returns(pos, lookback=lookback, date=date, **kwargs)
-    bench = time_series.prep_returns(benchmark, lookback=lookback, date=date, include_cash=False)
+    rets = time_series.prep_returns(pos, lookback=lookback, start_date=start_date, end=end_date, **kwargs)
+    bench = time_series.prep_returns(benchmark, lookback=lookback, start_date=start_date, end=end_date, include_cash=False)
 
     if rets.empty:
         logger.logging.error(f"{pos} prices missing")

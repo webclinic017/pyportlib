@@ -9,35 +9,37 @@ from pyportlib.utils.time_series import ITimeSeries
 from pyportlib.utils import time_series
 
 
-def skew(pos: ITimeSeries, lookback: str = None, date: datetime = None, **kwargs) -> float:
+def skew(pos: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None, **kwargs) -> float:
     """
     Compute the skew of the returns distribution from a TimeSeries object
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
     return returns.skew()
 
 
-def kurtosis(pos: ITimeSeries, lookback: str, date: datetime = None, **kwargs) -> float:
+def kurtosis(pos: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None, **kwargs) -> float:
     """
     Compute the kurtosis of the returns distribution from a TimeSeries object
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
     return returns.kurtosis()
 
 
-def beta(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: datetime = None,
+def beta(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None,
          **kwargs) -> float:
     """
     Compute the beta of the returns distribution from a TimeSeries object on a benchmark on the specified time period.
@@ -45,18 +47,19 @@ def beta(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: d
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param benchmark: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series on which to compute Beta
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
+    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, start_date=start_date, end_date=end_date,)
     returns, benchmark = time_series.match_index(returns, benchmark)
     matrix = np.cov(returns, benchmark)
     return round(matrix[0, 1] / matrix[1, 1], 2)
 
 
-def alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: datetime = None,
+def alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None,
           **kwargs) -> float:
     """
     Compute the alpha of the returns distribution from a TimeSeries object on a benchmark on the specified time period.
@@ -64,12 +67,13 @@ def alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param benchmark: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series on which to compute Beta
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
+    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, start_date=start_date, end_date=end_date,)
     returns, benchmark = time_series.match_index(returns, benchmark)
     matrix = np.cov(returns, benchmark)
     bet = matrix[0, 1] / matrix[1, 1]
@@ -77,7 +81,7 @@ def alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: 
     return alph*len(returns)
 
 
-def rolling_alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, date: datetime = None,
+def rolling_alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None,
                   rolling_period: int = 252, **kwargs) -> pd.Series:
     """
     Compute the gaussian rolling value at risk of the returns distribution from a TimeSeries object
@@ -86,13 +90,14 @@ def rolling_alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param benchmark: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series on which to compute Beta
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param rolling_period: Number of trading days for the rolling period
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
-    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, date=date)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
+    benchmark = time_series.prep_returns(ts=benchmark, lookback=lookback, start_date=start_date, end_date=end_date,)
     returns, benchmark = time_series.match_index(returns, benchmark)
     df = pd.DataFrame(data={"returns": returns, "benchmark": benchmark})
 
@@ -104,34 +109,36 @@ def rolling_alpha(pos: ITimeSeries, benchmark: ITimeSeries, lookback: str = None
     return rolling_alph * rolling_period
 
 
-def annualized_volatility(pos: ITimeSeries, lookback: str = None, date: datetime = None, **kwargs) -> float:
+def annualized_volatility(pos: ITimeSeries, lookback: str = None, start_date: datetime = None, end_date: datetime = None, **kwargs) -> float:
     """
     Compute the annualized volatility of the returns distribution from a TimeSeries object
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
     return qs.stats.volatility(returns=returns, prepare_returns=False, annualize=True)
 
 
-def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, method: str = "gaussian", **kwargs) -> float:
+def value_at_risk(pos, lookback: str, start_date: datetime = None, end_date: datetime = None, quantile=0.95, method: str = "gaussian", **kwargs) -> float:
     """
     Compute the value at risk of the returns distribution from a TimeSeries object with a specified quantile and method
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param quantile: Quantile on which to compite VaR
     :param method: VaR compute method. 'gaussian' and 'historical' are implemented
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
 
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
     if method == "gaussian":
         var = qs.stats.value_at_risk(returns=returns, confidence=quantile, prepare_returns=False)
         return abs(var)
@@ -143,7 +150,7 @@ def value_at_risk(pos, lookback: str, date: datetime = None, quantile=0.95, meth
     raise NotImplementedError(f"{method}")
 
 
-def rolling_var(pos, lookback: str = None, date: datetime = None, rolling_period: int = 252, quantile=0.95,
+def rolling_var(pos, lookback: str = None, start_date: datetime = None, end_date: datetime = None, rolling_period: int = 252, quantile=0.95,
                 **kwargs) -> pd.Series:
     """
     Compute the gaussian rolling value at risk of the returns distribution from a TimeSeries object
@@ -151,14 +158,15 @@ def rolling_var(pos, lookback: str = None, date: datetime = None, rolling_period
 
     :param pos: TimeSeries Object (Portfolio, Position, Pandas DataFrame/Series
     :param lookback: String: ex. "1y", "15m". Only m and y is supported to generate look back. See date_window doc.
-    :param date: Date to lookback from
+    :param start_date:
+    :param end_date:
     :param rolling_period: Number of trading days for the rolling period
     :param quantile: Quantile on which to compite VaR
     :param kwargs: Portfolio PnL or Position PnL kwargs
     :return:
     """
 
-    returns = time_series.prep_returns(ts=pos, lookback=lookback, date=date, **kwargs)
+    returns = time_series.prep_returns(ts=pos, lookback=lookback, start_date=start_date, end_date=end_date, **kwargs)
     mean = returns.rolling(rolling_period).mean()
     var = returns.rolling(rolling_period).std()
     stat = norm.ppf(1-quantile, mean, var)
