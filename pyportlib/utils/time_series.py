@@ -27,9 +27,6 @@ def prep_returns(ts: Union[ITimeSeries, pd.DataFrame, pd.Series], start_date: da
     :param kwargs: PnL keyword arguments for Portfolio (tags, positions_to_exclude, include_cash)
     :return:
     """
-    if "date" in kwargs:
-        raise Exception("date is deprecated")
-
     if lookback is not None:
         end_date = dates_utils.last_bday(end_date)
         start_date = dates_utils.date_window(lookback=lookback, date=end_date)
