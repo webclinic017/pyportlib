@@ -122,19 +122,18 @@ class DataReader:
         :param statement_type: 'balance_sheet', 'cash_flow', 'income_statement' or 'all'
         :return:
         """
-        if statement_type == 'balance_sheet':
-            self._statements_data_source.get_balance_sheet(ticker)
-        elif statement_type == 'cash_flow':
-            self._statements_data_source.get_cash_flow(ticker)
-        elif statement_type == 'income_statement':
-            self._statements_data_source.get_cash_flow(ticker)
+        try:
+            if statement_type == 'balance_sheet' or statement_type == 'all':
+                self._statements_data_source.get_balance_sheet(ticker)
+            if statement_type == 'cash_flow' or statement_type == 'all':
+                self._statements_data_source.get_cash_flow(ticker)
+            if statement_type == 'income_statement' or statement_type == 'all':
+                self._statements_data_source.get_cash_flow(ticker)
+            else:
+                raise NotImplementedError({statement_type})
+        except Exception as ex:
+            logger.logging.error(f"unable to update {ticker} - {statement_type} data: {ex}")
 
-        elif statement_type == 'all':
-            self._statements_data_source.get_balance_sheet(ticker)
-            self._statements_data_source.get_cash_flow(ticker)
-            self._statements_data_source.get_income_statement(ticker)
-        else:
-            raise NotImplementedError({statement_type})
 
     def update_dividends(self, ticker: str) -> None:
         self._market_data_source.get_dividends(ticker=ticker)
