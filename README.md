@@ -1,6 +1,11 @@
 # Pyportlib
 Author: Philippe Lacroix-Ouellete, HEC Montréal. (philippe.lacroix.ouellette@gmail.com)
 
+## To Install:
+```
+  pip install git+https://github.com/phil-lo/pyportlib.git
+```
+
 Firstly, this package manages a stock prices/statements within a set directory, and so, 
 directly from import. To override the default directory, use *set_client_dir(str)* in your script. 
 You can build equity portfolios and compute its historical 
